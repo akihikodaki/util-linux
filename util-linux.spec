@@ -1,8 +1,6 @@
 # Upstream maintainer aeb@cwi.nl
 
-%if %{?WITH_SELINUX:0}%{!?WITH_SELINUX:1}
 %define WITH_SELINUX 1
-%endif
 
 %define with_kbdrate 0
 %define floppyver 0.12
@@ -12,8 +10,8 @@
 
 Summary: A collection of basic system utilities.
 Name: util-linux
-Version: 2.12
-Release: 18
+Version: 2.12a
+Release: 2
 License: distributable
 Group: System Environment/Base
 
@@ -25,11 +23,9 @@ BuildRequires: zlib-devel
 BuildRequires: slang-devel
 BuildRequires: texinfo
 BuildRequires: gettext
-%if %{WITH_SELINUX}
 BuildRequires: libselinux-devel
-%endif
 
-Source0: http://ftp.cwi.nl/aeb/util-linux/util-linux-%{version}.tar.gz
+Source0: ftp://ftp.win.tue.nl/pub/linux-local/utils/util-linux/util-linux-%{version}.tar.gz
 Source1: util-linux-selinux.pamd
 Source4: util-linux-2.7-login.pamd
 Source2: util-linux-2.7-chfn.pamd
@@ -42,7 +38,7 @@ Source12: http://download.sourceforge.net/cramfs/cramfs-%{cramfsver}.tar.gz
 
 ##### Red Hat Linux-specific patches
 # Changes to MCONFIG build-time configuration
-Patch0: util-linux-2.11y-rhconfig.patch
+Patch0: util-linux-2.12a-rhconfig.patch
 # Don't install the chkdupexe perl script
 Patch1: util-linux-2.11r-nochkdupexe.patch
 # This patch is here because gafton put it here five years ago
@@ -60,8 +56,7 @@ Patch27: util-linux-2.11w-moretc.patch
 # 1. Reduce MAX_PARTS to 16 (upstream reasonably won't take it)
 # 2. Use O_LARGEFILE (I have no idea whether this has any effect given
 #    -D_FILE_OFFSET_BITS=64)
-# 3. Use the standard syscall() function instead of some bad hacks.
-Patch70: util-linux-2.12pre-miscfixes.patch
+Patch70: util-linux-2.12a-miscfixes.patch
 
 # Note on how to set up raw device mappings using RHL /etc/sysconfig/rawdevices
 Patch109: util-linux-2.11f-rawman.patch
@@ -69,33 +64,20 @@ Patch109: util-linux-2.11f-rawman.patch
 ######## Patches that should be upstream eventually
 Patch206: mount-2.10r-kudzu.patch
 
-Patch103: util-linux-2.11r-ownerumount.patch
 Patch106: util-linux-2.11w-swaponsymlink-57300.patch
 Patch107: util-linux-2.11y-procpartitions-37436.patch
 Patch113: util-linux-2.11r-ctty3.patch
-Patch116: util-linux-2.11n-loginutmp-66950.patch
 Patch117: util-linux-2.11y-moremisc.patch
 
 Patch120: util-linux-2.11y-skipraid2.patch
-Patch123: util-linux-2.11y-blkgetsize-81069.patch
-Patch124: util-linux-2.11y-umount-75421.patch
 Patch125: util-linux-2.11y-umask-82552.patch
 Patch126: util-linux-2.11y-multibyte.patch
-Patch127: util-linux-2.12pre-mcookie-83345.patch
-Patch128: util-linux-2.11y-ipcs-84243-86285.patch
+Patch128: util-linux-2.12a-ipcs-84243-86285.patch
 
-# Fixs wrong usage of BLKGETSIZE in mount_by_label
-Patch129: util-linux-2.11y-s390x.patch
-Patch130: util-linux-2.11y-login-32bit-lastlog-88574.patch
 Patch131: util-linux-2.11y-sysmap-85407.patch
-Patch132: util-linux-2.11y-mount-97381.patch
-Patch133: util-linux-2.11y-partx-68284.patch
-Patch134: util-linux-2.11y-readprofile-100433.patch
-Patch137: util-linux-2.11y-idecd-102114.patch
 Patch138: util-linux-2.11y-chsh-103004.patch
 Patch139: util-linux-2.11y-fdisksegv-103954.patch
 Patch140: util-linux-2.11y-alldevs-101772.patch
-Patch141: util-linux-selinux.patch
 Patch142: util-linux-2.11y-mountman-90588.patch
 
 Patch143: cramfs-1.1-blocksize_and_quiet.patch
@@ -110,6 +92,7 @@ Patch1010: util-linux-2.11z-02-base-nfsv4.patch
 Patch1020: util-linux-2.11z-03-krb5.patch
 Patch1030: mount-2.11y-selinux.patch
 Patch1040: util-linux-2.12-nfs-mount.patch
+Patch1041: util-linux-2.12a-mountman-123416.patch
 
 # When adding patches, please make sure that it is easy to find out what bug # the 
 # patch fixes.
@@ -199,43 +182,29 @@ cp %{SOURCE8} %{SOURCE9} .
 sed -e 's:^MAN_DIR=.*:MAN_DIR=%{_mandir}:' -e 's:^INFO_DIR=.*:INFO_DIR=%{_infodir}:' MCONFIG > MCONFIG.new
 mv MCONFIG.new MCONFIG
 
-%patch103 -p1 -b .ownerumount
 %patch106 -p1 -b .swaponsymlink
 %patch107 -p1 -b .procpartitions
 %patch109 -p1 -b .rawman
 
 %patch113 -p1 -b .ctty3
-%patch116 -p1 -b .loginutmp
 %patch117 -p1 -b .moremisc
 %patch120 -p1 -b .skipraid2
 
-#patch200 -p1 -b .hammer
-%patch123 -p1 -b .blkgetsize
-%patch124 -p1 -b .umount
 %patch125 -p1 -b .umask
 %patch126 -p1 -b .multibyte
-%patch127 -p1 -b .mcookie-dumbness
 %patch128 -p1 -b .ipcs
 
-#patch129 -p1 -b .s390x
-%patch130 -p1 -b .login32bitcompat
 %patch131 -p1 -b .sysmap
-%patch132 -p1 -b .mountnitpick
-%patch133 -p1 -b .partx
-%patch134 -p1 -b .readprofile
-%patch137 -p1
 %patch138 -p1
 %patch139 -p1
 %patch140 -p1
-%if %{WITH_SELINUX}
-#SELinux
-%patch141 -p1 -b .selinux
-%endif
 %patch142 -p1 -b .mountman
 
 # cramfs
 %patch143 -p0 -b .cramfs
 %patch144 -p1 -b .pagesize
+
+%patch145 -p1 -b .pam
 
 %patch1000 -p1 -b .nfsupdate
 %patch1010 -p1 -b .nfsv4
@@ -245,6 +214,7 @@ mv MCONFIG.new MCONFIG
 %patch1030 -p1 -b .mountselinux
 %endif
 %patch1040 -p1 -b .nfsmount
+%patch1041 -p1 -b .nfsman
 %patch1001 -p1 -b .nfssloppy
 
 %build
@@ -616,6 +586,16 @@ fi
 /sbin/losetup
 
 %changelog
+* Tue Jun 15 2004 Elliot Lee <sopwith@redhat.com>
+- rebuilt
+
+* Thu Jun 03 2004 Elliot Lee <sopwith@redhat.com> 2.12a-1
+- Update to 2.12a
+- Fix #122448
+
+* Thu May 13 2004 Dan Walsh <dwalsh@RedHat.com> 2.12-19
+- Change pam_selinux to run last
+
 * Tue May 04 2004 Elliot Lee <sopwith@redhat.com> 2.12-18
 - Fix #122448 (autofs issues)
 

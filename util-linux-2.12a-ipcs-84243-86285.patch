@@ -1,0 +1,21 @@
+--- util-linux-2.12a/sys-utils/ipcs.c.ipcs	2004-03-04 14:28:42.000000000 -0500
++++ util-linux-2.12a/sys-utils/ipcs.c	2004-05-26 18:05:44.967792668 -0400
+@@ -25,6 +25,7 @@
+ #include <time.h>
+ #include <pwd.h>
+ #include <grp.h>
++#include <unistd.h>
+ #include "nls.h"
+ 
+ /* X/OPEN tells us to use <sys/{types,ipc,sem}.h> for semctl() */
+@@ -279,8 +280,8 @@
+ 			(unsigned long) shminfo.shmmni);
+ 		printf (_("max seg size (kbytes) = %lu\n"),
+ 			(unsigned long) (shminfo.shmmax >> 10));
+-		printf (_("max total shared memory (pages) = %lu\n"),
+-			(unsigned long) shminfo.shmall);
++		printf (_("max total shared memory (kbytes) = %lu\n"),
++			getpagesize()*((unsigned long) shminfo.shmall/1024UL));
+ 		printf (_("min seg size (bytes) = %lu\n"),
+ 			(unsigned long) shminfo.shmmin);
+ 		return;
