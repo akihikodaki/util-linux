@@ -1,7 +1,10 @@
+# Rules for hacking:
+# When you add a patch to fix a bug, include the bug number in its filename.
+#
 # TODO:
 # Investigate turning on HAVE_BLKID - it's the right idea, it just needs verifying.
 #
-# Upstream maintainer aeb@cwi.nl
+# Upstream maintainer Andries Brouwer <aeb@cwi.nl>
 
 # 'raw' support is deprecated, only ship it if we need compatibility stuff.
 %define include_raw 0
@@ -50,9 +53,8 @@ Source11: http://download.sourceforge.net/floppyutil/floppy-%{floppyver}.tar.gz
 Source12: http://download.sourceforge.net/cramfs/cramfs-%{cramfsver}.tar.gz
 
 ##### Red Hat Linux-specific patches
-# 1. Add the option of not installing chkdupexe (WANT_CHKDUPEXE=no)
-# 2. Change 
-Patch: util-linux-2.12a-moretc.patch
+# Not really RH-specific
+Patch: util-linux-2.12a-moretc.patch 
 
 # Reduce MAX_PARTS to 16 (upstream reasonably won't take it)
 Patch70: util-linux-2.12a-partlimit.patch
@@ -61,7 +63,7 @@ Patch70: util-linux-2.12a-partlimit.patch
 Patch109: util-linux-2.11f-rawman.patch
 
 ######## Patches that should be upstream eventually
-Patch100: util-linux-2.12a-managed.patch
+Patch100: util-linux-2.12j-managed.patch
 
 Patch106: util-linux-2.11w-swaponsymlink-57300.patch
 Patch107: util-linux-2.11y-procpartitions-37436.patch
@@ -81,7 +83,6 @@ Patch143: cramfs-1.1-blocksize_and_quiet.patch
 Patch144: cramfs-1.1-pagesize.patch
 
 Patch147: util-linux-2.12a-126572-fdiskman.patch
-Patch148: util-linux-2.12a-127097-labelcrash.patch
 Patch149: util-linux-2.12j-125531-swaplabel.patch
 Patch150: floppy-0.12-locale.patch
 
@@ -208,7 +209,6 @@ mv MCONFIG.new MCONFIG
 %patch144 -p1
 
 %patch147 -p1
-%patch148 -p1
 %patch149 -p1
 %patch150 -p0
 
