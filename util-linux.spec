@@ -1,12 +1,21 @@
-# Maintainer util-linux@math.uio.no
+# Upstream maintainer util-linux@math.uio.no
+
+%define with_kbdrate 0
 
 Summary: A collection of basic system utilities.
 Name: util-linux
-Version: 2.11n
-Release: 13
+Version: 2.11r
+Release: 8
 License: distributable
 Group: System Environment/Base
-Source0: ftp://ftp.kernel.org/pub/linux/utils/util-linux/util-linux-%{version}.tar.bz2
+
+BuildRequires: sed
+BuildRequires: pam-devel
+BuildRequires: ncurses-devel
+BuildRequires: libtermcap-devel
+BuildRequires: zlib-devel
+
+Source0: ftp://ftp.kernel.org/pub/linux/utils/util-linux/util-linux-%{version}.tar.gz
 Source1: util-linux-2.7-login.pamd
 Source2: util-linux-2.7-chfn.pamd
 Source3: util-linux-2.7-chsh.pamd
@@ -16,83 +25,58 @@ Source8: nologin.c
 Source9: nologin.8
 Source10: kbdrate.tar.gz
 
-BuildRequires: sed
-BuildRequires: pam-devel
-BuildRequires: ncurses-devel
-BuildRequires: libtermcap-devel
-BuildRequires: slang-devel
-BuildRequires: zlib-devel
-
 Patch0: util-linux-2.11a-rhconfig.patch
-Patch1: util-linux-2.11n-nochkdupexe.patch
+Patch1: util-linux-2.11r-nochkdupexe.patch
 Patch2: util-linux-2.11a-gecossize.patch
 
-# XXX apply next patch to enable mount-2.8 from util-linux (not applied)
 Patch4: util-linux-2.11n-mount.patch
 
-Patch8: util-linux-2.9i-nomount.patch
-#Patch9: util-linux-2.11f-vipw.patch
-
 Patch21: util-linux-2.9v-nonroot.patch
-Patch27: util-linux-2.11a-moretc.patch
+
+Patch27: util-linux-2.11r-moretc.patch
+
 Patch35: util-linux-2.10m-loginpath.patch
-Patch39: util-linux-2.11n-ctty.patch
-Patch38: util-linux-2.11f-ctty2.patch
 Patch60: util-linux-2.10s-s390x.patch
 Patch61: util-linux-2.11b-s390x.patch
 
-Patch70: util-linux-2.11n-miscfixes.patch
-
-Patch71: fdisk.diff
-
-# This patch got added upstream in 2.11. Then we reverted it from our
-# local 2.10s copy. Oops.
-# Patches 75-77 no longer used, obsoleted by patch 37
-Patch75: util-linux-2.11f-logingrp-revert.patch
-
-Patch76: util-linux-2.11f-loginctty.patch
-Patch77: util-linux-2.11f-loginctty2.patch
+Patch70: util-linux-2.11r-miscfixes.patch
 
 Patch100: mkcramfs.patch
 Patch101: mkcramfs-quiet.patch
 
-# Patch36 no longer used
-Patch36: util-linux-2.11f-pwent.patch
-# Patch37 is no longer used
-Patch37: util-linux-2.11f-pwent2.patch
-
-Patch102: util-linux-2.11n-colrm.patch
-
-########### START UNSUBMITTED
-Patch103: util-linux-2.11n-ownerumount.patch
-Patch104: util-linux-2.11n-mkswapprint-58799.patch
-Patch105: util-linux-2.11n-hexdump-58471.patch
-Patch106: util-linux-2.11g-swaponsymlink-57300.patch
-Patch107: util-linux-2.10r-procpartitions-37436.patch
-Patch108: util-linux-2.11n-autosmb-32132.patch
-Patch109: util-linux-2.11f-rawman.patch
-Patch110: util-linux-2.11n-skipraid.patch
-Patch111: util-linux-2.11n-mkfsman.patch
-Patch112: util-linux-2.11n-ipcrmman.patch
-Patch113: util-linux-2.11n-ctty3.patch
-Patch114: util-linux-2.11n-dumboctal.patch
-Patch115: util-linux-2.11n-fstabperm-61868.patch
-########### END UNSUBMITTED
-
 ########
 # Mount patches
-Patch200: mount-2.10r-alphahack.patch
 Patch201: mount-2.10m-nolock-docs.patch
 Patch202: mount-2.10o-nfsman.patch
 Patch204: mount-2.10r-2gb.patch
-Patch205: mount-2.10r-ia64.patch
 Patch206: mount-2.10r-kudzu.patch
-Patch207: mount-2.10r-swapon.patch
+Patch207: mount-2.11r-swapon.patch
 Patch209: mount-2.11b-swapoff.patch
 Patch210: util-linux-2.11b-largefile.patch
 Patch211: mount-2.11e-user_label_umount.patch
-Patch212: mount-2.11m-netdev.patch
+Patch212: mount-2.11r-netdev.patch
 Patch220: util-linux-2.11n-makej.patch
+
+########### START UNSUBMITTED
+Patch103: util-linux-2.11r-ownerumount.patch
+Patch106: util-linux-2.11g-swaponsymlink-57300.patch
+Patch107: util-linux-2.11r-procpartitions-37436.patch
+Patch108: util-linux-2.11n-autosmb-32132.patch
+Patch109: util-linux-2.11f-rawman.patch
+Patch110: util-linux-2.11r-skipraid.patch
+Patch111: util-linux-2.11n-mkfsman.patch
+Patch113: util-linux-2.11r-ctty3.patch
+Patch114: util-linux-2.11n-dumboctal.patch
+Patch115: util-linux-2.11n-fstabperm-61868.patch
+Patch116: util-linux-2.11n-loginutmp-66950.patch
+Patch117: util-linux-2.11r-moremisc.patch
+Patch300: util-linux-2.11n-ia64mkswap.patch
+Patch301: util-linux-2.11r-swapondetect.patch
+Patch302: util-linux-2.11r-largeswap.patch
+
+Patch118: util-linux-2.11r-gptsize-69603.patch
+Patch119: fdisk-add-primary.patch
+########### END UNSUBMITTED
 
 Obsoletes: fdisk tunelp
 %ifarch alpha sparc sparc64 sparcv9 s390
@@ -103,7 +87,9 @@ Conflicts: initscripts <= 4.58, timeconfig <= 3.0.1
 %endif
 BuildRoot: %{_tmppath}/%{name}-root
 Requires: pam >= 0.66-4, /etc/pam.d/system-auth
+%if %{with_kbdrate}
 Requires: usermode
+%endif
 Conflicts: kernel < 2.2.12-7, 
 Prereq: /sbin/install-info
 
@@ -145,17 +131,20 @@ device.
 %setup -q -a 10
 
 %patch0 -p1 -b .rhconfig
+
+# We don't want the 'chkdupexe' program installed
 %patch1 -p1 -b .nochkdupexe
+
 %patch2 -p1 -b .gecos
 
 # mount comes from its own rpm (again)
 %patch4 -p1 -b .mount
-#%patch8 -p1 -b .nomount
-
-#%patch9 -p1 -b .vipw
 %patch21 -p1 -b .nonroot
 
+# Link 'more' against libtermcap instead of ncurses because ncurses
+# is under /usr and won't be accessable if / is mounted but /usr is not
 %patch27 -p1 -b .moretc
+
 %patch35 -p1 -b .loginpath
 
 %ifarch s390 s390x
@@ -163,12 +152,10 @@ device.
 %patch61 -p1 -b .s390x
 %endif
 
+# No support for large numbers of cylinders in fdisk{sgi,sun}label.*
+# Too many places in those files assume that it is an unsigned short,
+# not worth fixing.
 %patch70 -p1 -b .miscfixes
-%patch71 -p1
-
-#%patch75 -p1
-#%patch76 -p1
-#%patch77 -p1
 
 # mkcramfs
 cp %{SOURCE7} %{SOURCE6} .
@@ -178,41 +165,43 @@ cp %{SOURCE7} %{SOURCE6} .
 # nologin
 cp %{SOURCE8} %{SOURCE9} .
 
-%patch102 -p1 -b .colrmeof
-
-#%patch200 -p0 -b .alphahack # Doesn't make sense
 %patch201 -p1 -b .docbug
 %patch202 -p1 -b .nfsman
 %patch204 -p1 -b .2gb
-#%patch205 -p1 -b .ia64 # Already integrated/doesn't make sense
 %patch206 -p1 -b .kudzu
 %patch207 -p1 -b .swapon
 %patch209 -p2 -b .swapoff
 %patch210 -p1 -b .largefile
 %patch211 -p2 -b .userumount
-%patch212 -p2 -b .netdev
+%patch212 -p1 -b .netdev
 %patch220 -p1 -b .makej
 
 sed -e 's:^MAN_DIR=.*:MAN_DIR=%{_mandir}:' -e 's:^INFO_DIR=.*:INFO_DIR=%{_infodir}:' MCONFIG > MCONFIG.new
 mv MCONFIG.new MCONFIG
 
 %patch103 -p1 -b .ownerumount
-%patch104 -p1 -b .mkswapprint
-%patch105 -p1 -b .hexdump
 %patch106 -p1 -b .swaponsymlink
 %patch107 -p1 -b .procpartitions
 %patch108 -p1 -b .autosmb
 %patch109 -p1 -b .rawman
 %patch110 -p1 -b .skipraid
 %patch111 -p1 -b .mkfsman
-%patch112 -p1 -b .ipcrmman
 
-#%patch39 -p1 -b .ctty
-#%patch38 -p1 -b .ctty2
-# Third time's the charm
 %patch113 -p1 -b .ctty3
 %patch114 -p1 -b .dumboctal
 %patch115 -p1 -b .fstabperm
+%patch116 -p1 -b .loginutmp
+%patch117 -p1 -b .moremisc
+%patch118 -p1 -b .gptsize
+cd fdisk
+%patch119 -p0 -b .addprimary
+cd ..
+
+# All of this patch is in except a 'max swap size' change, which
+# doesn't seem to be needed
+#%patch300 -p1 -b .offtmkswap
+#%patch301 -p1 -b .detectswap
+%patch302 -p1 -b .largeswap
 
 %build
 unset LINGUAS || :
@@ -220,14 +209,15 @@ unset LINGUAS || :
 %configure
 
 make "OPT=$RPM_OPT_FLAGS -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE" \
+	LDFLAGS="" \
 	HAVE_PIVOT_ROOT=yes \
 	%{?_smp_mflags}
-make CFLAGS="$RPM_OPT_FLAGS" -C partx %{?_smp_mflags}
+make LDFLAGS="" CFLAGS="$RPM_OPT_FLAGS" -C partx %{?_smp_mflags}
 cd rescuept
 cc $RPM_OPT_FLAGS -o rescuept rescuept.c
 cd ..
 
-%ifnarch s390 s390x
+%if %{with_kbdrate}
 pushd kbdrate
     cc $RPM_OPT_FLAGS -o kbdrate kbdrate.c
 popd
@@ -264,7 +254,7 @@ mv rescuept/README rescuept/README.rescuept
 install -m 755 mkcramfs ${RPM_BUILD_ROOT}/usr/bin
 install -m 755 nologin ${RPM_BUILD_ROOT}/sbin
 install -m 644 nologin.8 ${RPM_BUILD_ROOT}%{_mandir}/man8
-%ifnarch s390 s390x
+%if %{with_kbdrate}
 install -m 555 kbdrate/kbdrate ${RPM_BUILD_ROOT}/sbin
 install -m 644 kbdrate/kbdrate.8 ${RPM_BUILD_ROOT}%{_mandir}/man8
 ln -s consolehelper ${RPM_BUILD_ROOT}/usr/bin/kbdrate
@@ -302,7 +292,7 @@ chmod 755 ${RPM_BUILD_ROOT}%{_bindir}/sunhostid
 
 gzip -9nf ${RPM_BUILD_ROOT}%{_infodir}/ipc.info
 
-%ifnarch s390 s390x
+%if %{with_kbdrate}
 install -m644 kbdrate/kbdrate.apps $RPM_BUILD_ROOT%{_sysconfdir}/security/console.apps/kbdrate
 install -m644 kbdrate/kbdrate.pam $RPM_BUILD_ROOT%{_sysconfdir}/pam.d/kbdrate
 %endif
@@ -388,7 +378,7 @@ fi
 %{_mandir}/man8/nologin.8*
 
 # Begin kbdrate stuff
-%ifnarch s390 s390x
+%if %{with_kbdrate}
 /sbin/kbdrate
 /usr/bin/kbdrate
 %{_mandir}/man8/kbdrate.8*
@@ -533,6 +523,61 @@ fi
 /sbin/losetup
 
 %changelog
+* Fri Aug 2 2002  Elliot Lee <sopwith@redhat.com> 2.11r-8
+- Patch119 (fdisk-add-primary) from #67898
+
+* Wed Jul 24 2002 Elliot Lee <sopwith@redhat.com> 2.11r-7
+- Really add the gptsize patch, instead of what I think the patch says.
+(+1)
+
+* Tue Jul 23 2002 Elliot Lee <sopwith@redhat.com> 2.11r-6
+- Add the sp[n].size part of the patch from #69603
+
+* Mon Jul 22 2002 Florian La Roche <Florian.LaRoche@redhat.de>
+- adjust mainframe patches
+
+* Tue Jul  2 2002 Bill Nottingham <notting@redhat.com> 2.11r-4
+- only require usermode if we're shipping kbdrate here
+
+* Fri Jun 28 2002 Trond Eivind Glomsrød <teg@redhat.com> 2.11r-3
+- Port the large swap patch to new util-linux... the off_t changes 
+  now in main aren't sufficient
+
+* Thu Jun 27 2002 Elliot Lee <sopwith@redhat.com> 2.11r-2
+- Remove swapondetect (patch301) until it avoids possible false positives.
+
+* Thu Jun 27 2002 Elliot Lee <sopwith@redhat.com> 2.11r-1
+- Update to 2.11r, wheeee
+- Remove unused patches
+
+* Thu Jun 27 2002 Elliot Lee <sopwith@redhat.com> 2.11n-19
+- Make a note here that this package was the source of the single change 
+contained in util-linux-2.11f-18 (in 7.2/Alpha), and also contains the 
+rawman patch from util-linux-2.11f-17.1 (in 2.1AS).
+- Package has no runtime deps on slang, so remove the BuildRequires: 
+slang-devel.
+
+* Fri Jun 21 2002 Tim Powers <timp@redhat.com>
+- automated rebuild
+
+* Thu Jun 20 2002 Elliot Lee <sopwith@redhat.com> 2.11n-17
+- Fix teg's swapondetect patch to not print out the usage message when 
+'swapon -a -e' is run. (#66690) (edit existing patch)
+- Apply hjl's utmp handling patch (#66950) (patch116)
+- Fix fdisk man page notes on IDE disk partition limit (#64013) (patch117)
+- Fix mount.8 man page notes on vfat shortname option (#65628) (patch117)
+- Fix possible cal overflow with widechars (#67090) (patch117)
+
+* Tue Jun 11 2002 Trond Eivind Glomsrød <teg@redhat.com> 2.11n-16
+- support large swap partitions
+- add '-d' option to autodetect available swap partitions
+
+* Thu May 23 2002 Tim Powers <timp@redhat.com>
+- automated rebuild
+
+* Wed May 15 2002 Elliot Lee <sopwith@redhat.com> 2.11n-14
+- Remove kbdrate (again).
+
 * Mon Apr 29 2002 Florian La Roche <Florian.LaRoche@redhat.de>
 - adjust mainframe patches to apply to current rpm
 - do not include fdisk until it is fixed to work on mainframe
