@@ -382,6 +382,7 @@ fi
 %config %{_sysconfdir}/pam.d/chfn
 %config %{_sysconfdir}/pam.d/chsh
 %config %{_sysconfdir}/pam.d/login
+%config %{_sysconfdir}/pam.d/remote
 
 /sbin/agetty
 %{_mandir}/man8/agetty.8*
