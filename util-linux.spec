@@ -1,6 +1,7 @@
 # Upstream maintainer aeb@cwi.nl
 
-%define WITH_SELINUX 1
+%define make_options HAVE_PIVOT_ROOT=yes HAVE_PAM=yes HAVE_SHADOW=no HAVE_PASSWD=yes ALLOW_VCS_USE=no ADD_RAW=yes HAVE_SLANG=yes SLANGFLAGS=-I/usr/include/slang INSTALLSUID='$(INSTALL) -m $(SUIDMODE)' USE_TTY_GROUP=no
+%define make_cflags -DUSE_TTY_GROUP -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64 
 
 %define with_kbdrate 0
 %define floppyver 0.12
@@ -11,7 +12,7 @@
 Summary: A collection of basic system utilities.
 Name: util-linux
 Version: 2.12a
-Release: 2
+Release: 6
 License: distributable
 Group: System Environment/Base
 
@@ -37,32 +38,18 @@ Source11: http://download.sourceforge.net/floppyutil/floppy-%{floppyver}.tar.gz
 Source12: http://download.sourceforge.net/cramfs/cramfs-%{cramfsver}.tar.gz
 
 ##### Red Hat Linux-specific patches
-# Changes to MCONFIG build-time configuration
-Patch0: util-linux-2.12a-rhconfig.patch
-# Don't install the chkdupexe perl script
-Patch1: util-linux-2.11r-nochkdupexe.patch
-# This patch is here because gafton put it here five years ago
-Patch2: util-linux-2.11a-gecossize.patch
-# No clue why this patch is here
-Patch4: util-linux-2.11n-mount.patch
+# 1. Add the option of not installing chkdupexe (WANT_CHKDUPEXE=no)
+# 2. Change 
+Patch: util-linux-2.12a-moretc.patch
 
-# Helps allow building/installing as non-root
-Patch21: util-linux-2.9v-nonroot.patch
-
-# Force 'more' to link against libtermcap so that we don't have a
-# /bin binary depending on a /usr/lib library (ncurses)
-Patch27: util-linux-2.11w-moretc.patch
-
-# 1. Reduce MAX_PARTS to 16 (upstream reasonably won't take it)
-# 2. Use O_LARGEFILE (I have no idea whether this has any effect given
-#    -D_FILE_OFFSET_BITS=64)
-Patch70: util-linux-2.12a-miscfixes.patch
+# Reduce MAX_PARTS to 16 (upstream reasonably won't take it)
+Patch70: util-linux-2.12a-partlimit.patch
 
 # Note on how to set up raw device mappings using RHL /etc/sysconfig/rawdevices
 Patch109: util-linux-2.11f-rawman.patch
 
 ######## Patches that should be upstream eventually
-Patch206: mount-2.10r-kudzu.patch
+Patch100: util-linux-2.12a-managed.patch
 
 Patch106: util-linux-2.11w-swaponsymlink-57300.patch
 Patch107: util-linux-2.11y-procpartitions-37436.patch
@@ -84,6 +71,17 @@ Patch143: cramfs-1.1-blocksize_and_quiet.patch
 Patch144: cramfs-1.1-pagesize.patch
 
 Patch145: util-linux-2.12.pam.patch
+Patch147: util-linux-2.12a-126572-fdiskman.patch
+Patch148: util-linux-2.12a-127097-labelcrash.patch
+Patch149: util-linux-2.12a-125531-swaplabel.patch
+Patch150: floppy-0.12-locale.patch
+
+Patch151: util-linux-2.12a-mountbylabel-dm.patch
+Patch152: util-linux-2.12a-mountnolabel.patch
+Patch153: util-linux-2.12a-16415-rdevman.patch
+Patch154: util-linux-2.11y-102566-loginman.patch
+Patch155: util-linux-2.12a-104321-rescuept.patch
+Patch156: util-linux-2.12a-fdiskmessage-107824.patch
 
 # patches required for NFSv4 support
 Patch1000: util-linux-2.11z-01-nfs.patch
@@ -154,65 +152,57 @@ device.
 
 %setup -q -a 10 -a 11 -a 12
 
-%patch0 -p1 -b .rhconfig
+%patch0 -p1
 
-# We don't want the 'chkdupexe' program installed
-%patch1 -p1 -b .nochkdupexe
-
-%patch2 -p1 -b .gecos
-
-# mount comes from its own rpm (again)
-%patch4 -p1 -b .mount
-%patch21 -p1 -b .nonroot
-
-# Link 'more' against libtermcap instead of ncurses because ncurses
-# is under /usr and won't be accessable if / is mounted but /usr is not
-%patch27 -p1 -b .moretc
-
-# No support for large numbers of cylinders in fdisk{sgi,sun}label.*
-# Too many places in those files assume that it is an unsigned short,
-# not worth fixing.
-%patch70 -p1 -b .miscfixes
+%patch70 -p1
 
 # nologin
 cp %{SOURCE8} %{SOURCE9} .
 
-%patch206 -p1 -b .kudzu
+%patch100 -p1
 
 sed -e 's:^MAN_DIR=.*:MAN_DIR=%{_mandir}:' -e 's:^INFO_DIR=.*:INFO_DIR=%{_infodir}:' MCONFIG > MCONFIG.new
 mv MCONFIG.new MCONFIG
 
-%patch106 -p1 -b .swaponsymlink
-%patch107 -p1 -b .procpartitions
-%patch109 -p1 -b .rawman
+%patch106 -p1
+%patch107 -p1
+%patch109 -p1
 
-%patch113 -p1 -b .ctty3
-%patch117 -p1 -b .moremisc
-%patch120 -p1 -b .skipraid2
+%patch113 -p1
+%patch117 -p1
+%patch120 -p1
 
-%patch125 -p1 -b .umask
-%patch126 -p1 -b .multibyte
-%patch128 -p1 -b .ipcs
+%patch125 -p1
+%patch126 -p1
+%patch128 -p1
 
-%patch131 -p1 -b .sysmap
+%patch131 -p1
 %patch138 -p1
 %patch139 -p1
 %patch140 -p1
-%patch142 -p1 -b .mountman
+%patch142 -p1
 
 # cramfs
-%patch143 -p0 -b .cramfs
-%patch144 -p1 -b .pagesize
+%patch143 -p0
+%patch144 -p1
 
-%patch145 -p1 -b .pam
+%patch145 -p1
+%patch147 -p1
+%patch148 -p1
+%patch149 -p1
+%patch150 -p0
+
+%patch151 -p1
+%patch152 -p1
+%patch153 -p1
+%patch154 -p1
+%patch155 -p1
+%patch156 -p1 -b .fdiskmessage
 
 %patch1000 -p1 -b .nfsupdate
 %patch1010 -p1 -b .nfsv4
 %patch1020 -p1 -b .krb5
-%if %{WITH_SELINUX}
-#SELinux
 %patch1030 -p1 -b .mountselinux
-%endif
 %patch1040 -p1 -b .nfsmount
 %patch1041 -p1 -b .nfsman
 %patch1001 -p1 -b .nfssloppy
@@ -221,15 +211,14 @@ mv MCONFIG.new MCONFIG
 unset LINGUAS || :
 
 %configure
-make -C mount loop.h
 
-make "OPT=$RPM_OPT_FLAGS -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64" \
+make OPT="$RPM_OPT_FLAGS %{make_cflags}" \
 	LDFLAGS="" \
-	HAVE_PIVOT_ROOT=yes \
+	%{make_options} \
 	%{?_smp_mflags}
 make LDFLAGS="" CFLAGS="$RPM_OPT_FLAGS" -C partx %{?_smp_mflags}
 cd rescuept
-cc $RPM_OPT_FLAGS -o rescuept rescuept.c
+cc -D_FILE_OFFSET_BITS=64 $RPM_OPT_FLAGS -o rescuept rescuept.c
 cd ..
 
 %if %{with_kbdrate}
@@ -262,6 +251,9 @@ mkdir -p ${RPM_BUILD_ROOT}%{_sbindir}
 mkdir -p ${RPM_BUILD_ROOT}%{_sysconfdir}/{pam.d,security/console.apps}
 
 make \
+	OPT="$RPM_OPT_FLAGS %{make_cflags}" \
+	LDFLAGS="" \
+	%{make_options} \
         INSTALLDIR="install -d -m 755" \
         INSTALLSUID="install -m 755" \
         INSTALLBIN="install -m 755" \
@@ -327,11 +319,7 @@ install -m644 kbdrate/kbdrate.pam $RPM_BUILD_ROOT%{_sysconfdir}/pam.d/kbdrate
 %endif
 { 
   pushd ${RPM_BUILD_ROOT}%{_sysconfdir}/pam.d
-%if %{WITH_SELINUX}
   install -m 644 %{SOURCE1} ./login
-%else
-  install -m 644 %{SOURCE4} ./login
-%endif
   install -m 644 ${RPM_SOURCE_DIR}/util-linux-2.7-chsh.pamd ./chsh
   install -m 644 ${RPM_SOURCE_DIR}/util-linux-2.7-chsh.pamd ./chfn
   popd
@@ -357,17 +345,15 @@ rm -f $RPM_BUILD_ROOT/usr/{bin,sbin}/{fdformat,tunelp,floppy,setfdprm} $RPM_BUIL
 rm -f $RPM_BUILD_ROOT/%{_sysconfdir}/fdprm
 %endif
 
-for I in /sbin/cfdisk /sbin/fsck.minix /sbin/mkfs.{bfs,minix} /sbin/sln \
-	%{_bindir}/line %{_bindir}/pg; do
+for I in /sbin/cfdisk /sbin/fsck.minix /sbin/mkfs.{bfs,minix} /sbin/sln /usr/bin/chkdupexe \
+	%{_bindir}/line %{_bindir}/pg %{_bindir}/raw; do
 	rm -f $RPM_BUILD_ROOT$I
 done
 
-rm -f $RPM_BUILD_ROOT%{_mandir}/man1/line.1*
-rm -f $RPM_BUILD_ROOT%{_mandir}/man1/pg.1*
-rm -f $RPM_BUILD_ROOT%{_mandir}/man8/cfdisk.8*
-rm -f $RPM_BUILD_ROOT%{_mandir}/man8/fsck.minix.8*
-rm -f $RPM_BUILD_ROOT%{_mandir}/man8/mkfs.minix.8*
-rm -f $RPM_BUILD_ROOT%{_mandir}/man8/mkfs.bfs.8*
+for I in man1/chkdupexe.1 man1/line.1 man1/pg.1 man8/cfdisk.8 man8/fsck.minix.8 man8/mkfs.minix.8 man8/mkfs.bfs.8 \
+	man8/raw.8 man8/rawdevices.8; do
+	rm -rf $RPM_BUILD_ROOT%{_mandir}/${I}*
+done
 
 ln -sf ../../bin/kill $RPM_BUILD_ROOT%{_bindir}/kill
 
@@ -386,7 +372,7 @@ fi
 
 %files -f %{name}.lang
 %defattr(-,root,root)
-%doc */README.*
+%doc */README.* HISTORY MAINTAINER
 
 /bin/arch
 /bin/dmesg
@@ -402,6 +388,7 @@ fi
 %config %{_sysconfdir}/pam.d/login
 
 /sbin/agetty
+%{_mandir}/man8/agetty.8*
 /sbin/blockdev
 /sbin/pivot_root
 /sbin/ctrlaltdel
@@ -470,7 +457,6 @@ fi
 %endif
 %{_bindir}/namei
 %attr(4711,root,root)	%{_bindir}/newgrp
-%{_bindir}/raw
 %{_bindir}/rename
 %{_bindir}/renice
 %{_bindir}/rev
@@ -536,7 +522,6 @@ fi
 %{_mandir}/man1/whereis.1*
 %{_mandir}/man1/write.1*
 
-%{_mandir}/man8/agetty.8*
 %{_mandir}/man8/blockdev.8*
 %{_mandir}/man8/ctrlaltdel.8*
 %{_mandir}/man8/dmesg.8*
@@ -550,8 +535,6 @@ fi
 %{_mandir}/man8/mkfs.8*
 %{_mandir}/man8/mkswap.8*
 %{_mandir}/man8/pivot_root.8*
-%{_mandir}/man8/raw.8*
-%{_mandir}/man8/rawdevices.8*
 %{_mandir}/man8/renice.8*
 %ifnarch s390 s390x
 %{_mandir}/man8/setfdprm.8*
@@ -586,6 +569,37 @@ fi
 /sbin/losetup
 
 %changelog
+* Tue Aug 31 2004 Elliot Lee <sopwith@redhat.com> 2.12a-6
+- Fix #16415, #70616 with rdevman.patch
+- Fix #102566 with loginman.patch
+- Fix #104321 with rescuept.patch (just use plain lseek - we're in _FILE_OFFSET_BITS=64 land now)
+- Fix #130016 - remove raw.
+- Re-add agetty (replacing it with mgetty is too much pain, and mgetty is much larger)
+
+* Thu Aug 26 2004 Steve Dickson <SteveD@RedHat.com>
+- Made the NFS security checks more explicit to avoid confusion
+  (an upstream fix)
+- Also removed a compilation warning
+
+* Wed Aug 11 2004 Alasdair Kergon <agk@redhat.com>
+- Remove unused mount libdevmapper inclusion.
+
+* Wed Aug 11 2004 Alasdair Kergon <agk@redhat.com>
+- Add device-mapper mount-by-label support
+- Fix segfault in mount-by-label when a device without a label is present.
+
+* Wed Aug 11 2004 Steve Dickson <SteveD@RedHat.com>
+- Updated nfs man page to show that intr are on by
+  default for nfs4
+
+* Thu Aug 05 2004 Jindrich Novy <jnovy@redhat.com>
+- modified warning causing heart attack for >16 partitions, #107824
+
+* Fri Jul 09 2004 Elliot Lee <sopwith@redhat.com> 2.12a-3
+- Fix #126623, #126572
+- Patch cleanup
+- Remove agetty (use mgetty, agetty is broken)
+
 * Tue Jun 15 2004 Elliot Lee <sopwith@redhat.com>
 - rebuilt
 

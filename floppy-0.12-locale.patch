@@ -1,0 +1,10 @@
+--- floppy-0.12/superfloppy.c.fixfail	2004-07-15 14:41:21.835145325 -0400
++++ floppy-0.12/superfloppy.c	2004-07-15 14:41:32.385876513 -0400
+@@ -12,6 +12,7 @@
+ #include <errno.h>
+ #include <popt.h>
+ #include <libintl.h>
++#include <locale.h>
+ #include <sys/types.h>
+ #include <sys/stat.h>
+ #include <unistd.h>

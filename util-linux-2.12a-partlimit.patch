@@ -1,0 +1,22 @@
+--- util-linux-2.12pre/fdisk/fdisk.8.miscfixes	2002-08-06 10:33:33.000000000 -0400
++++ util-linux-2.12pre/fdisk/fdisk.8	2003-12-17 13:55:16.000000000 -0500
+@@ -65,7 +65,7 @@
+ name followed by a partition number.  For example,
+ .B /dev/hda1
+ is the first partition on the first IDE hard disk in the system.
+-IDE disks can have up to 63 partitions, SCSI disks up to 15.
++Disks can have up to 15 partitions.
+ See also
+ .IR /usr/src/linux/Documentation/devices.txt .
+ 
+--- util-linux-2.12pre/fdisk/fdisk.h.miscfixes	2003-07-13 14:25:00.000000000 -0400
++++ util-linux-2.12pre/fdisk/fdisk.h	2003-12-17 13:55:16.000000000 -0500
+@@ -5,7 +5,7 @@
+ #define DEFAULT_SECTOR_SIZE	512
+ #define MAX_SECTOR_SIZE	2048
+ #define SECTOR_SIZE	512	/* still used in BSD code */
+-#define MAXIMUM_PARTS	60
++#define MAXIMUM_PARTS	16
+ 
+ #define ACTIVE_FLAG     0x80
+ 
