@@ -12,7 +12,7 @@
 Summary: A collection of basic system utilities.
 Name: util-linux
 Version: 2.12a
-Release: 8
+Release: 9
 License: distributable
 Group: System Environment/Base
 
@@ -87,13 +87,7 @@ Patch156: util-linux-2.12a-fdiskmessage-107824.patch
 Patch157: util-linux-2.12a-pamstart.patch
 
 # patches required for NFSv4 support
-Patch1000: util-linux-2.11z-01-nfs.patch
-Patch1001: util-linux-2.12-nfssloppy.patch
-Patch1010: util-linux-2.11z-02-base-nfsv4.patch
-Patch1020: util-linux-2.11z-03-krb5.patch
-Patch1030: mount-2.11y-selinux.patch
-Patch1040: util-linux-2.12-nfs-mount.patch
-Patch1041: util-linux-2.12a-mountman-123416.patch
+Patch1000: util-linux-2.12-nfsv4.patch
 
 # When adding patches, please make sure that it is easy to find out what bug # the 
 # patch fixes.
@@ -203,13 +197,7 @@ mv MCONFIG.new MCONFIG
 %patch156 -p1 -b .fdiskmessage
 %patch157 -p1 -b .pamstart
 
-%patch1000 -p1 -b .nfsupdate
-%patch1010 -p1 -b .nfsv4
-%patch1020 -p1 -b .krb5
-%patch1030 -p1 -b .mountselinux
-%patch1040 -p1 -b .nfsmount
-%patch1041 -p1 -b .nfsman
-%patch1001 -p1 -b .nfssloppy
+%patch1000 -p1 -b .nfsv4
 
 %build
 unset LINGUAS || :
@@ -573,6 +561,10 @@ fi
 /sbin/losetup
 
 %changelog
+* Tue Sep 28 2004 Steve Dickson <SteveD@RedHat.com>
+- Updated the NFS and NFS4 code to the latest CITI patch set
+  (in which they incorporate a number of our local patches).
+
 * Wed Sep 15 2004 Nalin Dahybhai <nalin@redhat.com> 2.12a-8
 - Fix #132196 - turn on SELinux support at build-time.
 
