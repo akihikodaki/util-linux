@@ -21,7 +21,7 @@
 Summary: A collection of basic system utilities.
 Name: util-linux
 Version: 2.12a
-Release: 19
+Release: 20
 License: distributable
 Group: System Environment/Base
 
@@ -116,6 +116,7 @@ Patch167: util-linux-2.12a-mount-ocfs2-support.patch
 # patches required for NFSv4 support
 Patch1000: util-linux-2.12-nfsv4.patch
 Patch1001: util-linux-2.12a-mount-proto.patch
+Patch1002: util-linux-2.12a-nfsmount-overflow.patch
 
 # When adding patches, please make sure that it is easy to find out what bug # the 
 # patch fixes.
@@ -245,6 +246,7 @@ mv MCONFIG.new MCONFIG
 
 %patch1000 -p1 -b .nfsv4
 %patch1001 -p1
+%patch1002 -p1
 
 %build
 unset LINGUAS || :
@@ -620,10 +622,14 @@ fi
 /sbin/losetup
 
 %changelog
+* Tue Dec  7 2004 Steve Dickson <SteveD@RedHat.com> 2.12a-20
+- Corrected a buffer overflow problem with nfs mounts.
+  (bz# 141733) 
+
 * Wed Dec 01 2004 Elliot Lee <sopwith@redhat.com> 2.12a-19
 - Patches for various bugs.
 
-* Mon Nov 29 2004 Steve Dickson <SteveD@RedHat.com>
+* Mon Nov 29 2004 Steve Dickson <SteveD@RedHat.com> 2.12a-18
 - Made NFS mounts adhere to the IP protocol if specified on
   command line as well as made NFS umounts adhere to the
   current IP protocol. Fix #140016
