@@ -12,7 +12,7 @@
 Summary: A collection of basic system utilities.
 Name: util-linux
 Version: 2.12a
-Release: 6
+Release: 7
 License: distributable
 Group: System Environment/Base
 
@@ -82,6 +82,9 @@ Patch153: util-linux-2.12a-16415-rdevman.patch
 Patch154: util-linux-2.11y-102566-loginman.patch
 Patch155: util-linux-2.12a-104321-rescuept.patch
 Patch156: util-linux-2.12a-fdiskmessage-107824.patch
+
+# Patch to enabled remote service for login/pam (#91174)
+Patch157: util-linux-2.12a-pamstart.patch
 
 # patches required for NFSv4 support
 Patch1000: util-linux-2.11z-01-nfs.patch
@@ -198,6 +201,7 @@ mv MCONFIG.new MCONFIG
 %patch154 -p1
 %patch155 -p1
 %patch156 -p1 -b .fdiskmessage
+%patch157 -p1 -b .pamstart
 
 %patch1000 -p1 -b .nfsupdate
 %patch1010 -p1 -b .nfsv4
@@ -569,6 +573,9 @@ fi
 /sbin/losetup
 
 %changelog
+* Wed Sep 15 2004 Phil Knirsch <pknirsch@redhat.com> 2.12a-7
+- Fix #91174 with pamstart.patch
+
 * Tue Aug 31 2004 Elliot Lee <sopwith@redhat.com> 2.12a-6
 - Fix #16415, #70616 with rdevman.patch
 - Fix #102566 with loginman.patch
