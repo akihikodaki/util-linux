@@ -3,7 +3,7 @@
 Summary: A collection of basic system utilities.
 Name: util-linux
 Version: 2.11n
-Release: 12.7.3
+Release: 13
 License: distributable
 Group: System Environment/Base
 Source0: ftp://ftp.kernel.org/pub/linux/utils/util-linux/util-linux-%{version}.tar.bz2
@@ -77,8 +77,6 @@ Patch112: util-linux-2.11n-ipcrmman.patch
 Patch113: util-linux-2.11n-ctty3.patch
 Patch114: util-linux-2.11n-dumboctal.patch
 Patch115: util-linux-2.11n-fstabperm-61868.patch
-
-Patch116: util-linux-2.11n-setpwrace.patch
 ########### END UNSUBMITTED
 
 ########
@@ -215,8 +213,6 @@ mv MCONFIG.new MCONFIG
 %patch113 -p1 -b .ctty3
 %patch114 -p1 -b .dumboctal
 %patch115 -p1 -b .fstabperm
-
-%patch116 -p1 -b .setpwrace
 
 %build
 unset LINGUAS || :
@@ -359,10 +355,10 @@ fi
 /sbin/pivot_root
 %ifnarch s390 s390x
 /sbin/clock
+/sbin/fdisk
 %endif
 /sbin/ctrlaltdel
 /sbin/elvtune
-/sbin/fdisk
 /sbin/addpart
 /sbin/delpart
 /sbin/partx
@@ -494,8 +490,8 @@ fi
 %{_mandir}/man8/dmesg.8*
 %{_mandir}/man8/elvtune.8*
 %{_mandir}/man8/fdformat.8*
-%{_mandir}/man8/fdisk.8*
 %ifnarch s390 s390x
+%{_mandir}/man8/fdisk.8*
 %{_mandir}/man8/hwclock.8*
 %endif
 %{_mandir}/man8/ipcrm.8*
@@ -537,8 +533,9 @@ fi
 /sbin/losetup
 
 %changelog
-* Mon Jun 24 2002 Elliot Lee <sopwith@redhat.com> 2.11n-12.7.3
-- Fix setpwnam race (patch116)
+* Mon Apr 29 2002 Florian La Roche <Florian.LaRoche@redhat.de>
+- adjust mainframe patches to apply to current rpm
+- do not include fdisk until it is fixed to work on mainframe
 
 * Mon Apr 01 2002 Elliot Lee <sopwith@redhat.com> 2.11n-12
 - Don't strip binaries - rpm does it for us.
