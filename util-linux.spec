@@ -86,6 +86,8 @@ Patch156: util-linux-2.12a-fdiskmessage-107824.patch
 # Patch to enabled remote service for login/pam (#91174)
 Patch157: util-linux-2.12a-pamstart.patch
 
+Patch158: util-linux-2.12a-moreswaplabel.patch
+
 # patches required for NFSv4 support
 Patch1000: util-linux-2.12-nfsv4.patch
 
@@ -196,6 +198,7 @@ mv MCONFIG.new MCONFIG
 %patch155 -p1
 %patch156 -p1 -b .fdiskmessage
 %patch157 -p1 -b .pamstart
+%patch158 -p1
 
 %patch1000 -p1 -b .nfsv4
 
@@ -561,6 +564,9 @@ fi
 /sbin/losetup
 
 %changelog
+* Wed Sep 29 2004 Elliot Lee <sopwith@redhat.com> 2.12a-9
+- Make swaplabel support work with swapon -a -e
+
 * Tue Sep 28 2004 Steve Dickson <SteveD@RedHat.com>
 - Updated the NFS and NFS4 code to the latest CITI patch set
   (in which they incorporate a number of our local patches).
