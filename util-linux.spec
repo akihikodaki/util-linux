@@ -233,7 +233,7 @@ mv MCONFIG.new MCONFIG
 
 %patch180 -p1 -b .lastlog
 %patch181 -p1
-%patch182 -p1
+%patch182 -p1 -b .typo
 %patch183 -p1 -b .duplabel
 
 %build
@@ -278,8 +278,9 @@ mkdir -p ${RPM_BUILD_ROOT}%{_infodir}
 mkdir -p ${RPM_BUILD_ROOT}%{_mandir}/man{1,6,8,5}
 mkdir -p ${RPM_BUILD_ROOT}%{_sbindir}
 mkdir -p ${RPM_BUILD_ROOT}%{_sysconfdir}/{pam.d,security/console.apps}
-mkdir -p ${RPM_BUILD_ROOT}/var/log/
-touch ${RPM_BUILD_ROOT}/var/log/lastlog
+mkdir -p %{buildroot}/var/log
+touch %{buildroot}/var/log/lastlog
+chmod 0400 %{buildroot}/var/log/lastlog
 
 make \
 	OPT="$RPM_OPT_FLAGS %{make_cflags}" \
@@ -453,7 +454,7 @@ fi
 /sbin/rescuept
 /sbin/nologin
 %{_mandir}/man8/nologin.8*
-%ghost %attr(0400,root,root) /var/log/lastlog
+%ghost %attr(0400,root,root) %verify(not md5 size mtime) /var/log/lastlog
 
 # Begin kbdrate stuff
 %if %{with_kbdrate}
