@@ -1,10 +1,12 @@
 Summary: A collection of basic system utilities.
 Name: util-linux
 Version: 2.10m
-Release: 12
+Release: 12tc1
 Copyright: distributable
+Packager: Red Hat, Inc. <http://bugzilla.redhat.com/bugzilla>
+Vendor: Red Hat, Inc.
 Group: System Environment/Base
-Source0: ftp://ftp.kernel.org/mirrors/linux/utils/util-linux/util-linux-%{version}.tar.gz
+Source0: ftp://ftp.kernel.org/mirrors/linux/utils/util-linux/util-linux-%{version}.tar.bz2
 Source1: util-linux-2.7-login.pamd
 Source2: util-linux-2.7-chfn.pamd
 Source3: util-linux-2.7-chsh.pamd
@@ -30,6 +32,8 @@ Patch34: util-linux-ia64-hwclock.patch
 Patch35: util-linux-2.10m-loginpath.patch
 Patch36: util-linux-2.10m-dict.patch
 Patch37: util-linux-2.10m-fdwronly.patch
+
+Patch50: util-linux-2.9o-8bit.patch
 
 Obsoletes: fdisk tunelp
 %ifarch alpha sparc sparc64 sparcv9
@@ -76,6 +80,8 @@ the login program.
 %patch35 -p1 -b .loginpath
 %patch36 -p1 -b .dict
 %patch37 -p1 -b .fdwronly
+
+%patch50 -p1
 
 %build
 unset LINGUAS || :
