@@ -3,7 +3,7 @@
 Summary: A collection of basic system utilities.
 Name: util-linux
 Version: 2.11f
-Release: 7
+Release: 8
 Copyright: distributable
 Group: System Environment/Base
 Source0: ftp://ftp.kernel.org/pub/linux/utils/util-linux/util-linux-%{version}.tar.bz2
@@ -54,13 +54,13 @@ Obsoletes: clock
 Conflicts: initscripts <= 4.58, timeconfig <= 3.0.1
 %endif
 BuildRoot: %{_tmppath}/%{name}-root
-Requires: pam >= 0.66-4, /etc/pam.d/system-auth, usermode
+Requires: pam >= 0.66-4, /etc/pam.d/system-auth
 Conflicts: kernel < 2.2.12-7, 
 Prereq: /sbin/install-info
 
 %description
 The util-linux package contains a large variety of low-level system
-utilities that are necessary for a Linux system to function.  Among
+utilities that are necessary for a Linux system to function. Among
 others, Util-linux contains the fdisk configuration tool and the login
 program.
 
@@ -390,6 +390,9 @@ fi
 %{_datadir}/misc/more.help
 
 %changelog
+* Wed Aug  1 2001 Tim Powers <timp@redhat.com>
+- don't require usermode
+
 * Mon Jul 30 2001 Elliot Lee <sopwith@redhat.com> 2.11f-7
 - Incorporate kbdrate back in.
 
