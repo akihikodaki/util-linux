@@ -27,7 +27,7 @@
 Summary: A collection of basic system utilities.
 Name: util-linux
 Version: 2.12p
-Release: 4
+Release: 5
 License: distributable
 Group: System Environment/Base
 
@@ -107,6 +107,7 @@ Patch170: util-linux-2.12p-nfsv4.patch
 Patch171: util-linux-2.12a-mount-proto.patch
 Patch172: util-linux-2.12a-nfsmount-overflow.patch
 Patch173: util-linux-2.12a-nfsmount-reservp.patch
+Patch174: util-linux-2.12p-nfsmount-rollback.patch
 
 # Makeing /var/log/lastlog (#151635)
 Patch180: util-linux-2.12p-login-lastlog.patch
@@ -230,6 +231,7 @@ mv MCONFIG.new MCONFIG
 %patch171 -p1
 %patch172 -p1
 %patch173 -p1
+%patch174 -p1
 
 %patch180 -p1 -b .lastlog
 %patch181 -p1
@@ -625,6 +627,9 @@ fi
 /sbin/losetup
 
 %changelog
+* Thu Mar 31 2005 Steve Dickson <SteveD@RedHat.com> 2.12p-5
+- Fixed nfs mount to rollback correctly.
+
 * Fri Mar 25 2005 Karel Zak <kzak@redhat.com> 2.12p-4
 - added /var/log/lastlog to util-linux (#151635)
 - disabled 'newgrp' in util-linux (enabled in shadow-utils) (#149997, #151613)
