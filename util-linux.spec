@@ -3,7 +3,7 @@
 Summary: A collection of basic system utilities.
 Name: util-linux
 Version: 2.11f
-Release: 16
+Release: 17
 License: distributable
 Group: System Environment/Base
 Source0: ftp://ftp.kernel.org/pub/linux/utils/util-linux/util-linux-%{version}.tar.bz2
@@ -34,7 +34,10 @@ Patch9: util-linux-2.11f-vipw.patch
 Patch21: util-linux-2.9v-nonroot.patch
 Patch27: util-linux-2.11a-moretc.patch
 Patch35: util-linux-2.10m-loginpath.patch
+# Patch36 no longer used
 Patch36: util-linux-2.11f-pwent.patch
+Patch37: util-linux-2.11f-pwent2.patch
+Patch38: util-linux-2.11f-ctty2.patch
 Patch60: util-linux-2.10s-s390x.patch
 Patch61: util-linux-2.11b-s390x.patch
 
@@ -44,9 +47,11 @@ Patch71: fdisk.diff
 
 # This patch got added upstream in 2.11. Then we reverted it from our
 # local 2.10s copy. Oops.
+# Patches 75-77 no longer used, obsoleted by patch 37
 Patch75: util-linux-2.11f-logingrp-revert.patch
 
 Patch76: util-linux-2.11f-loginctty.patch
+Patch77: util-linux-2.11f-loginctty2.patch
 
 Patch100: mkcramfs.patch
 Patch101: mkcramfs-quiet.patch
@@ -95,7 +100,9 @@ program.
 %patch70 -p1
 %patch71 -p1
 
-%patch75 -p1
+#%patch75 -p1
+#%patch76 -p1
+#%patch77 -p1
 
 # mkcramfs
 cp %{SOURCE7} %{SOURCE6} .
@@ -105,9 +112,9 @@ cp %{SOURCE7} %{SOURCE6} .
 # nologin
 cp %{SOURCE8} %{SOURCE9} .
 
-%patch36 -p1 -b .pwent
-
-%patch76 -p1
+#%patch36 -p1 -b .pwent
+%patch37 -p1 -b .pwent2
+#%patch38 -p1 -b .ctty2
 
 %build
 unset LINGUAS || :
@@ -252,8 +259,9 @@ fi
 %endif
 /sbin/ctrlaltdel
 /sbin/elvtune
+/sbin/fdisk
 
-%ifarch %{ix86} alpha ia64
+%ifarch %{ix86} alpha ia64 s390 s390x
 /sbin/fsck.minix
 /sbin/mkfs.minix
 /sbin/mkfs.bfs
@@ -266,7 +274,6 @@ fi
 %endif
 
 %ifnarch s390 s390x
-/sbin/fdisk
 /sbin/hwclock
 /usr/sbin/hwclock
 %endif
@@ -386,8 +393,8 @@ fi
 %{_mandir}/man8/dmesg.8*
 %{_mandir}/man8/elvtune.8*
 %{_mandir}/man8/fdformat.8*
-%ifnarch s390 s390x
 %{_mandir}/man8/fdisk.8*
+%ifnarch s390 s390x
 %{_mandir}/man8/hwclock.8*
 %endif
 %{_mandir}/man8/ipcrm.8*
@@ -410,9 +417,11 @@ fi
 %{_datadir}/misc/more.help
 
 %changelog
-* Wed Nov 14 2001 Karsten Hopp <karsten@redhat.de>
-- don't include fdisk, cfdisk on S/390 #56102 
-- remove minix support for S/390 #56114
+* Tue Dec 04 2001 Elliot Lee <sopwith@redhat.com> 2.11f-17
+- Add patch38 (util-linux-2.11f-ctty2.patch) to ignore SIGINT/SIGTERM/SIGQUIT in the parent, so that ^\ won't break things.
+
+* Fri Nov 09 2001 Elliot Lee <sopwith@redhat.com> 2.11f-16
+- Merge patches 36, 75, 76, and 77 into patch #37, to attempt resolve all the remaining issues with #54741.
 
 * Wed Oct 24 2001 Florian La Roche <Florian.LaRoche@redhat.de>
 - add nologin man-page for s390/s390x
