@@ -1,7 +1,4 @@
-# This 2.12pre package is not in a buildable state - it's in CVS here
-# to allow patch merging etc.
-
-# Upstream maintainer util-linux@math.uio.no
+# Upstream maintainer aeb@cwi.nl
 
 %if %{?WITH_SELINUX:0}%{!?WITH_SELINUX:1}
 %define WITH_SELINUX 1
@@ -16,7 +13,7 @@
 Summary: A collection of basic system utilities.
 Name: util-linux
 Version: 2.12
-Release: 14
+Release: 18
 License: distributable
 Group: System Environment/Base
 
@@ -27,16 +24,14 @@ BuildRequires: libtermcap-devel
 BuildRequires: zlib-devel
 BuildRequires: slang-devel
 BuildRequires: texinfo
+BuildRequires: gettext
 %if %{WITH_SELINUX}
 BuildRequires: libselinux-devel
 %endif
 
 Source0: http://ftp.cwi.nl/aeb/util-linux/util-linux-%{version}.tar.gz
-%if %{WITH_SELINUX}
 Source1: util-linux-selinux.pamd
-%else
-Source1: util-linux-2.7-login.pamd
-%endif
+Source4: util-linux-2.7-login.pamd
 Source2: util-linux-2.7-chfn.pamd
 Source3: util-linux-2.7-chsh.pamd
 Source8: nologin.c
@@ -104,9 +99,13 @@ Patch141: util-linux-selinux.patch
 Patch142: util-linux-2.11y-mountman-90588.patch
 
 Patch143: cramfs-1.1-blocksize_and_quiet.patch
+Patch144: cramfs-1.1-pagesize.patch
+
+Patch145: util-linux-2.12.pam.patch
 
 # patches required for NFSv4 support
 Patch1000: util-linux-2.11z-01-nfs.patch
+Patch1001: util-linux-2.12-nfssloppy.patch
 Patch1010: util-linux-2.11z-02-base-nfsv4.patch
 Patch1020: util-linux-2.11z-03-krb5.patch
 Patch1030: mount-2.11y-selinux.patch
@@ -236,6 +235,7 @@ mv MCONFIG.new MCONFIG
 
 # cramfs
 %patch143 -p0 -b .cramfs
+%patch144 -p1 -b .pagesize
 
 %patch1000 -p1 -b .nfsupdate
 %patch1010 -p1 -b .nfsv4
@@ -245,6 +245,7 @@ mv MCONFIG.new MCONFIG
 %patch1030 -p1 -b .mountselinux
 %endif
 %patch1040 -p1 -b .nfsmount
+%patch1001 -p1 -b .nfssloppy
 
 %build
 unset LINGUAS || :
@@ -356,7 +357,11 @@ install -m644 kbdrate/kbdrate.pam $RPM_BUILD_ROOT%{_sysconfdir}/pam.d/kbdrate
 %endif
 { 
   pushd ${RPM_BUILD_ROOT}%{_sysconfdir}/pam.d
+%if %{WITH_SELINUX}
   install -m 644 %{SOURCE1} ./login
+%else
+  install -m 644 %{SOURCE4} ./login
+%endif
   install -m 644 ${RPM_SOURCE_DIR}/util-linux-2.7-chsh.pamd ./chsh
   install -m 644 ${RPM_SOURCE_DIR}/util-linux-2.7-chsh.pamd ./chfn
   popd
@@ -611,6 +616,19 @@ fi
 /sbin/losetup
 
 %changelog
+* Tue May 04 2004 Elliot Lee <sopwith@redhat.com> 2.12-18
+- Fix #122448 (autofs issues)
+
+* Fri Apr 23 2004 Elliot Lee <sopwith@redhat.com> 2.12-17
+- Fix #119157 by editing the patch
+- Add patch145 to fix #119986
+
+* Fri Apr 16 2004 Elliot Lee <sopwith@redhat.com> 2.12-16
+- Fix #118803
+
+* Tue Mar 23 2004 Jeremy Katz <katzj@redhat.com> 2.12-15
+- mkcramfs: use PAGE_SIZE for default blocksize (#118681)
+
 * Sat Mar 20 2004 <SteveD@RedHat.com>
 - Updated the nfs-mount.patch to correctly 
   handle the mounthost option and to ignore 
