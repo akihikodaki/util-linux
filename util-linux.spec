@@ -3,7 +3,7 @@
 Summary: A collection of basic system utilities.
 Name: util-linux
 Version: 2.11f
-Release: 17
+Release: 17a
 License: distributable
 Group: System Environment/Base
 Source0: ftp://ftp.kernel.org/pub/linux/utils/util-linux/util-linux-%{version}.tar.bz2
@@ -256,10 +256,10 @@ fi
 /sbin/pivot_root
 %ifnarch s390 s390x
 /sbin/clock
+/sbin/fdisk
 %endif
 /sbin/ctrlaltdel
 /sbin/elvtune
-/sbin/fdisk
 
 %ifarch %{ix86} alpha ia64 s390 s390x
 /sbin/fsck.minix
@@ -417,6 +417,10 @@ fi
 %{_datadir}/misc/more.help
 
 %changelog
+* Fri Apr 05 2002 karsten Hopp <karsten@redhat.de> 2.11f-17a
+- remove /sbin/fdisk from the s390/s390x filelist, it's already 
+  provided by s390utils
+
 * Tue Dec 04 2001 Elliot Lee <sopwith@redhat.com> 2.11f-17
 - Add patch38 (util-linux-2.11f-ctty2.patch) to ignore SIGINT/SIGTERM/SIGQUIT in the parent, so that ^\ won't break things.
 
