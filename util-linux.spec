@@ -3,8 +3,8 @@
 Summary: A collection of basic system utilities.
 Name: util-linux
 Version: 2.11f
-Release: 12
-Copyright: distributable
+Release: 16
+License: distributable
 Group: System Environment/Base
 Source0: ftp://ftp.kernel.org/pub/linux/utils/util-linux/util-linux-%{version}.tar.bz2
 Source1: util-linux-2.7-login.pamd
@@ -45,6 +45,8 @@ Patch71: fdisk.diff
 # This patch got added upstream in 2.11. Then we reverted it from our
 # local 2.10s copy. Oops.
 Patch75: util-linux-2.11f-logingrp-revert.patch
+
+Patch76: util-linux-2.11f-loginctty.patch
 
 Patch100: mkcramfs.patch
 Patch101: mkcramfs-quiet.patch
@@ -105,6 +107,8 @@ cp %{SOURCE8} %{SOURCE9} .
 
 %patch36 -p1 -b .pwent
 
+%patch76 -p1
+
 %build
 unset LINGUAS || :
 
@@ -117,9 +121,11 @@ cd rescuept
 gcc $RPM_OPT_FLAGS -o rescuept rescuept.c
 cd ..
 
+%ifnarch s390 s390x
 pushd kbdrate
     cc $RPM_OPT_FLAGS -o kbdrate kbdrate.c
 popd
+%endif
 
 gcc $RPM_OPT_FLAGS -o mkcramfs mkcramfs.c -I. -lz
 
@@ -141,13 +147,16 @@ mkdir -p ${RPM_BUILD_ROOT}%{_sysconfdir}/{pam.d,security/console.apps}
 make install DESTDIR=${RPM_BUILD_ROOT}
 
 install -s -m 755 mount/pivot_root ${RPM_BUILD_ROOT}/sbin
-install -s -m 755 mount/pivot_root.8 ${RPM_BUILD_ROOT}%{_mandir}/man8
+install -m 644 mount/pivot_root.8 ${RPM_BUILD_ROOT}%{_mandir}/man8
 install -m 755 rescuept/rescuept ${RPM_BUILD_ROOT}/sbin
 install -m 755 mkcramfs ${RPM_BUILD_ROOT}/usr/bin
 install -m 755 nologin ${RPM_BUILD_ROOT}/sbin
-install -m 644 kbdrate/kbdrate.8 nologin.8 ${RPM_BUILD_ROOT}%{_mandir}/man8
+install -m 644 nologin.8 ${RPM_BUILD_ROOT}%{_mandir}/man8
+%ifnarch s390 s390x
 install -m 555 kbdrate/kbdrate ${RPM_BUILD_ROOT}/sbin
+install -m 644 kbdrate/kbdrate.8 ${RPM_BUILD_ROOT}%{_mandir}/man8
 ln -s consolehelper ${RPM_BUILD_ROOT}/usr/bin/kbdrate
+%endif
 
 if [ "%{_mandir}" != "%{_prefix}/man" -a -d ${RPM_BUILD_ROOT}%{_prefix}/man ]; then
    ( cd ${RPM_BUILD_ROOT}%{_prefix}/man; tar cf - ./* ) |
@@ -183,8 +192,10 @@ chmod 755 ${RPM_BUILD_ROOT}%{_bindir}/sunhostid
 
 gzip -9nf ${RPM_BUILD_ROOT}%{_infodir}/ipc.info
 
+%ifnarch s390 s390x
 install -m644 kbdrate/kbdrate.apps $RPM_BUILD_ROOT%{_sysconfdir}/security/console.apps/kbdrate
 install -m644 kbdrate/kbdrate.pam $RPM_BUILD_ROOT%{_sysconfdir}/pam.d/kbdrate
+%endif
 { 
   pushd ${RPM_BUILD_ROOT}%{_sysconfdir}/pam.d
   install -m 644 ${RPM_SOURCE_DIR}/util-linux-2.7-login.pamd ./login
@@ -241,9 +252,8 @@ fi
 %endif
 /sbin/ctrlaltdel
 /sbin/elvtune
-/sbin/fdisk
 
-%ifarch %{ix86} alpha ia64 s390 s390x
+%ifarch %{ix86} alpha ia64
 /sbin/fsck.minix
 /sbin/mkfs.minix
 /sbin/mkfs.bfs
@@ -256,6 +266,7 @@ fi
 %endif
 
 %ifnarch s390 s390x
+/sbin/fdisk
 /sbin/hwclock
 /usr/sbin/hwclock
 %endif
@@ -266,11 +277,13 @@ fi
 #/sbin/sln
 /sbin/nologin
 %{_mandir}/man8/nologin.8*
+%ifnarch s390 s390x
 /sbin/kbdrate
 /usr/bin/kbdrate
 %{_mandir}/man8/kbdrate.8*
 %{_sysconfdir}/pam.d/kbdrate
 %{_sysconfdir}/security/console.apps/kbdrate
+%endif
 
 %{_bindir}/cal
 %attr(4711,root,root)	%{_bindir}/chfn
@@ -373,8 +386,8 @@ fi
 %{_mandir}/man8/dmesg.8*
 %{_mandir}/man8/elvtune.8*
 %{_mandir}/man8/fdformat.8*
-%{_mandir}/man8/fdisk.8*
 %ifnarch s390 s390x
+%{_mandir}/man8/fdisk.8*
 %{_mandir}/man8/hwclock.8*
 %endif
 %{_mandir}/man8/ipcrm.8*
@@ -397,6 +410,21 @@ fi
 %{_datadir}/misc/more.help
 
 %changelog
+* Wed Nov 14 2001 Karsten Hopp <karsten@redhat.de>
+- don't include fdisk, cfdisk on S/390 #56102 
+- remove minix support for S/390 #56114
+
+* Wed Oct 24 2001 Florian La Roche <Florian.LaRoche@redhat.de>
+- add nologin man-page for s390/s390x
+
+* Wed Oct 24 2001 Bernhard Rosenkraenzer <bero@redhat.com> 2.11f-14
+- Don't build kbdrate on s390/s390x
+- Don't make the pivot_root.8 man page executable(!)
+
+* Tue Oct 23 2001 Elliot Lee <sopwith@redhat.com> 2.11f-13
+- Patch/idea #76 from HJL, fixes bug #54741 (race condition in login 
+acquisition of controlling terminal).
+
 * Thu Oct 11 2001 Bill Nottingham <notting@redhat.com>
 - fix permissions problem with vipw & shadow files, again (doh!)
 
