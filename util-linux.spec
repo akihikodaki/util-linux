@@ -3,7 +3,7 @@
 Summary: A collection of basic system utilities.
 Name: util-linux
 Version: 2.11f
-Release: 8
+Release: 9
 Copyright: distributable
 Group: System Environment/Base
 Source0: ftp://ftp.kernel.org/pub/linux/utils/util-linux/util-linux-%{version}.tar.bz2
@@ -307,9 +307,10 @@ fi
 %{_prefix}/games/banner
 
 %ifnarch sparc sparc64 sparcv9
-%{_sbindir}/cfdisk
-%{_mandir}/man8/cfdisk.8*
+#%{_sbindir}/cfdisk
+#%{_mandir}/man8/cfdisk.8*
 %endif
+
 %ifarch %{ix86}
 %{_sbindir}/rdev
 %{_sbindir}/ramsize
@@ -390,6 +391,9 @@ fi
 %{_datadir}/misc/more.help
 
 %changelog
+* Sun Aug 26 2001 Elliot Lee <sopwith@redhat.com> 2.11f-9
+- Don't include cfdisk, since it appears to be an even bigger pile of junk than fdisk? :)
+
 * Wed Aug  1 2001 Tim Powers <timp@redhat.com>
 - don't require usermode
 
