@@ -111,6 +111,7 @@ Patch163: util-linux-2.12a-140437-sgisectors.patch
 Patch164: util-linux-2.12a-113790-hotkeys.patch
 Patch165: util-linux-2.12a-117855-mountman.patch
 Patch166: util-linux-2.12a-134860-sldocs.patch
+Patch167: util-linux-2.12a-mount-ocfs2-support.patch
 
 # patches required for NFSv4 support
 Patch1000: util-linux-2.12-nfsv4.patch
@@ -240,6 +241,7 @@ mv MCONFIG.new MCONFIG
 %patch164 -p1
 %patch165 -p1
 %patch166 -p1
+%patch167 -p1
 
 %patch1000 -p1 -b .nfsv4
 %patch1001 -p1
