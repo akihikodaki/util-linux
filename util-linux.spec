@@ -1,11 +1,15 @@
 # Upstream maintainer util-linux@math.uio.no
 
 %define with_kbdrate 0
+%define floppyver 0.12
+%define no_sfdisk_archs ppc ppc64
+%define no_hwclock_archs s390 s390x
+%define cytune_archs %{ix86} alpha armv4l
 
 Summary: A collection of basic system utilities.
 Name: util-linux
-Version: 2.11r
-Release: 10
+Version: 2.11y
+Release: 9
 License: distributable
 Group: System Environment/Base
 
@@ -14,8 +18,9 @@ BuildRequires: pam-devel
 BuildRequires: ncurses-devel
 BuildRequires: libtermcap-devel
 BuildRequires: zlib-devel
+BuildRequires: slang-devel
 
-Source0: ftp://ftp.kernel.org/pub/linux/utils/util-linux/util-linux-%{version}.tar.gz
+Source0: ftp://ftp.kernel.org/pub/linux/utils/util-linux/util-linux-%{version}.tar.bz2
 Source1: util-linux-2.7-login.pamd
 Source2: util-linux-2.7-chfn.pamd
 Source3: util-linux-2.7-chsh.pamd
@@ -24,61 +29,71 @@ Source7: cramfs.h
 Source8: nologin.c
 Source9: nologin.8
 Source10: kbdrate.tar.gz
+Source11: http://download.sourceforge.net/floppyutil/floppy-%{floppyver}.tar.gz
 
-Patch0: util-linux-2.11a-rhconfig.patch
+##### Red Hat Linux-specific patches
+# Changes to MCONFIG build-time configuration
+Patch0: util-linux-2.11y-rhconfig.patch
+# Don't install the chkdupexe perl script
 Patch1: util-linux-2.11r-nochkdupexe.patch
+# This patch is here because gafton put it here five years ago
 Patch2: util-linux-2.11a-gecossize.patch
-
+# No clue why this patch is here
 Patch4: util-linux-2.11n-mount.patch
 
+# Helps allow building/installing as non-root
 Patch21: util-linux-2.9v-nonroot.patch
 
-Patch27: util-linux-2.11r-moretc.patch
+# Force 'more' to link against libtermcap so that we don't have a
+# /bin binary depending on a /usr/lib library (ncurses)
+Patch27: util-linux-2.11w-moretc.patch
 
-Patch35: util-linux-2.10m-loginpath.patch
-Patch60: util-linux-2.10s-s390x.patch
-Patch61: util-linux-2.11b-s390x.patch
-
+# 1. Reduce MAX_PARTS to 16 (upstream reasonably won't take it)
+# 2. Use O_LARGEFILE (I have no idea whether this has any effect given
+#    -D_FILE_OFFSET_BITS=64)
+# 3. Use the standard syscall() function instead of some bad hacks.
 Patch70: util-linux-2.11r-miscfixes.patch
 
+# Because we have our own mkcramfs, because the copyright/license is unclear
 Patch100: mkcramfs.patch
 Patch101: mkcramfs-quiet.patch
 
-########
-# Mount patches
-Patch201: mount-2.10m-nolock-docs.patch
-Patch202: mount-2.10o-nfsman.patch
-Patch204: mount-2.10r-2gb.patch
-Patch206: mount-2.10r-kudzu.patch
-Patch207: mount-2.11r-swapon.patch
-Patch209: mount-2.11b-swapoff.patch
-Patch210: util-linux-2.11b-largefile.patch
-Patch211: mount-2.11e-user_label_umount.patch
-Patch212: mount-2.11r-netdev.patch
-Patch220: util-linux-2.11n-makej.patch
-
-########### START UNSUBMITTED
-Patch103: util-linux-2.11r-ownerumount.patch
-Patch106: util-linux-2.11g-swaponsymlink-57300.patch
-Patch107: util-linux-2.11r-procpartitions-37436.patch
-Patch108: util-linux-2.11n-autosmb-32132.patch
+# Note on how to set up raw device mappings using RHL /etc/sysconfig/rawdevices
 Patch109: util-linux-2.11f-rawman.patch
-Patch111: util-linux-2.11n-mkfsman.patch
+
+######## Patches that should be upstream eventually
+Patch206: mount-2.10r-kudzu.patch
+#Patch207: util-linux-2.11w-swapon.patch
+#Patch211: mount-2.11e-user_label_umount.patch
+#Patch212: util-linux-2.11w-netdev.patch
+
+#Patch60: util-linux-2.10s-s390x.patch
+#Patch61: util-linux-2.11b-s390x.patch
+
+Patch103: util-linux-2.11r-ownerumount.patch
+Patch106: util-linux-2.11w-swaponsymlink-57300.patch
+Patch107: util-linux-2.11y-procpartitions-37436.patch
 Patch113: util-linux-2.11r-ctty3.patch
-Patch114: util-linux-2.11n-dumboctal.patch
-Patch115: util-linux-2.11n-fstabperm-61868.patch
 Patch116: util-linux-2.11n-loginutmp-66950.patch
-Patch117: util-linux-2.11r-moremisc.patch
-Patch300: util-linux-2.11n-ia64mkswap.patch
-Patch301: util-linux-2.11r-swapondetect.patch
-Patch302: util-linux-2.11r-largeswap.patch
+Patch117: util-linux-2.11y-moremisc.patch
 
-Patch118: util-linux-2.11r-gptsize-69603.patch
-Patch119: fdisk-add-primary.patch
+#Patch119: fdisk-add-primary.patch
 
-Patch120: util-linux-2.11r-skipraid2.patch
-Patch121: util-linux-2.11r-hwclock-72140.patch
-########### END UNSUBMITTED
+Patch120: util-linux-2.11y-skipraid2.patch
+#Patch121: util-linux-2.11r-hwclock-72140.patch
+#Patch122: util-linux-2.11r-hwclock_hammer.patch
+
+#Patch200: util-linux-2.11w-hammer.patch
+Patch123: util-linux-2.11y-blkgetsize-81069.patch
+Patch124: util-linux-2.11y-umount-75421.patch
+Patch125: util-linux-2.11y-umask-82552.patch
+Patch126: util-linux-2.11y-multibyte.patch
+Patch127: util-linux-2.11y-mcookie-83345.patch
+Patch128: util-linux-2.11y-ipcs-84243.patch
+
+# When adding patches, please make sure that it is easy to find out what bug # the 
+# patch fixes.
+########### END upstreamable
 
 Obsoletes: fdisk tunelp
 %ifarch alpha sparc sparc64 sparcv9 s390
@@ -105,7 +120,6 @@ program.
 Group: System Environment/Base
 Summary: Programs for mounting and unmounting filesystems.
 ExclusiveOS: Linux
-Prereq: mktemp /bin/awk /usr/bin/cmp textutils fileutils
 
 %description -n mount
 The mount package contains the mount, umount, swapon, and swapoff
@@ -130,7 +144,7 @@ device.
 
 %prep
 
-%setup -q -a 10
+%setup -q -a 10 -a 11
 
 %patch0 -p1 -b .rhconfig
 
@@ -147,12 +161,8 @@ device.
 # is under /usr and won't be accessable if / is mounted but /usr is not
 %patch27 -p1 -b .moretc
 
-%patch35 -p1 -b .loginpath
-
-%ifarch s390 s390x
-%patch60 -p1 -b .s390x2
-%patch61 -p1 -b .s390x
-%endif
+#patch60 -p1 -b .s390x2
+#patch61 -p1 -b .s390x
 
 # No support for large numbers of cylinders in fdisk{sgi,sun}label.*
 # Too many places in those files assume that it is an unsigned short,
@@ -167,16 +177,10 @@ cp %{SOURCE7} %{SOURCE6} .
 # nologin
 cp %{SOURCE8} %{SOURCE9} .
 
-%patch201 -p1 -b .docbug
-%patch202 -p1 -b .nfsman
-%patch204 -p1 -b .2gb
 %patch206 -p1 -b .kudzu
-%patch207 -p1 -b .swapon
-%patch209 -p2 -b .swapoff
-%patch210 -p1 -b .largefile
-%patch211 -p2 -b .userumount
-%patch212 -p1 -b .netdev
-%patch220 -p1 -b .makej
+#patch207 -p1 -b .swapon
+#patch211 -p2 -b .userumount
+#patch212 -p1 -b .netdev
 
 sed -e 's:^MAN_DIR=.*:MAN_DIR=%{_mandir}:' -e 's:^INFO_DIR=.*:INFO_DIR=%{_infodir}:' MCONFIG > MCONFIG.new
 mv MCONFIG.new MCONFIG
@@ -184,34 +188,34 @@ mv MCONFIG.new MCONFIG
 %patch103 -p1 -b .ownerumount
 %patch106 -p1 -b .swaponsymlink
 %patch107 -p1 -b .procpartitions
-%patch108 -p1 -b .autosmb
 %patch109 -p1 -b .rawman
-%patch111 -p1 -b .mkfsman
 
 %patch113 -p1 -b .ctty3
-%patch114 -p1 -b .dumboctal
-%patch115 -p1 -b .fstabperm
 %patch116 -p1 -b .loginutmp
 %patch117 -p1 -b .moremisc
-%patch118 -p1 -b .gptsize
-cd fdisk
-%patch119 -p0 -b .addprimary
-cd ..
+#cd fdisk
+#patch119 -p0 -b .addprimary
+#cd ..
 %patch120 -p1 -b .skipraid2
-%patch121 -p1 -b .hwclock
+#patch121 -p1 -b .hwclock
+#patch122 -p1 -b .hammer_rtc
+
+#patch200 -p1 -b .hammer
+%patch123 -p1 -b .blkgetsize
+%patch124 -p1 -b .umount
+%patch125 -p1 -b .umask
+%patch126 -p1 -b .multibyte
+%patch127 -p1 -b .mcookie-dumbness
 
 # All of this patch is in except a 'max swap size' change, which
 # doesn't seem to be needed
-#%patch300 -p1 -b .offtmkswap
-#%patch301 -p1 -b .detectswap
-%patch302 -p1 -b .largeswap
 
 %build
 unset LINGUAS || :
 
 %configure
 
-make "OPT=$RPM_OPT_FLAGS -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE" \
+make "OPT=$RPM_OPT_FLAGS -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64" \
 	LDFLAGS="" \
 	HAVE_PIVOT_ROOT=yes \
 	%{?_smp_mflags}
@@ -225,6 +229,12 @@ pushd kbdrate
     cc $RPM_OPT_FLAGS -o kbdrate kbdrate.c
 popd
 %endif
+
+pushd floppy-%{floppyver}
+# We have to disable floppygtk somehow...
+%configure --with-gtk-prefix=/asfd/jkl
+make %{?_smp_mflags}
+popd
 
 gcc $RPM_OPT_FLAGS -o mkcramfs mkcramfs.c -I. -lz
 
@@ -249,6 +259,9 @@ make \
         INSTALLBIN="install -m 755" \
         INSTALLMAN="install -m 644" \
 	install DESTDIR=${RPM_BUILD_ROOT}
+pushd floppy-%{floppyver}
+%makeinstall
+popd
 
 install -m 755 mount/pivot_root ${RPM_BUILD_ROOT}/sbin
 install -m 644 mount/pivot_root.8 ${RPM_BUILD_ROOT}%{_mandir}/man8
@@ -315,6 +328,35 @@ ln -sf hwclock ${RPM_BUILD_ROOT}/sbin/clock
 chmod 644 ${RPM_BUILD_ROOT}%{_datadir}/misc/getopt/*
 rm -f fdisk/README.cfdisk
 
+mkdir -p $RPM_BUILD_ROOT%{_datadir}/misc
+install text-utils/more.help $RPM_BUILD_ROOT%{_datadir}/misc/
+
+# Final cleanup
+%ifnarch %cytune_archs
+rm -f $RPM_BUILD_ROOT%{_bindir}/cytune $RPM_BUILD_ROOT%{_mandir}/man8/cytune.8*
+%endif
+%ifarch %no_sfdisk_archs
+rm -f $RPM_BUILD_ROOT/sbin/sfdisk $RPM_BUILD_ROOT%{_mandir}/man8/sfdisk.8*
+%endif
+%ifarch %no_hwclock_archs
+rm -f $RPM_BUILD_ROOT/sbin/{hwclock,clock} $RPM_BUILD_ROOT%{_mandir}/man8/hwclock.8*
+%endif
+%ifarch s390 s390x
+rm -f $RPM_BUILD_ROOT/usr/{bin,sbin}/{fdformat,tunelp,floppy,setfdprm} $RPM_BUILD_ROOT%{_mandir}/man8/{fdformat,tunelp,floppy,setfdprm}.8*
+rm -f $RPM_BUILD_ROOT/%{_sysconfdir}/fdprm
+%endif
+
+for I in /sbin/cfdisk /sbin/fsck.minix /sbin/mkfs.{bfs,minix} /sbin/sln %{_bindir}/line %{_bindir}/pg; do
+	rm -f $RPM_BUILD_ROOT$I
+done
+
+rm -f $RPM_BUILD_ROOT%{_mandir}/man1/line.1*
+rm -f $RPM_BUILD_ROOT%{_mandir}/man1/pg.1*
+rm -f $RPM_BUILD_ROOT%{_mandir}/man8/cfdisk.8*
+rm -f $RPM_BUILD_ROOT%{_mandir}/man8/fsck.minix.8*
+rm -f $RPM_BUILD_ROOT%{_mandir}/man8/mkfs.minix.8*
+rm -f $RPM_BUILD_ROOT%{_mandir}/man8/mkfs.bfs.8*
+
 %find_lang %{name}
 
 %clean
@@ -338,7 +380,9 @@ fi
 %attr(755,root,root)	/bin/login
 /bin/more
 
+%ifnarch s390 s390x
 %config %{_sysconfdir}/fdprm
+%endif
 %config %{_sysconfdir}/pam.d/chfn
 %config %{_sysconfdir}/pam.d/chsh
 %config %{_sysconfdir}/pam.d/login
@@ -346,37 +390,29 @@ fi
 /sbin/agetty
 /sbin/blockdev
 /sbin/pivot_root
-%ifnarch s390 s390x
-/sbin/clock
-/sbin/fdisk
-%endif
 /sbin/ctrlaltdel
 /sbin/elvtune
 /sbin/addpart
 /sbin/delpart
 /sbin/partx
 
-%ifarch %{ix86} alpha ia64 s390 s390x
-/sbin/fsck.minix
-/sbin/mkfs.minix
-/sbin/mkfs.bfs
-%{_mandir}/man8/fsck.minix.8*
-%{_mandir}/man8/mkfs.minix.8*
-%{_mandir}/man8/mkfs.bfs.8*
+%ifnarch %no_sfdisk_archs
 /sbin/sfdisk
 %{_mandir}/man8/sfdisk.8*
 %doc fdisk/sfdisk.examples
 %endif
 
-%ifnarch s390 s390x
+/sbin/fdisk
+%{_mandir}/man8/fdisk.8*
+%ifnarch %no_hwclock_archs
+/sbin/clock
 /sbin/hwclock
 /usr/sbin/hwclock
+%{_mandir}/man8/hwclock.8*
 %endif
 /sbin/mkfs
 /sbin/mkswap
-#/sbin/mkfs.bfs
 /sbin/rescuept
-#/sbin/sln
 /sbin/nologin
 %{_mandir}/man8/nologin.8*
 
@@ -396,12 +432,14 @@ fi
 %{_bindir}/colcrt
 %{_bindir}/colrm
 %{_bindir}/column
-%ifarch %{ix86} alpha armv4l
+%ifarch %cytune_archs
 %{_bindir}/cytune
 %{_mandir}/man8/cytune.8*
 %endif
 %{_bindir}/ddate
+%ifnarch s390 s390x
 %{_bindir}/fdformat
+%endif
 %{_bindir}/getopt
 %{_bindir}/hexdump
 %{_bindir}/ipcrm
@@ -411,6 +449,12 @@ fi
 %{_bindir}/look
 %{_bindir}/mcookie
 %{_bindir}/mkcramfs
+/sbin/fsck.cramfs
+/sbin/mkfs.cramfs
+%ifnarch s390 s390x
+%{_bindir}/floppy
+%{_mandir}/man8/floppy.8*
+%endif
 %{_bindir}/namei
 %attr(4711,root,root)	%{_bindir}/newgrp
 %{_bindir}/raw
@@ -418,13 +462,14 @@ fi
 %{_bindir}/renice
 %{_bindir}/rev
 %{_bindir}/script
+%ifnarch s390 s390x
 %{_bindir}/setfdprm
+%endif
 %{_bindir}/setsid
 %{_bindir}/setterm
 %ifarch sparc sparc64 sparcv9
 %{_bindir}/sunhostid
 %endif
-#%{_bindir}/tsort
 %{_bindir}/ul
 %{_bindir}/whereis
 %attr(2755,root,tty)	%{_bindir}/write
@@ -440,7 +485,7 @@ fi
 %{_mandir}/man8/vidmode.8*
 %endif
 %{_sbindir}/readprofile
-%ifnarch s390
+%ifnarch s390 s390x
 %{_sbindir}/tunelp
 %endif
 %{_sbindir}/vipw
@@ -459,7 +504,6 @@ fi
 %{_mandir}/man1/ddate.1*
 %{_mandir}/man1/getopt.1*
 %{_mandir}/man1/hexdump.1*
-#%{_mandir}/man1/hostid.1*
 %{_mandir}/man1/kill.1*
 %{_mandir}/man1/logger.1*
 %{_mandir}/man1/login.1*
@@ -473,7 +517,6 @@ fi
 %{_mandir}/man1/rev.1*
 %{_mandir}/man1/script.1*
 %{_mandir}/man1/setterm.1*
-#%{_mandir}/man1/tsort.1*
 %{_mandir}/man1/ul.1*
 %{_mandir}/man1/whereis.1*
 %{_mandir}/man1/write.1*
@@ -483,26 +526,27 @@ fi
 %{_mandir}/man8/ctrlaltdel.8*
 %{_mandir}/man8/dmesg.8*
 %{_mandir}/man8/elvtune.8*
-%{_mandir}/man8/fdformat.8*
 %ifnarch s390 s390x
-%{_mandir}/man8/fdisk.8*
-%{_mandir}/man8/hwclock.8*
+%{_mandir}/man8/fdformat.8*
 %endif
 %{_mandir}/man8/ipcrm.8*
 %{_mandir}/man8/ipcs.8*
 %{_mandir}/man8/isosize.8*
 %{_mandir}/man8/mkfs.8*
-#%{_mandir}/man8/mkfs.bfs.8*
 %{_mandir}/man8/mkswap.8*
 %{_mandir}/man8/pivot_root.8*
 %{_mandir}/man8/raw.8*
 %{_mandir}/man8/rawdevices.8*
 %{_mandir}/man8/renice.8*
+%ifnarch s390 s390x
 %{_mandir}/man8/setfdprm.8*
+%endif
 %{_mandir}/man8/setsid.8*
 # XXX this man page should be moved to glibc.
 %{_mandir}/man8/sln.8*
+%ifnarch s390 s390x
 %{_mandir}/man8/tunelp.8*
+%endif
 %{_mandir}/man8/vigr.8*
 %{_mandir}/man8/vipw.8*
 
@@ -528,6 +572,60 @@ fi
 /sbin/losetup
 
 %changelog
+* Mon Feb 24 2003 Elliot Lee <sopwith@redhat.com>
+- rebuilt
+
+* Wed Feb 19 2003 Elliot Lee <sopwith@redhat.com> 2.11y-8
+- ipcs-84243.patch to fix #84243
+
+* Thu Feb 13 2003 Yukihiro Nakai <ynakai@redhat.com> 2.11y-7
+- Update moremisc patch to fix swprintf()'s minimum field (bug #83361).
+
+* Mon Feb 03 2003 Elliot Lee <sopwith@redhat.com> 2.11y-6
+- Fix mcookie segfault on many 64-bit architectures (bug #83345).
+
+* Mon Feb 03 2003 Tim Waugh <twaugh@redhat.com> 2.11y-5
+- Fix underlined multibyte characters (bug #83376).
+
+* Sun Feb 02 2003 Florian La Roche <Florian.LaRoche@redhat.de>
+- rebuild to have again a s390 rpm
+- disable some more apps for mainframe
+
+* Wed Jan 29 2003 Elliot Lee <sopwith@redhat.com> 2.11y-4
+- util-linux-2.11y-umask-82552.patch
+
+* Wed Jan 22 2003 Tim Powers <timp@redhat.com>
+- rebuilt
+
+* Mon Jan 13 2003 Elliot Lee <sopwith@redhat.com> 2.11y-2
+- Fix #81069, #75421
+
+* Mon Jan 13 2003 Elliot Lee <sopwith@redhat.com> 2.11y-1
+- Update to 2.11y
+- Fix #80953
+- Update patch0, patch107, patch117, patch120 for 2.11y
+- Remove patch60, patch61, patch207, patch211, patch212, patch119, patch121
+- Remove patch122, patch200
+
+* Wed Oct 30 2002 Elliot Lee <sopwith@redhat.com> 2.11w-2
+- Remove some crack/unnecessary patches while submitting stuff upstream.
+- Build with -D_FILE_OFFSET_BITS=64
+
+* Tue Oct 29 2002 Elliot Lee <sopwith@redhat.com> 2.11w-1
+- Update to 2.11w, resolve patch conflicts
+
+* Tue Oct 08 2002 Phil Knirsch <pknirsch@redhat.com> 2.11r-10hammer.3
+- Extended util-linux-2.11b-s390x patch to work again.
+
+* Thu Oct 03 2002 Elliot Lee <sopwith@redhat.com> 2.11r-10hammer.2
+- Add patch122 for hwclock on x86_64
+
+* Thu Sep 12 2002 Than Ngo <than@redhat.com> 2.11r-10hammer.1
+- Fixed pam config files
+
+* Wed Sep 11 2002 Bernhard Rosenkraenzer <bero@redhat.com> 2.11r-10hammer
+- Port to hammer
+
 * Fri Aug 30 2002 Elliot Lee <sopwith@redhat.com> 2.11r-10
 - Patch120 (hwclock) to fix #72140
 - Include isosize util

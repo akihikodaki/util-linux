@@ -1,0 +1,109 @@
+--- util-linux-2.11y/mount/linux_fs.h.skipraid2	2002-10-07 09:08:22.000000000 -0400
++++ util-linux-2.11y/mount/linux_fs.h	2003-01-13 14:42:57.000000000 -0500
+@@ -13,6 +13,12 @@
+ #endif
+ #endif
+ 
++#include <inttypes.h>
++#ifndef BLKGETSIZE64
++#include <sys/ioctl.h>
++#define BLKGETSIZE64 _IOR(0x12,114,sizeof(uint64_t))
++#endif
++
+ #define MINIX_SUPER_MAGIC   0x137F         /* minix v1, 14 char names */
+ #define MINIX_SUPER_MAGIC2  0x138F         /* minix v1, 30 char names */
+ #define MINIX2_SUPER_MAGIC  0x2468	   /* minix v2, 14 char names */
+--- util-linux-2.11y/mount/get_label_uuid.c.skipraid2	2003-01-13 14:44:04.000000000 -0500
++++ util-linux-2.11y/mount/get_label_uuid.c	2003-01-13 14:46:34.000000000 -0500
+@@ -6,6 +6,8 @@
+ #include <unistd.h>
+ #include <stdlib.h>
+ #include <string.h>
++#include <endian.h>
++#include <sys/stat.h>
+ 
+ #include "linux_fs.h"
+ #include "get_label_uuid.h"
+@@ -19,28 +21,62 @@
+  *  not on the disks that form the raid array. This test causes a lot of
+  *  problems when run on my striped promise fasttrak 100 array."
+  */
+-static inline int
+-is_raid_partition(int fd) {
+-#if 0
+-	struct mdp_super_block mdsb;
+-	int n;
+-
+-	/* hardcode 4096 here in various places, because that's
+-	   what it's defined to be.  Note that even if we used
+-	   the actual kernel headers, sizeof(mdp_super_t) is
+-	   slightly larger in the 2.2 kernel on 64-bit archs,
+-	   so using that wouldn't work. */
+-	lseek(fd, -4096, SEEK_END);	/* Ignore possible error
+-					   about return value overflow */
+-	n = 4096;
+-	if (sizeof(mdsb) < n)
+-		n = sizeof(mdsb);
+-	if (read(fd, &mdsb, n) != n)
+-		return 1;		/* error */
+-	return (mdsbmagic(mdsb) == MD_SB_MAGIC);
++
++#if BYTE_ORDER == BIG_ENDIAN
++#define INT32_FROM_LE(val)        ((unsigned int) ( \
++    (((unsigned int) (val) & (unsigned int) 0x000000ffU) << 24) | \
++    (((unsigned int) (val) & (unsigned int) 0x0000ff00U) <<  8) | \
++    (((unsigned int) (val) & (unsigned int) 0x00ff0000U) >>  8) | \
++    (((unsigned int) (val) & (unsigned int) 0xff000000U) >> 24)))
+ #else
+-	return 0;
++#define INT32_FROM_LE(val) (val)
++#endif
++
++typedef struct {
++	unsigned int md_magic;
++} mdp_super_t;
++#ifndef MD_SB_MAGIC
++#define MD_SB_MAGIC		0xa92b4efc
++#endif
++#ifndef MD_RESERVED_BYTES
++#define MD_RESERVED_BYTES 65536L
+ #endif
++#ifndef MD_NEW_SIZE_BYTES
++#define MD_NEW_SIZE_BYTES(x)		((x & ~(MD_RESERVED_BYTES - 1L)) - MD_RESERVED_BYTES)
++#endif
++
++static int
++is_raid_partition(int fd)
++{
++        mdp_super_t mdsb;
++        int n;
++	struct stat sbuf;
++ 	if(fstat(fd, &sbuf))
++	  return 2;
++	if(!sbuf.st_size) {
++		uint64_t bsize64;
++		unsigned int bsize32;
++		if(!ioctl(fd, BLKGETSIZE64, &bsize64))
++			sbuf.st_size = bsize64;
++		else if(!ioctl(fd, BLKGETSIZE, &bsize32))
++			sbuf.st_size = bsize32;
++	}
++	if(!sbuf.st_size) return 3;
++	/* hardcode 4096 here in various places,
++	   because that's what it's defined to be.
++	   Note that even if we used the actual kernel headers,
++	   sizeof(mdp_super_t) is slightly larger in the 2.2 kernel on 64-bit
++	   archs, so using that wouldn't work. */
++	lseek(fd, MD_NEW_SIZE_BYTES(sbuf.st_size), SEEK_SET);
++	n = 4096; if(sizeof(mdsb) < n) n = sizeof(mdsb);
++        if(read(fd, &mdsb, n) != n)
++	  return 4; /* error */
++	mdsb.md_magic = INT32_FROM_LE(mdsb.md_magic);
++	return (mdsb.md_magic == MD_SB_MAGIC); /* If this device has a
++						  RAID superblock at
++						  the end, it must be
++						  part of a RAID
++						  array. */
+ }
+ 
+ /* for now, only ext2, ext3, xfs, ocfs are supported */
