@@ -609,7 +609,7 @@ fi
 /sbin/losetup
 
 %changelog
-* Fri Dec 10 2004 Elliot Lee <sopwith@redhat.com> 2.12a-21
+* Fri Dec 10 2004 Elliot Lee <sopwith@redhat.com> 2.12j-1
 - Update to util-linux-2.12j
 
 * Tue Dec  7 2004 Steve Dickson <SteveD@RedHat.com> 2.12a-20
