@@ -12,7 +12,7 @@
 Summary: A collection of basic system utilities.
 Name: util-linux
 Version: 2.12a
-Release: 13
+Release: 14
 License: distributable
 Group: System Environment/Base
 
@@ -87,6 +87,9 @@ Patch156: util-linux-2.12a-fdiskmessage-107824.patch
 Patch157: util-linux-2.12a-pamstart.patch
 
 Patch158: util-linux-2.12a-moreswaplabel.patch
+
+# Patch to enable the pamconsole flag for restricting mounting to users at the console (#133941)
+Patch159: util-linux-2.12a-console.patch
 
 # patches required for NFSv4 support
 Patch1000: util-linux-2.12-nfsv4.patch
@@ -199,6 +202,8 @@ mv MCONFIG.new MCONFIG
 %patch156 -p1 -b .fdiskmessage
 %patch157 -p1 -b .pamstart
 %patch158 -p1
+
+%patch159 -p1 -b .console
 
 %patch1000 -p1 -b .nfsv4
 
@@ -568,6 +573,9 @@ fi
 /sbin/losetup
 
 %changelog
+* Wed Oct 13 2004 John (J5) Palmieri <johnp@redhat.com> 2.12a-14
+- Add David Zeuthen's patch to enable the pamconsole flag #133941
+
 * Wed Oct 13 2004 Stephen C. Tweedie <sct@redhat.com> 2.12a-13
 - Restore raw utils (bugzilla #130016)
 
