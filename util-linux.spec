@@ -5,7 +5,7 @@
 Summary: A collection of basic system utilities.
 Name: util-linux
 Version: 2.11r
-Release: 9
+Release: 10
 License: distributable
 Group: System Environment/Base
 
@@ -77,6 +77,7 @@ Patch118: util-linux-2.11r-gptsize-69603.patch
 Patch119: fdisk-add-primary.patch
 
 Patch120: util-linux-2.11r-skipraid2.patch
+Patch121: util-linux-2.11r-hwclock-72140.patch
 ########### END UNSUBMITTED
 
 Obsoletes: fdisk tunelp
@@ -196,7 +197,8 @@ mv MCONFIG.new MCONFIG
 cd fdisk
 %patch119 -p0 -b .addprimary
 cd ..
-%patch120 -p1 -b .sopwith
+%patch120 -p1 -b .skipraid2
+%patch121 -p1 -b .hwclock
 
 # All of this patch is in except a 'max swap size' change, which
 # doesn't seem to be needed
@@ -404,6 +406,7 @@ fi
 %{_bindir}/hexdump
 %{_bindir}/ipcrm
 %{_bindir}/ipcs
+%{_bindir}/isosize
 %{_bindir}/logger
 %{_bindir}/look
 %{_bindir}/mcookie
@@ -487,6 +490,7 @@ fi
 %endif
 %{_mandir}/man8/ipcrm.8*
 %{_mandir}/man8/ipcs.8*
+%{_mandir}/man8/isosize.8*
 %{_mandir}/man8/mkfs.8*
 #%{_mandir}/man8/mkfs.bfs.8*
 %{_mandir}/man8/mkswap.8*
@@ -524,8 +528,12 @@ fi
 /sbin/losetup
 
 %changelog
+* Fri Aug 30 2002 Elliot Lee <sopwith@redhat.com> 2.11r-10
+- Patch120 (hwclock) to fix #72140
+- Include isosize util
+
 * Wed Aug 7 2002  Elliot Lee <sopwith@redhat.com> 2.11r-9
-- Patch120 (skiproot2) to fix #70353, because the original patch was 
+- Patch120 (skipraid2) to fix #70353, because the original patch was 
 totally useless.
 
 * Fri Aug 2 2002  Elliot Lee <sopwith@redhat.com> 2.11r-8
