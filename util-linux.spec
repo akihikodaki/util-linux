@@ -21,7 +21,7 @@
 Summary: A collection of basic system utilities.
 Name: util-linux
 Version: 2.12a
-Release: 17
+Release: 18
 License: distributable
 Group: System Environment/Base
 
@@ -108,6 +108,7 @@ Patch161: util-linux-2.12a-solarispart.patch
 
 # patches required for NFSv4 support
 Patch1000: util-linux-2.12-nfsv4.patch
+Patch1001: util-linux-2.12a-mount-proto.patch
 
 # When adding patches, please make sure that it is easy to find out what bug # the 
 # patch fixes.
@@ -229,6 +230,7 @@ mv MCONFIG.new MCONFIG
 %patch161 -p1
 
 %patch1000 -p1 -b .nfsv4
+%patch1001 -p1
 
 %build
 unset LINGUAS || :
@@ -604,6 +606,11 @@ fi
 /sbin/losetup
 
 %changelog
+* Mon Nov 29 2004 Steve Dickson <SteveD@RedHat.com>
+- Made NFS mounts adhere to the IP protocol if specified on
+  command line as well as made NFS umounts adhere to the
+  current IP protocol. Fix #140016
+
 * Thu Oct 14 2004 Elliot Lee <sopwith@redhat.com> 2.12a-16
 - Add include_raw macro, build with it off for Fedora
 
