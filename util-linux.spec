@@ -15,7 +15,7 @@
 %define raw_options %{nil}
 %endif
 
-%define make_options HAVE_BLKID=no HAVE_PIVOT_ROOT=yes HAVE_PAM=yes HAVE_SHADOW=no HAVE_PASSWD=yes ALLOW_VCS_USE=no %{raw_options} HAVE_SLANG=yes HAVE_SELINUX=yes SLANGFLAGS=-I/usr/include/slang INSTALLSUID='$(INSTALL) -m $(SUIDMODE)' USE_TTY_GROUP=no
+%define make_options HAVE_BLKID=yes HAVE_PIVOT_ROOT=yes HAVE_PAM=yes HAVE_SHADOW=no HAVE_PASSWD=yes ALLOW_VCS_USE=no %{raw_options} HAVE_SLANG=yes HAVE_SELINUX=yes SLANGFLAGS=-I/usr/include/slang INSTALLSUID='$(INSTALL) -m $(SUIDMODE)' USE_TTY_GROUP=no
 %define make_cflags -DUSE_TTY_GROUP -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64 
 
 %define with_kbdrate 0
@@ -27,7 +27,7 @@
 Summary: A collection of basic system utilities.
 Name: util-linux
 Version: 2.12p
-Release: 5
+Release: 6
 License: distributable
 Group: System Environment/Base
 
@@ -40,6 +40,7 @@ BuildRequires: slang-devel
 BuildRequires: texinfo
 BuildRequires: gettext
 BuildRequires: libselinux-devel
+BuildRequires: e2fsprogs-devel >= 1.36
 
 Source0: ftp://ftp.win.tue.nl/pub/linux-local/utils/util-linux/util-linux-%{version}.tar.gz
 Source1: util-linux-selinux.pamd
@@ -115,8 +116,6 @@ Patch180: util-linux-2.12p-login-lastlog.patch
 Patch181: util-linux-2.12p-mtab-lock.patch
 # Stupid typo (#151156)
 Patch182: util-linux-2.12p-ipcs-typo.patch
-# priority for duplicated labels (multipath) (#116300)
-Patch183: util-linux-2.12p-mount-duplabel.patch
 
 # When adding patches, please make sure that it is easy to find out what bug # the 
 # patch fixes.
@@ -236,7 +235,6 @@ mv MCONFIG.new MCONFIG
 %patch180 -p1 -b .lastlog
 %patch181 -p1
 %patch182 -p1 -b .typo
-%patch183 -p1 -b .duplabel
 
 %build
 unset LINGUAS || :
@@ -627,6 +625,10 @@ fi
 /sbin/losetup
 
 %changelog
+* Tue Apr  5 2005 Karel Zak <kzak@redhat.com> 2.12p-6
+- enable build with libblkid from e2fsprogs-devel
+- remove workaround for duplicated labels
+
 * Thu Mar 31 2005 Steve Dickson <SteveD@RedHat.com> 2.12p-5
 - Fixed nfs mount to rollback correctly.
 
