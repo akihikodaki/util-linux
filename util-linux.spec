@@ -4,7 +4,7 @@
 # TODO:
 # Investigate turning on HAVE_BLKID - it's the right idea, it just needs verifying.
 #
-# Upstream maintainer Andries Brouwer <aeb@cwi.nl>
+# Upstream maintainer Adrian Bunk <bunk@stusta.de>
 
 # 'raw' support is deprecated, only ship it if we need compatibility stuff.
 %define include_raw 0
@@ -95,6 +95,7 @@ Patch159: util-linux-2.12j-pamconsole.patch
 Patch160: raw-handle-nonpresent-devs.patch
 
 Patch164: util-linux-2.12j-113790-hotkeys.patch
+Patch168: util-linux-2.12j-143597-newgrp.patch
 
 # patches required for NFSv4 support
 Patch1000: util-linux-2.12p-nfsv4.patch
@@ -205,6 +206,7 @@ mv MCONFIG.new MCONFIG
 %endif
 
 %patch164 -p1
+%patch168 -p1
 
 %patch1000 -p1 -b .nfsv4
 %patch1001 -p1
