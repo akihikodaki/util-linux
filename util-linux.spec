@@ -1,3 +1,6 @@
+# TODO:
+# Investigate turning on HAVE_BLKID - it's the right idea, it just needs verifying.
+#
 # Upstream maintainer aeb@cwi.nl
 
 # 'raw' support is deprecated, only ship it if we need compatibility stuff.
@@ -9,7 +12,7 @@
 %define raw_options %{nil}
 %endif
 
-%define make_options HAVE_PIVOT_ROOT=yes HAVE_PAM=yes HAVE_SHADOW=no HAVE_PASSWD=yes ALLOW_VCS_USE=no %{raw_options} HAVE_SLANG=yes HAVE_SELINUX=yes SLANGFLAGS=-I/usr/include/slang INSTALLSUID='$(INSTALL) -m $(SUIDMODE)' USE_TTY_GROUP=no
+%define make_options HAVE_BLKID=no HAVE_PIVOT_ROOT=yes HAVE_PAM=yes HAVE_SHADOW=no HAVE_PASSWD=yes ALLOW_VCS_USE=no %{raw_options} HAVE_SLANG=yes HAVE_SELINUX=yes SLANGFLAGS=-I/usr/include/slang INSTALLSUID='$(INSTALL) -m $(SUIDMODE)' USE_TTY_GROUP=no
 %define make_cflags -DUSE_TTY_GROUP -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64 
 
 %define with_kbdrate 0
@@ -472,6 +475,7 @@ fi
 %ifnarch s390 s390x
 %{_bindir}/fdformat
 %endif
+%{_bindir}/flock
 %{_bindir}/getopt
 %{_bindir}/hexdump
 %{_bindir}/ipcrm
@@ -538,6 +542,7 @@ fi
 %{_mandir}/man1/colrm.1*
 %{_mandir}/man1/column.1*
 %{_mandir}/man1/ddate.1*
+%{_mandir}/man1/flock.1*
 %{_mandir}/man1/getopt.1*
 %{_mandir}/man1/hexdump.1*
 %{_mandir}/man1/kill.1*
