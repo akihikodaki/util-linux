@@ -27,7 +27,7 @@
 Summary: A collection of basic system utilities.
 Name: util-linux
 Version: 2.12p
-Release: 1
+Release: 2
 License: distributable
 Group: System Environment/Base
 
@@ -101,6 +101,7 @@ Patch168: util-linux-2.12j-143597-newgrp.patch
 Patch1000: util-linux-2.12p-nfsv4.patch
 Patch1001: util-linux-2.12a-mount-proto.patch
 Patch1002: util-linux-2.12a-nfsmount-overflow.patch
+Patch1003: util-linux-2.12a-nfsmount-reservp.patch
 
 # When adding patches, please make sure that it is easy to find out what bug # the 
 # patch fixes.
@@ -211,6 +212,7 @@ mv MCONFIG.new MCONFIG
 %patch1000 -p1 -b .nfsv4
 %patch1001 -p1
 %patch1002 -p1
+%patch1003 -p1
 
 %build
 unset LINGUAS || :
@@ -588,6 +590,10 @@ fi
 /sbin/losetup
 
 %changelog
+* Fri Feb 25 2005 Steve Dickson <SteveD@RedHat.com> 2.12p-2
+- Changed nfsmount to only use reserve ports when necessary
+  (bz# 141773) 
+
 * Thu Dec 23 2004 Elliot Lee <sopwith@redhat.com> 2.12p-1
 - Update to util-linux-2.12p. This changes swap header format
   from - you may need to rerun mkswap if you did a clean install of
