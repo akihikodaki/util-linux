@@ -9,7 +9,7 @@
 Summary: A collection of basic system utilities.
 Name: util-linux
 Version: 2.11y
-Release: 9
+Release: 9.1
 License: distributable
 Group: System Environment/Base
 
@@ -90,6 +90,7 @@ Patch125: util-linux-2.11y-umask-82552.patch
 Patch126: util-linux-2.11y-multibyte.patch
 Patch127: util-linux-2.11y-mcookie-83345.patch
 Patch128: util-linux-2.11y-ipcs-84243.patch
+Patch129: util-linux-2.11y-login-32bit-lastlog-88574.patch
 
 # When adding patches, please make sure that it is easy to find out what bug # the 
 # patch fixes.
@@ -206,6 +207,7 @@ mv MCONFIG.new MCONFIG
 %patch125 -p1 -b .umask
 %patch126 -p1 -b .multibyte
 %patch127 -p1 -b .mcookie-dumbness
+%patch129 -p1 -b .login32bitcompat
 
 # All of this patch is in except a 'max swap size' change, which
 # doesn't seem to be needed
@@ -572,6 +574,9 @@ fi
 /sbin/losetup
 
 %changelog
+* Thu Apr 10 2003 Matt Wilson <msw@redhat.com> 2.11y-9.1
+- fix last login date display on AMD64 (#88574)
+
 * Mon Feb 24 2003 Elliot Lee <sopwith@redhat.com>
 - rebuilt
 
