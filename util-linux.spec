@@ -1,45 +1,50 @@
+# Maintainer util-linux@math.uio.no
+
 Summary: A collection of basic system utilities.
 Name: util-linux
-Version: 2.10s
-Release: 13.7
+Version: 2.11f
+Release: 7
 Copyright: distributable
 Group: System Environment/Base
-Source0: ftp://ftp.kernel.org/pub/linux/utils/util-linux/util-linux-%{version}.tar.gz
+Source0: ftp://ftp.kernel.org/pub/linux/utils/util-linux/util-linux-%{version}.tar.bz2
 Source1: util-linux-2.7-login.pamd
 Source2: util-linux-2.7-chfn.pamd
 Source3: util-linux-2.7-chsh.pamd
-Source4: util-linux-2.9w-kbdrate.pamd
-Source5: util-linux-2.9w-kbdrate.apps
 Source6: mkcramfs.c
 Source7: cramfs.h
+Source8: nologin.c
+Source9: nologin.8
+Source10: kbdrate.tar.gz
 
-Patch0: util-linux-2.10o-rhconfig.patch
+BuildRequires: pam-devel
+BuildRequires: ncurses-devel
+BuildRequires: libtermcap-devel
+BuildRequires: slang-devel
+BuildRequires: zlib-devel
+
+Patch0: util-linux-2.11a-rhconfig.patch
 Patch1: util-linux-2.10e-nochkdupexe.patch
-Patch2: util-linux-2.10m-gecos.patch
+Patch2: util-linux-2.11a-gecossize.patch
+
 # XXX apply next patch to enable mount-2.8 from util-linux (not applied)
 Patch4: util-linux-2.9i-mount.patch
-Patch6: util-linux-2.9i-fdiskwarning.patch
+
 Patch8: util-linux-2.9i-nomount.patch
-Patch11: util-linux-2.10p-btmp.patch
+Patch9: util-linux-2.11f-vipw.patch
 Patch21: util-linux-2.9v-nonroot.patch
-Patch23: util-linux-2.9w-kbdrate.patch
-Patch27: util-linux-2.10f-moretc.patch
-Patch28: util-linux-2.10k-sparcraid.patch
-Patch31: util-linux-2.10k-overflow.patch
-Patch32: util-linux-2.10k-glibc.patch
+Patch27: util-linux-2.11a-moretc.patch
 Patch35: util-linux-2.10m-loginpath.patch
-Patch36: util-linux-2.10m-dict.patch
-Patch37: util-linux-2.10m-fdisk-efi-dell.patch
-Patch50: util-linux-2.10m-s390.patch
-Patch51: util-linux-2.10p-extended.patch
-Patch52: util-linux-2.10p-moremandate.patch
-Patch53: util-linux-2.10p-fdisk-l.patch
-Patch54: util-linux-2.10s-vipwrace.patch
-Patch55: util-linux-2.10s-killman.patch
-Patch56: util-linux-2.10s-vipwshadow.patch
-Patch57: util-linux-2.10s-logingrp.patch
-Patch58: util-linux-2.10s-ipc-info.patch
-Patch59: util-linux-2.10s-swapon.patch
+Patch60: util-linux-2.10s-s390x.patch
+Patch61: util-linux-2.11b-s390x.patch
+
+Patch70: util-linux-2.11f-miscfixes.patch
+
+# This patch got added upstream in 2.11. Then we reverted it from our
+# local 2.10s copy. Oops.
+Patch75: util-linux-2.11f-logingrp-revert.patch
+
+Patch100: mkcramfs.patch
+Patch101: mkcramfs-quiet.patch
 
 Obsoletes: fdisk tunelp
 %ifarch alpha sparc sparc64 sparcv9 s390
@@ -49,19 +54,19 @@ Obsoletes: clock
 Conflicts: initscripts <= 4.58, timeconfig <= 3.0.1
 %endif
 BuildRoot: %{_tmppath}/%{name}-root
-Requires: pam >= 0.66-4, /etc/pam.d/system-auth
+Requires: pam >= 0.66-4, /etc/pam.d/system-auth, usermode
 Conflicts: kernel < 2.2.12-7, 
 Prereq: /sbin/install-info
 
 %description
 The util-linux package contains a large variety of low-level system
 utilities that are necessary for a Linux system to function.  Among
-many features, Util-linux contains the fdisk configuration tool and
-the login program.
+others, Util-linux contains the fdisk configuration tool and the login
+program.
 
 %prep
 
-%setup -q
+%setup -q -a 10
 
 %patch0 -p1 -b .rhconfig
 %patch1 -p1 -b .nochkdupexe
@@ -70,46 +75,48 @@ the login program.
 # mount comes from its own rpm (again)
 #%patch4 -p1 -b .mount
 
-%patch6 -p1 -b .fdiskwarning
 %patch8 -p1 -b .nomount
-%patch11 -p1 -b .btmp
 %patch21 -p1 -b .nonroot
-%patch23 -p1 -b .kbdrate
 
 %patch27 -p1 -b .moretc
-%patch28 -p1 -b .sparcraid
-
-%patch31 -p1 -b .overflow
-
-%patch32 -p1 -b .nonx86
-
 %patch35 -p1 -b .loginpath
-%patch36 -p1 -b .dict
-%patch37 -p1 -b .bug17610
 
-%patch50 -p1 -b .s390
+%ifarch s390 s390x
+%patch60 -p1 -b .s390x2
+%patch61 -p1 -b .s390x
+%endif
 
-%patch51 -p1 -b .extendedfix
-%patch52 -p1 -b .moreman
-%patch53 -p1 -b .fdisk-l
-%patch54 -p1 -b .vipwrace
-%patch55 -p1 -b .killman
-%patch56 -p1 -b .vipwshadow
-#%patch57 -p1 -b .logingrp
-%patch58 -p1 -b .dirinfo
-%patch59 -p1 -b .swapon
+%patch70 -p1
+
+%patch75 -p1
+
+# mkcramfs
+cp %{SOURCE7} %{SOURCE6} .
+%patch100 -p1 -b .mkcramfs
+%patch101 -p1 -b .quiet
+
+# nologin
+cp %{SOURCE8} %{SOURCE9} .
 
 %build
 unset LINGUAS || :
 
 %configure
-make "OPT=$RPM_OPT_FLAGS -g" 
+
+make "OPT=$RPM_OPT_FLAGS -g -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE" \
+	%{?_smp_mflags}
+make "OPT=$RPM_OPT_FLAGS -g -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE" HAVE_PIVOT_ROOT=yes -C mount pivot_root
 cd rescuept
 gcc $RPM_OPT_FLAGS -o rescuept rescuept.c
 cd ..
 
-cp %{SOURCE7} .
-gcc $RPM_OPT_FLAGS -o mkcramfs %{SOURCE6} -I. -lz
+pushd kbdrate
+    cc $RPM_OPT_FLAGS -o kbdrate kbdrate.c
+popd
+
+gcc $RPM_OPT_FLAGS -o mkcramfs mkcramfs.c -I. -lz
+
+gcc $RPM_OPT_FLAGS -o nologin nologin.c
 
 pushd sys-utils
     makeinfo --number-sections ipc.texi
@@ -122,11 +129,18 @@ mkdir -p ${RPM_BUILD_ROOT}%{_bindir}
 mkdir -p ${RPM_BUILD_ROOT}%{_infodir}
 mkdir -p ${RPM_BUILD_ROOT}%{_mandir}/man{1,6,8}
 mkdir -p ${RPM_BUILD_ROOT}%{_sbindir}
+mkdir -p ${RPM_BUILD_ROOT}%{_sysconfdir}/{pam.d,security/console.apps}
 
 make install DESTDIR=${RPM_BUILD_ROOT}
 
+install -s -m 755 mount/pivot_root ${RPM_BUILD_ROOT}/sbin
+install -s -m 755 mount/pivot_root.8 ${RPM_BUILD_ROOT}%{_mandir}/man8
 install -m 755 rescuept/rescuept ${RPM_BUILD_ROOT}/sbin
 install -m 755 mkcramfs ${RPM_BUILD_ROOT}/usr/bin
+install -m 755 nologin ${RPM_BUILD_ROOT}/sbin
+install -m 644 kbdrate/kbdrate.8 nologin.8 ${RPM_BUILD_ROOT}%{_mandir}/man8
+install -m 555 kbdrate/kbdrate ${RPM_BUILD_ROOT}/sbin
+ln -s consolehelper ${RPM_BUILD_ROOT}/usr/bin/kbdrate
 
 if [ "%{_mandir}" != "%{_prefix}/man" -a -d ${RPM_BUILD_ROOT}%{_prefix}/man ]; then
    ( cd ${RPM_BUILD_ROOT}%{_prefix}/man; tar cf - ./* ) |
@@ -162,24 +176,18 @@ chmod 755 ${RPM_BUILD_ROOT}%{_bindir}/sunhostid
 
 gzip -9nf ${RPM_BUILD_ROOT}%{_infodir}/ipc.info
 
-mkdir -p ${RPM_BUILD_ROOT}%{_sysconfdir}/pam.d
+install -m644 kbdrate/kbdrate.apps $RPM_BUILD_ROOT%{_sysconfdir}/security/console.apps/kbdrate
+install -m644 kbdrate/kbdrate.pam $RPM_BUILD_ROOT%{_sysconfdir}/pam.d/kbdrate
 { 
   pushd ${RPM_BUILD_ROOT}%{_sysconfdir}/pam.d
   install -m 644 ${RPM_SOURCE_DIR}/util-linux-2.7-login.pamd ./login
   install -m 644 ${RPM_SOURCE_DIR}/util-linux-2.7-chsh.pamd ./chsh
   install -m 644 ${RPM_SOURCE_DIR}/util-linux-2.7-chsh.pamd ./chfn
-  install -m 644 ${RPM_SOURCE_DIR}/util-linux-2.9w-kbdrate.pamd ./kbdrate
   popd
 }
 
-mkdir -p ${RPM_BUILD_ROOT}%{_sysconfdir}/security/console.apps
-{ pushd ${RPM_BUILD_ROOT}%{_sysconfdir}/security/console.apps
-  install -m 644 ${RPM_SOURCE_DIR}/util-linux-2.9w-kbdrate.apps ./kbdrate
-  popd
-}
-
-ln -sf consolehelper ${RPM_BUILD_ROOT}%{_bindir}/kbdrate
-
+ln -sf ../../sbin/hwclock ${RPM_BUILD_ROOT}/usr/sbin/hwclock
+ln -sf ../../sbin/clock ${RPM_BUILD_ROOT}/usr/sbin/clock
 ln -sf hwclock ${RPM_BUILD_ROOT}/sbin/clock
 
 # We do not want dependencies on csh
@@ -216,34 +224,46 @@ fi
 %config %{_sysconfdir}/fdprm
 %config %{_sysconfdir}/pam.d/chfn
 %config %{_sysconfdir}/pam.d/chsh
-%config %{_sysconfdir}/pam.d/kbdrate
 %config %{_sysconfdir}/pam.d/login
-%config %{_sysconfdir}/security/console.apps/kbdrate
 
 /sbin/agetty
 /sbin/blockdev
+/sbin/pivot_root
+%ifnarch s390 s390x
 /sbin/clock
+%endif
 /sbin/ctrlaltdel
 /sbin/elvtune
 /sbin/fdisk
 
-%ifarch %{ix86} alpha ia64
+%ifarch %{ix86} alpha ia64 s390 s390x
 /sbin/fsck.minix
 /sbin/mkfs.minix
+/sbin/mkfs.bfs
 %{_mandir}/man8/fsck.minix.8*
 %{_mandir}/man8/mkfs.minix.8*
+%{_mandir}/man8/mkfs.bfs.8*
 /sbin/sfdisk
 %{_mandir}/man8/sfdisk.8*
 %doc fdisk/sfdisk.examples
 %endif
 
+%ifnarch s390 s390x
 /sbin/hwclock
-/sbin/kbdrate
+/usr/sbin/hwclock
+%endif
 /sbin/mkfs
 /sbin/mkswap
 #/sbin/mkfs.bfs
 /sbin/rescuept
 #/sbin/sln
+/sbin/nologin
+%{_mandir}/man8/nologin.8*
+/sbin/kbdrate
+/usr/bin/kbdrate
+%{_mandir}/man8/kbdrate.8*
+%{_sysconfdir}/pam.d/kbdrate
+%{_sysconfdir}/security/console.apps/kbdrate
 
 %{_bindir}/cal
 %attr(4711,root,root)	%{_bindir}/chfn
@@ -262,7 +282,6 @@ fi
 %{_bindir}/hexdump
 %{_bindir}/ipcrm
 %{_bindir}/ipcs
-%{_bindir}/kbdrate
 %{_bindir}/logger
 %{_bindir}/look
 %{_bindir}/mcookie
@@ -295,12 +314,10 @@ fi
 %{_sbindir}/rdev
 %{_sbindir}/ramsize
 %{_sbindir}/rootflags
-%{_sbindir}/swapdev
 %{_sbindir}/vidmode
 %{_mandir}/man8/rdev.8*
 %{_mandir}/man8/ramsize.8*
 %{_mandir}/man8/rootflags.8*
-%{_mandir}/man8/swapdev.8*
 %{_mandir}/man8/vidmode.8*
 %endif
 %{_sbindir}/readprofile
@@ -340,22 +357,25 @@ fi
 %{_mandir}/man1/whereis.1*
 %{_mandir}/man1/write.1*
 
+%{_mandir}/man1/arch.1*
 %{_mandir}/man6/banner.6*
 
-#%{_mandir}/man8/agtetty.8*
+%{_mandir}/man8/agetty.8*
 %{_mandir}/man8/blockdev.8*
 %{_mandir}/man8/ctrlaltdel.8*
 %{_mandir}/man8/dmesg.8*
 %{_mandir}/man8/elvtune.8*
 %{_mandir}/man8/fdformat.8*
 %{_mandir}/man8/fdisk.8*
+%ifnarch s390 s390x
 %{_mandir}/man8/hwclock.8*
+%endif
 %{_mandir}/man8/ipcrm.8*
 %{_mandir}/man8/ipcs.8*
-%{_mandir}/man8/kbdrate.8*
 %{_mandir}/man8/mkfs.8*
 #%{_mandir}/man8/mkfs.bfs.8*
 %{_mandir}/man8/mkswap.8*
+%{_mandir}/man8/pivot_root.8*
 %{_mandir}/man8/raw.8*
 %{_mandir}/man8/renice.8*
 %{_mandir}/man8/setfdprm.8*
@@ -370,16 +390,64 @@ fi
 %{_datadir}/misc/more.help
 
 %changelog
+* Mon Jul 30 2001 Elliot Lee <sopwith@redhat.com> 2.11f-7
+- Incorporate kbdrate back in.
+
+* Mon Jul 30 2001 Bill Nottingham <notting@redhat.com>
+- revert the patch that calls setsid() in login that we had reverted
+  locally but got integrated upstream (#46223)
+
+* Tue Jul 24 2001 Florian La Roche <Florian.LaRoche@redhat.de>
+- correct s390x patch
+
+* Mon Jul 23 2001 Elliot Lee <sopwith@redhat.com>
+- Add my megapatch (various bugs)
+- Include pivot_root (#44828)
+
+* Thu Jul 12 2001 Bill Nottingham <notting@redhat.com>
+- make shadow files 0400, not 0600
+
 * Wed Jul 11 2001 Bill Nottingham <notting@redhat.com>
-- fix vipw to not create world-readable shadow files
+- fix permissions problem with vipw & shadow files
+
+* Mon Jun 18 2001 Florian La Roche <Florian.LaRoche@redhat.de>
+- update to 2.11f, remove any merged patches
+- add s390x patches for somewhat larger swap
+
+* Thu Jun 14 2001 Erik Troan <ewt@redhat.com>
+- added --verbose patch to mkcramfs; it's much quieter by default now
+
+* Tue May 22 2001 Erik Troan <ewt@redhat.com>
+- removed warning about starting partitions on cylinder 0 -- swap version2
+  makes it unnecessary
+
+* Wed May  9 2001 Bernhard Rosenkraenzer <bero@redhat.com> 2.11b-2
+- Fix up s390x support
+
+* Mon May  7 2001 Bernhard Rosenkraenzer <bero@redhat.com> 2.11b-1
+- Fix up login for real (a console session should be the controlling tty)
+  by reverting to 2.10s code (#36839, #36840, #39237)
+- Add man page for agetty (#39287)
+- 2.11b, while at it
+
+* Fri Apr 27 2001 Preston Brown <pbrown@redhat.com> 2.11a-4
+- /sbin/nologin from OpenBSD added.
+
+* Fri Apr 20 2001 Bernhard Rosenkraenzer <bero@redhat.com> 2.11a-3
+- Fix up login - exiting immediately even if the password is correct
+  is not exactly a nice feature.
+- Make definite plans to kill people who update login without checking
+  if the new version works ;)
+
+* Tue Apr 17 2001 Erik Troan <ewt@redhat.com>
+- upgraded to 2.11a (kbdrate moved to kbd, among other things)
+- turned off ALLOW_VCS_USE
+- modified mkcramfs to not use a large number of file descriptors
+- include mkfs.bfs
 
 * Sun Apr  8 2001 Matt Wilson <msw@redhat.com>
 - changed Requires: kernel >= 2.2.12-7 to Conflicts: kernel < 2.2.12-7
   (fixes a initscripts -> util-linux -> kernel -> initscripts prereq loop)
-
-* Thu Mar 22 2001 Erik Troan <ewt@redhat.com>
-- added -e option to swapon
-- made -a silently skip swap devics that are already enabled
 
 * Tue Mar 20 2001 Matt Wilson <msw@redhat.com>
 - patched mkcramfs to use the PAGE_SIZE from asm/page.h instead of hard
