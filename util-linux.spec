@@ -3,7 +3,7 @@
 Summary: A collection of basic system utilities.
 Name: util-linux
 Version: 2.11f
-Release: 17a
+Release: 17.1
 License: distributable
 Group: System Environment/Base
 Source0: ftp://ftp.kernel.org/pub/linux/utils/util-linux/util-linux-%{version}.tar.bz2
@@ -52,6 +52,7 @@ Patch75: util-linux-2.11f-logingrp-revert.patch
 
 Patch76: util-linux-2.11f-loginctty.patch
 Patch77: util-linux-2.11f-loginctty2.patch
+Patch78: util-linux-2.11f-rawman.patch
 
 Patch100: mkcramfs.patch
 Patch101: mkcramfs-quiet.patch
@@ -116,6 +117,8 @@ cp %{SOURCE8} %{SOURCE9} .
 %patch37 -p1 -b .pwent2
 #%patch38 -p1 -b .ctty2
 
+%patch78 -p1 -b .rawman
+
 %build
 unset LINGUAS || :
 
@@ -170,6 +173,7 @@ if [ "%{_mandir}" != "%{_prefix}/man" -a -d ${RPM_BUILD_ROOT}%{_prefix}/man ]; t
    ( cd ${RPM_BUILD_ROOT}%{_mandir}; tar xf - )
    ( cd ${RPM_BUILD_ROOT}%{_prefix}; rm -rf ./man )
 fi
+echo '.so man8/raw.8' > ${RPM_BUILD_ROOT}%{_mandir}/man8/rawdevices.8
 
 # Correct mail spool path.
 perl -pi -e 's,/usr/spool/mail,/var/spool/mail,' ${RPM_BUILD_ROOT}%{_mandir}/man1/login.1
@@ -256,10 +260,10 @@ fi
 /sbin/pivot_root
 %ifnarch s390 s390x
 /sbin/clock
-/sbin/fdisk
 %endif
 /sbin/ctrlaltdel
 /sbin/elvtune
+/sbin/fdisk
 
 %ifarch %{ix86} alpha ia64 s390 s390x
 /sbin/fsck.minix
@@ -404,6 +408,7 @@ fi
 %{_mandir}/man8/mkswap.8*
 %{_mandir}/man8/pivot_root.8*
 %{_mandir}/man8/raw.8*
+%{_mandir}/man8/rawdevices.8*
 %{_mandir}/man8/renice.8*
 %{_mandir}/man8/setfdprm.8*
 %{_mandir}/man8/setsid.8*
@@ -417,9 +422,8 @@ fi
 %{_datadir}/misc/more.help
 
 %changelog
-* Fri Apr 05 2002 karsten Hopp <karsten@redhat.de> 2.11f-17a
-- remove /sbin/fdisk from the s390/s390x filelist, it's already 
-  provided by s390utils
+* Tue Feb 26 2002 Elliot Lee <sopwith@redhat.com> 2.11f-17.1
+- Incorporate man page changes from jrfuller (bug 60363).
 
 * Tue Dec 04 2001 Elliot Lee <sopwith@redhat.com> 2.11f-17
 - Add patch38 (util-linux-2.11f-ctty2.patch) to ignore SIGINT/SIGTERM/SIGQUIT in the parent, so that ^\ won't break things.

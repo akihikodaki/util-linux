@@ -1,0 +1,14 @@
+--- util-linux-2.11f/disk-utils/raw.8.sopwith	Tue Feb 26 13:15:34 2002
++++ util-linux-2.11f/disk-utils/raw.8	Tue Feb 26 13:16:28 2002
+@@ -58,6 +58,11 @@
+ disk, they must be an exact number of sectors long, and the data buffer
+ in virtual memory must also be aligned to a multiple of the sector
+ size.  The sector size is 512 bytes for most devices.
++.PP
++Use the /etc/sysconfig/rawdevices file to define the set of raw device
++mappings automatically created during the system startup sequence. The
++format of the file is the same used in the command line with the exception
++that the "raw" command itself is omitted.
+ .SH OPTIONS
+ .TP
+ .B -q
