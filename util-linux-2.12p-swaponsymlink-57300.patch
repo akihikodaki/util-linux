@@ -1,0 +1,24 @@
+--- util-linux-2.12p/mount/swapon.c.sopwith	Wed Dec 22 04:50:19 2004
++++ util-linux-2.12p/mount/swapon.c	Thu Dec 23 14:44:49 2004
+@@ -138,9 +138,19 @@
+ is_in_proc_swaps(const char *fname) {
+ 	int i;
+ 
+-	for (i = 0; i < numSwaps; i++)
+-		if (swapFiles[i] && !strcmp(fname, swapFiles[i]))
++	for (i = 0; i < numSwaps; i++) {
++	        struct stat swapped, swapping;
++
++		if (!swapFiles[i]) continue;
++
++		if (!strcmp(fname, swapFiles[i])
++ 		    || (!stat (swapFiles[i], &swapped)
++ 			&& !stat (fname, &swapping)
++ 			&& (swapped.st_dev == swapping.st_dev
++ 			    && swapped.st_ino == swapping.st_ino)))
++		    )
+ 			return 1;
++	}
+ 	return 0;
+ }
+ 

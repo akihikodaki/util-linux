@@ -26,7 +26,7 @@
 
 Summary: A collection of basic system utilities.
 Name: util-linux
-Version: 2.12j
+Version: 2.12p
 Release: 1
 License: distributable
 Group: System Environment/Base
@@ -65,38 +65,28 @@ Patch109: util-linux-2.11f-rawman.patch
 ######## Patches that should be upstream eventually
 Patch100: util-linux-2.12j-managed.patch
 
-Patch106: util-linux-2.11w-swaponsymlink-57300.patch
+Patch106: util-linux-2.12p-swaponsymlink-57300.patch
 Patch107: util-linux-2.11y-procpartitions-37436.patch
 Patch113: util-linux-2.11r-ctty3.patch
 
 Patch120: util-linux-2.11y-skipraid2.patch
-Patch125: util-linux-2.11y-umask-82552.patch
 Patch126: util-linux-2.11y-multibyte.patch
 Patch128: util-linux-2.12a-ipcs-84243-86285.patch
 
-Patch131: util-linux-2.11y-sysmap-85407.patch
 Patch138: util-linux-2.11y-chsh-103004.patch
 Patch139: util-linux-2.11y-fdisksegv-103954.patch
-Patch142: util-linux-2.12j-mountman-90588.patch
 
 Patch143: cramfs-1.1-blocksize_and_quiet.patch
 Patch144: cramfs-1.1-pagesize.patch
 
 Patch147: util-linux-2.12a-126572-fdiskman.patch
-Patch149: util-linux-2.12j-125531-swaplabel.patch
 Patch150: floppy-0.12-locale.patch
 
 Patch151: util-linux-2.12a-mountbylabel-dm.patch
-Patch152: util-linux-2.12j-mountnolabel.patch
 Patch153: util-linux-2.12a-16415-rdevman.patch
-Patch154: util-linux-2.11y-102566-loginman.patch
-Patch155: util-linux-2.12a-104321-rescuept.patch
-Patch156: util-linux-2.12j-fdiskmessage-107824.patch
 
 # Patch to enabled remote service for login/pam (#91174)
 Patch157: util-linux-2.12a-pamstart.patch
-
-Patch158: util-linux-2.12a-moreswaplabel.patch
 
 # Patch to enable the pamconsole flag for restricting mounting to users at the console (#133941)
 Patch159: util-linux-2.12j-pamconsole.patch
@@ -104,13 +94,10 @@ Patch159: util-linux-2.12j-pamconsole.patch
 # Allow raw(8) to bind raw devices whose device nodes do not yet exist.
 Patch160: raw-handle-nonpresent-devs.patch
 
-Patch163: util-linux-2.12j-140437-sgisectors.patch
 Patch164: util-linux-2.12j-113790-hotkeys.patch
-Patch165: util-linux-2.12a-117855-mountman.patch
-Patch166: util-linux-2.12a-134860-sldocs.patch
 
 # patches required for NFSv4 support
-Patch1000: util-linux-2.12j-nfsv4.patch
+Patch1000: util-linux-2.12p-nfsv4.patch
 Patch1001: util-linux-2.12a-mount-proto.patch
 Patch1002: util-linux-2.12a-nfsmount-overflow.patch
 
@@ -195,42 +182,29 @@ mv MCONFIG.new MCONFIG
 %patch113 -p1
 %patch120 -p1
 
-%patch125 -p1
 %patch126 -p1
 %patch128 -p1
 
-%patch131 -p1
 %patch138 -p1
 %patch139 -p1
-%patch142 -p1
 
 # cramfs
 %patch143 -p0
 %patch144 -p1
 
 %patch147 -p1
-%patch149 -p1
 %patch150 -p0
 
 %patch151 -p1
-%patch152 -p1
 %patch153 -p1
-%patch154 -p1
-%patch155 -p1
-%patch156 -p1 -b .fdiskmessage
 %patch157 -p1 -b .pamstart
-%patch158 -p1
-
 %patch159 -p1 -b .console
 
 %if %{include_raw}
 %patch160 -p1
 %endif
 
-%patch163 -p1
 %patch164 -p1
-%patch165 -p1
-%patch166 -p1
 
 %patch1000 -p1 -b .nfsv4
 %patch1001 -p1
@@ -612,6 +586,11 @@ fi
 /sbin/losetup
 
 %changelog
+* Thu Dec 23 2004 Elliot Lee <sopwith@redhat.com> 2.12p-1
+- Update to util-linux-2.12p. This changes swap header format
+  from - you may need to rerun mkswap if you did a clean install of
+  FC3.
+
 * Fri Dec 10 2004 Elliot Lee <sopwith@redhat.com> 2.12j-1
 - Update to util-linux-2.12j
 
