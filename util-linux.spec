@@ -5,7 +5,7 @@
 Summary: A collection of basic system utilities.
 Name: util-linux
 Version: 2.11r
-Release: 8
+Release: 9
 License: distributable
 Group: System Environment/Base
 
@@ -63,7 +63,6 @@ Patch106: util-linux-2.11g-swaponsymlink-57300.patch
 Patch107: util-linux-2.11r-procpartitions-37436.patch
 Patch108: util-linux-2.11n-autosmb-32132.patch
 Patch109: util-linux-2.11f-rawman.patch
-Patch110: util-linux-2.11r-skipraid.patch
 Patch111: util-linux-2.11n-mkfsman.patch
 Patch113: util-linux-2.11r-ctty3.patch
 Patch114: util-linux-2.11n-dumboctal.patch
@@ -76,6 +75,8 @@ Patch302: util-linux-2.11r-largeswap.patch
 
 Patch118: util-linux-2.11r-gptsize-69603.patch
 Patch119: fdisk-add-primary.patch
+
+Patch120: util-linux-2.11r-skipraid2.patch
 ########### END UNSUBMITTED
 
 Obsoletes: fdisk tunelp
@@ -184,7 +185,6 @@ mv MCONFIG.new MCONFIG
 %patch107 -p1 -b .procpartitions
 %patch108 -p1 -b .autosmb
 %patch109 -p1 -b .rawman
-%patch110 -p1 -b .skipraid
 %patch111 -p1 -b .mkfsman
 
 %patch113 -p1 -b .ctty3
@@ -196,6 +196,7 @@ mv MCONFIG.new MCONFIG
 cd fdisk
 %patch119 -p0 -b .addprimary
 cd ..
+%patch120 -p1 -b .sopwith
 
 # All of this patch is in except a 'max swap size' change, which
 # doesn't seem to be needed
@@ -523,6 +524,10 @@ fi
 /sbin/losetup
 
 %changelog
+* Wed Aug 7 2002  Elliot Lee <sopwith@redhat.com> 2.11r-9
+- Patch120 (skiproot2) to fix #70353, because the original patch was 
+totally useless.
+
 * Fri Aug 2 2002  Elliot Lee <sopwith@redhat.com> 2.11r-8
 - Patch119 (fdisk-add-primary) from #67898
 
