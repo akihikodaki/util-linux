@@ -1,47 +1,57 @@
 Summary: A collection of basic system utilities.
 Name: util-linux
-Version: 2.10m
-Release: 12.7.0
+Version: 2.10s
+Release: 12
 Copyright: distributable
 Group: System Environment/Base
-Source0: ftp://ftp.kernel.org/mirrors/linux/utils/util-linux/util-linux-%{version}.tar.gz
+Source0: ftp://ftp.kernel.org/pub/linux/utils/util-linux/util-linux-%{version}.tar.gz
 Source1: util-linux-2.7-login.pamd
 Source2: util-linux-2.7-chfn.pamd
 Source3: util-linux-2.7-chsh.pamd
 Source4: util-linux-2.9w-kbdrate.pamd
 Source5: util-linux-2.9w-kbdrate.apps
+Source6: mkcramfs.c
+Source7: cramfs.h
 
-Patch0: util-linux-2.10c-rhconfig.patch
+Patch0: util-linux-2.10o-rhconfig.patch
 Patch1: util-linux-2.10e-nochkdupexe.patch
 Patch2: util-linux-2.10m-gecos.patch
 # XXX apply next patch to enable mount-2.8 from util-linux (not applied)
 Patch4: util-linux-2.9i-mount.patch
 Patch6: util-linux-2.9i-fdiskwarning.patch
 Patch8: util-linux-2.9i-nomount.patch
-Patch11: util-linux-2.9o-btmp.patch
+Patch11: util-linux-2.10p-btmp.patch
 Patch21: util-linux-2.9v-nonroot.patch
 Patch23: util-linux-2.9w-kbdrate.patch
 Patch27: util-linux-2.10f-moretc.patch
 Patch28: util-linux-2.10k-sparcraid.patch
 Patch31: util-linux-2.10k-overflow.patch
 Patch32: util-linux-2.10k-glibc.patch
-Patch33: util-linux-2.10m-vipath.patch
-Patch34: util-linux-ia64-hwclock.patch
 Patch35: util-linux-2.10m-loginpath.patch
 Patch36: util-linux-2.10m-dict.patch
-Patch37: util-linux-2.10m-fdwronly.patch
-
-Patch116: util-linux-2.11n-setpwrace.patch
+Patch37: util-linux-2.10m-fdisk-efi-dell.patch
+Patch50: util-linux-2.10m-s390.patch
+Patch51: util-linux-2.10p-extended.patch
+Patch52: util-linux-2.10p-moremandate.patch
+Patch53: util-linux-2.10p-fdisk-l.patch
+Patch54: util-linux-2.10s-vipwrace.patch
+Patch55: util-linux-2.10s-killman.patch
+Patch56: util-linux-2.10s-vipwshadow.patch
+Patch57: util-linux-2.10s-logingrp.patch
+Patch58: util-linux-2.10s-ipc-info.patch
+Patch59: util-linux-2.10s-swapon.patch
 
 Obsoletes: fdisk tunelp
-%ifarch alpha sparc sparc64 sparcv9
+%ifarch alpha sparc sparc64 sparcv9 s390
 Obsoletes: clock
 %endif
 %ifarch alpha
 Conflicts: initscripts <= 4.58, timeconfig <= 3.0.1
 %endif
 BuildRoot: %{_tmppath}/%{name}-root
-Requires: pam >= 0.66-4, kernel >= 2.2.12-7, /etc/pam.d/system-auth
+Requires: pam >= 0.66-4, /etc/pam.d/system-auth
+Conflicts: kernel < 2.2.12-7, 
+Prereq: /sbin/install-info
 
 %description
 The util-linux package contains a large variety of low-level system
@@ -73,42 +83,59 @@ the login program.
 
 %patch32 -p1 -b .nonx86
 
-%patch33 -p1 -b .vipath
-%patch34 -p1 -b .ia64-rtc
 %patch35 -p1 -b .loginpath
 %patch36 -p1 -b .dict
-%patch37 -p1 -b .fdwronly
+%patch37 -p1 -b .bug17610
 
-%patch116 -p1 -b .setpwrace
+%patch50 -p1 -b .s390
+
+%patch51 -p1 -b .extendedfix
+%patch52 -p1 -b .moreman
+%patch53 -p1 -b .fdisk-l
+%patch54 -p1 -b .vipwrace
+%patch55 -p1 -b .killman
+%patch56 -p1 -b .vipwshadow
+#%patch57 -p1 -b .logingrp
+%patch58 -p1 -b .dirinfo
+%patch59 -p1 -b .swapon
 
 %build
 unset LINGUAS || :
 
 %configure
-make "RPM_OPT_FLAGS=$RPM_OPT_FLAGS" 
+make "OPT=$RPM_OPT_FLAGS -g" 
 cd rescuept
 gcc $RPM_OPT_FLAGS -o rescuept rescuept.c
 cd ..
 
+cp %{SOURCE7} .
+gcc $RPM_OPT_FLAGS -o mkcramfs %{SOURCE6} -I. -lz
+
+pushd sys-utils
+    makeinfo --number-sections ipc.texi
+popd
+
 %install
 rm -rf ${RPM_BUILD_ROOT}
 mkdir -p ${RPM_BUILD_ROOT}/{bin,sbin}
-mkdir -p ${RPM_BUILD_ROOT}%{_prefix}/lib
 mkdir -p ${RPM_BUILD_ROOT}%{_bindir}
 mkdir -p ${RPM_BUILD_ROOT}%{_infodir}
 mkdir -p ${RPM_BUILD_ROOT}%{_mandir}/man{1,6,8}
 mkdir -p ${RPM_BUILD_ROOT}%{_sbindir}
-mkdir -p ${RPM_BUILD_ROOT}%{_prefix}/share/locale/{cs,de,fr,it,ja,nl,pt_BR}/LC_MESSAGES
 
 make install DESTDIR=${RPM_BUILD_ROOT}
 
 install -m 755 rescuept/rescuept ${RPM_BUILD_ROOT}/sbin
+install -m 755 mkcramfs ${RPM_BUILD_ROOT}/usr/bin
 
 if [ "%{_mandir}" != "%{_prefix}/man" -a -d ${RPM_BUILD_ROOT}%{_prefix}/man ]; then
    ( cd ${RPM_BUILD_ROOT}%{_prefix}/man; tar cf - ./* ) |
    ( cd ${RPM_BUILD_ROOT}%{_mandir}; tar xf - )
    ( cd ${RPM_BUILD_ROOT}%{_prefix}; rm -rf ./man )
 fi
+
+# Correct mail spool path.
+perl -pi -e 's,/usr/spool/mail,/var/spool/mail,' ${RPM_BUILD_ROOT}%{_mandir}/man1/login.1
 
 if [ "%{_infodir}" != "%{_prefix}/info" -a -d ${RPM_BUILD_ROOT}%{_prefix}/info ]; then
    ( cd ${RPM_BUILD_ROOT}%{_prefix}/info; tar cf - ./* ) |
@@ -135,23 +162,20 @@ chmod 755 ${RPM_BUILD_ROOT}%{_bindir}/sunhostid
 
 gzip -9nf ${RPM_BUILD_ROOT}%{_infodir}/ipc.info
 
-for i in /bin/login %{_bindir}/chfn %{_bindir}/chsh %{_bindir}/newgrp ; do
-    strip ${RPM_BUILD_ROOT}/$i
-done
-
-strip ${RPM_BUILD_ROOT}/sbin/fdisk || :
-
 mkdir -p ${RPM_BUILD_ROOT}%{_sysconfdir}/pam.d
-{ cd ${RPM_BUILD_ROOT}%{_sysconfdir}/pam.d
+{ 
+  pushd ${RPM_BUILD_ROOT}%{_sysconfdir}/pam.d
   install -m 644 ${RPM_SOURCE_DIR}/util-linux-2.7-login.pamd ./login
   install -m 644 ${RPM_SOURCE_DIR}/util-linux-2.7-chsh.pamd ./chsh
   install -m 644 ${RPM_SOURCE_DIR}/util-linux-2.7-chsh.pamd ./chfn
   install -m 644 ${RPM_SOURCE_DIR}/util-linux-2.9w-kbdrate.pamd ./kbdrate
+  popd
 }
 
 mkdir -p ${RPM_BUILD_ROOT}%{_sysconfdir}/security/console.apps
-{ cd ${RPM_BUILD_ROOT}%{_sysconfdir}/security/console.apps
+{ pushd ${RPM_BUILD_ROOT}%{_sysconfdir}/security/console.apps
   install -m 644 ${RPM_SOURCE_DIR}/util-linux-2.9w-kbdrate.apps ./kbdrate
+  popd
 }
 
 ln -sf consolehelper ${RPM_BUILD_ROOT}%{_bindir}/kbdrate
@@ -159,138 +183,114 @@ ln -sf consolehelper ${RPM_BUILD_ROOT}%{_bindir}/kbdrate
 ln -sf hwclock ${RPM_BUILD_ROOT}/sbin/clock
 
 # We do not want dependencies on csh
-chmod 644 ${RPM_BUILD_ROOT}%{_prefix}/lib/getopt/*
+chmod 644 ${RPM_BUILD_ROOT}%{_datadir}/misc/getopt/*
 
 # This has dependencies on stuff in /usr
 %ifnarch sparc sparc64 sparcv9
 mv ${RPM_BUILD_ROOT}/sbin/cfdisk ${RPM_BUILD_ROOT}/usr/sbin
 %endif
 
+%find_lang %{name}
+
 %clean
 [ "${RPM_BUILD_ROOT}" != "/" ] && rm -rf ${RPM_BUILD_ROOT}
 
-%files
+%post
+/sbin/install-info %{_infodir}/ipc.info* %{_infodir}/dir
+
+%postun
+if [ "$1" = 0 ]; then
+    /sbin/install-info --del %{_infodir}/ipc.info* %{_infodir}/dir
+fi
+
+%files -f %{name}.lang
 %defattr(-,root,root)
-%{_prefix}/share/locale/*/LC_MESSAGES/*
+%doc */README.*
 
-/sbin/clock
-/sbin/hwclock
-%{_mandir}/man8/hwclock.8*
+/bin/arch
+/bin/dmesg
+/bin/kill
+%attr(755,root,root)	/bin/login
+/bin/more
 
-%{_sbindir}/tunelp
-%{_mandir}/man8/tunelp.8*
-
-%config %{_sysconfdir}/pam.d/login
+%config %{_sysconfdir}/fdprm
 %config %{_sysconfdir}/pam.d/chfn
 %config %{_sysconfdir}/pam.d/chsh
-
 %config %{_sysconfdir}/pam.d/kbdrate
+%config %{_sysconfdir}/pam.d/login
 %config %{_sysconfdir}/security/console.apps/kbdrate
-%{_bindir}/kbdrate
 
+/sbin/agetty
+/sbin/blockdev
+/sbin/clock
+/sbin/ctrlaltdel
+/sbin/elvtune
 /sbin/fdisk
-/sbin/rescuept
-%ifnarch sparc sparc64 sparcv9
-/usr/sbin/cfdisk
-%endif
 
 %ifarch %{ix86} alpha ia64
 /sbin/fsck.minix
 /sbin/mkfs.minix
+%{_mandir}/man8/fsck.minix.8*
+%{_mandir}/man8/mkfs.minix.8*
+/sbin/sfdisk
+%{_mandir}/man8/sfdisk.8*
+%doc fdisk/sfdisk.examples
 %endif
 
-%{_bindir}/raw
-%{_mandir}/man8/raw.8*
-
+/sbin/hwclock
+/sbin/kbdrate
 /sbin/mkfs
 /sbin/mkswap
+#/sbin/mkfs.bfs
+/sbin/rescuept
+#/sbin/sln
 
-%{_bindir}/fdformat
-%{_bindir}/setfdprm
-%config %{_sysconfdir}/fdprm
-
-%{_mandir}/man8/fdformat.8*
-%{_mandir}/man8/mkswap.8*
-%{_mandir}/man8/setfdprm.8*
-
-%{_prefix}/games/banner
-%{_mandir}/man6/banner.6*
-
-%{_bindir}/ddate
-%{_mandir}/man1/ddate.1*
-
-%attr(755,root,root)	/bin/login
+%{_bindir}/cal
 %attr(4711,root,root)	%{_bindir}/chfn
 %attr(4711,root,root)	%{_bindir}/chsh
-%attr(4711,root,root)	%{_bindir}/newgrp
-%{_sbindir}/vipw
-%{_sbindir}/vigr
-%{_mandir}/man1/chfn.1*
-%{_mandir}/man1/chsh.1*
-%{_mandir}/man1/login.1*
-%{_mandir}/man1/newgrp.1*
-%{_mandir}/man8/vipw.8*
-%{_mandir}/man8/vigr.8*
-
-/bin/kill
-%{_bindir}/cal
-%ifarch sparc sparc64 sparcv9
-%{_bindir}/sunhostid
+%{_bindir}/col
+%{_bindir}/colcrt
+%{_bindir}/colrm
+%{_bindir}/column
+%ifarch %{ix86} alpha armv4l
+%{_bindir}/cytune
+%{_mandir}/man8/cytune.8*
 %endif
+%{_bindir}/ddate
+%{_bindir}/fdformat
+%{_bindir}/getopt
+%{_bindir}/hexdump
+%{_bindir}/ipcrm
+%{_bindir}/ipcs
+%{_bindir}/kbdrate
 %{_bindir}/logger
 %{_bindir}/look
 %{_bindir}/mcookie
+%{_bindir}/mkcramfs
 %{_bindir}/namei
+%attr(4711,root,root)	%{_bindir}/newgrp
+%{_bindir}/raw
+%{_bindir}/rename
+%{_bindir}/renice
+%{_bindir}/rev
 %{_bindir}/script
+%{_bindir}/setfdprm
+%{_bindir}/setsid
 %{_bindir}/setterm
+%ifarch sparc sparc64 sparcv9
+%{_bindir}/sunhostid
+%endif
 #%{_bindir}/tsort
+%{_bindir}/ul
 %{_bindir}/whereis
 %attr(2755,root,tty)	%{_bindir}/write
-%{_bindir}/getopt
-%{_mandir}/man1/cal.1*
-#%{_mandir}/man1/hostid.1*
-%{_mandir}/man1/kill.1*
-%{_mandir}/man1/logger.1*
-%{_mandir}/man1/look.1*
-%{_mandir}/man1/mcookie.1*
-%{_mandir}/man1/namei.1*
-%{_mandir}/man1/script.1*
-%{_mandir}/man1/setterm.1*
-#%{_mandir}/man1/tsort.1*
-%{_mandir}/man1/whereis.1*
-%{_mandir}/man1/write.1*
-%{_mandir}/man1/getopt.1*
 
-%{_prefix}/lib/getopt
+%{_prefix}/games/banner
 
-/bin/dmesg
-
-/sbin/ctrlaltdel
-/sbin/kbdrate
-#/sbin/sln
-/bin/arch
-%{_bindir}/ipcrm
-%{_bindir}/ipcs
-%{_bindir}/renice
-%{_sbindir}/readprofile
-%{_bindir}/setsid
-%ifarch %{ix86} alpha armv4l
-%{_bindir}/cytune
-%endif
-
-%{_mandir}/man1/arch.1*
-%{_mandir}/man1/readprofile.1*
 %ifnarch sparc sparc64 sparcv9
-%{_mandir}/man8/cytune.8*
+%{_sbindir}/cfdisk
+%{_mandir}/man8/cfdisk.8*
 %endif
-%{_mandir}/man8/ctrlaltdel.8*
-%{_mandir}/man8/dmesg.8*
-%{_mandir}/man8/ipcrm.8*
-%{_mandir}/man8/ipcs.8*
-%{_mandir}/man8/kbdrate.8*
-%{_mandir}/man8/renice.8*
-%{_mandir}/man8/setsid.8*
-
 %ifarch %{ix86}
 %{_sbindir}/rdev
 %{_sbindir}/ramsize
@@ -303,54 +303,146 @@ mv ${RPM_BUILD_ROOT}/sbin/cfdisk ${RPM_BUILD_ROOT}/usr/sbin
 %{_mandir}/man8/swapdev.8*
 %{_mandir}/man8/vidmode.8*
 %endif
+%{_sbindir}/readprofile
+%{_sbindir}/tunelp
+%{_sbindir}/vipw
+%{_sbindir}/vigr
 
 %{_infodir}/ipc.info*
 
-%{_bindir}/col
-%{_bindir}/colcrt
-%{_bindir}/colrm
-%{_bindir}/column
-%{_bindir}/hexdump
-%{_bindir}/rename
-%{_bindir}/rev
-%{_bindir}/ul
-
+%{_mandir}/man1/arch.1*
+%{_mandir}/man1/cal.1*
+%{_mandir}/man1/chfn.1*
+%{_mandir}/man1/chsh.1*
 %{_mandir}/man1/col.1*
 %{_mandir}/man1/colcrt.1*
 %{_mandir}/man1/colrm.1*
 %{_mandir}/man1/column.1*
+%{_mandir}/man1/ddate.1*
+%{_mandir}/man1/getopt.1*
 %{_mandir}/man1/hexdump.1*
+#%{_mandir}/man1/hostid.1*
+%{_mandir}/man1/kill.1*
+%{_mandir}/man1/logger.1*
+%{_mandir}/man1/login.1*
+%{_mandir}/man1/look.1*
+%{_mandir}/man1/mcookie.1*
+%{_mandir}/man1/more.1*
+%{_mandir}/man1/namei.1*
+%{_mandir}/man1/newgrp.1*
+%{_mandir}/man1/readprofile.1*
 %{_mandir}/man1/rename.1*
 %{_mandir}/man1/rev.1*
+%{_mandir}/man1/script.1*
+%{_mandir}/man1/setterm.1*
+#%{_mandir}/man1/tsort.1*
 %{_mandir}/man1/ul.1*
+%{_mandir}/man1/whereis.1*
+%{_mandir}/man1/write.1*
 
-/bin/more
-%{_mandir}/man1/more.1*
-%{_prefix}/lib/more.help
+%{_mandir}/man6/banner.6*
 
-%ifarch %{ix86} alpha ia64
-%{_mandir}/man8/fsck.minix.8*
-%{_mandir}/man8/mkfs.minix.8*
-%{_mandir}/man8/mkfs.8*
-%endif
-
+#%{_mandir}/man8/agtetty.8*
+%{_mandir}/man8/blockdev.8*
+%{_mandir}/man8/ctrlaltdel.8*
+%{_mandir}/man8/dmesg.8*
+%{_mandir}/man8/elvtune.8*
+%{_mandir}/man8/fdformat.8*
 %{_mandir}/man8/fdisk.8*
+%{_mandir}/man8/hwclock.8*
+%{_mandir}/man8/ipcrm.8*
+%{_mandir}/man8/ipcs.8*
+%{_mandir}/man8/kbdrate.8*
+%{_mandir}/man8/mkfs.8*
+#%{_mandir}/man8/mkfs.bfs.8*
+%{_mandir}/man8/mkswap.8*
+%{_mandir}/man8/raw.8*
+%{_mandir}/man8/renice.8*
+%{_mandir}/man8/setfdprm.8*
+%{_mandir}/man8/setsid.8*
+# XXX this man page should be moved to glibc.
+%{_mandir}/man8/sln.8*
+%{_mandir}/man8/tunelp.8*
+%{_mandir}/man8/vigr.8*
+%{_mandir}/man8/vipw.8*
 
-%ifnarch sparc sparc64 sparcv9
-%{_mandir}/man8/cfdisk.8*
-%endif
-
-%doc */README.*
-
-%ifarch %{ix86} alpha ia64
-/sbin/sfdisk
-%{_mandir}/man8/sfdisk.8*
-%doc fdisk/sfdisk.examples
-%endif
+%{_datadir}/misc/getopt
+%{_datadir}/misc/more.help
 
 %changelog
-* Mon Jun 24 2002 Elliot Lee <sopwith@redhat.com>
-- Fix setpw race (patch116)
+* Sun Apr  8 2001 Matt Wilson <msw@redhat.com>
+- changed Requires: kernel >= 2.2.12-7 to Conflicts: kernel < 2.2.12-7
+  (fixes a initscripts -> util-linux -> kernel -> initscripts prereq loop)
+
+* Thu Mar 22 2001 Erik Troan <ewt@redhat.com>
+- added -e option to swapon
+- made -a silently skip swap devics that are already enabled
+
+* Tue Mar 20 2001 Matt Wilson <msw@redhat.com>
+- patched mkcramfs to use the PAGE_SIZE from asm/page.h instead of hard
+  coding 4096 (fixes mkcramfs on alpha...)
+
+* Mon Mar 19 2001 Matt Wilson <msw@redhat.com>
+- added mkcramfs (from linux/scripts/mkcramfs)
+
+* Mon Feb 26 2001 Tim Powers <timp@redhat.com>
+- fixed bug #29131, where ipc.info didn't have an info dir entry,
+  added the dir entry to ipc.texi (Patch58)
+
+* Fri Feb 23 2001 Preston Brown <pbrown@redhat.com>
+- use lang finder script
+- install info files
+
+* Thu Feb 08 2001 Erik Troan <ewt@redhat.com>
+- reverted login patch; seems to cause problems
+- added agetty
+
+* Wed Feb 07 2001 Erik Troan <ewt@redhat.com>
+- updated kill man page
+- added patch to fix vipw race
+- updated vipw to edit /etc/shadow and /etc/gshadow, if appropriate
+- added patch to disassociate login from tty, session, and pgrp
+
+* Tue Feb 06 2001 Erik Troan <ewt@redhat.com>
+- fixed problem w/ empty extended partitions
+- added patch to fix the date in the more man page
+- set OPT to pass optimization flags to make rather then RPM_OPT_FLAG
+- fixed fdisk -l /Proc/partitions parsing
+- updated to 2.10s
+
+* Tue Jan 23 2001 Preston Brown <pbrown@redhat.com>
+- danish translations added
+
+* Mon Jan 15 2001 Nalin Dahyabhai <nalin@redhat.com>
+- fix segfault in login in btmp patch (#24025)
+
+* Mon Dec 11 2000 Oliver Paukstadt <oliver.paukstadt@millenux.com>
+- ported to s390
+
+* Wed Nov 01 2000 Florian La Roche <Florian.LaRoche@redhat.de>
+- update to 2.10p
+- update patch37 to newer fdisk version
+
+* Mon Oct  9 2000 Jeff Johnson <jbj@redhat.com>
+- update to 2.10o
+-  fdformat: fixed to work with kernel 2.4.0test6 (Marek Wojtowicz)
+-  login: not installed suid
+-  getopt: by default install aux files in /usr/share/misc
+- update to 2.10n:
+-  added blockdev.8
+-  change to elvtune (andrea)
+-  fixed overrun in agetty (vii@penguinpowered.com)
+-  shutdown: prefer umounting by mount point (rgooch)
+-  fdisk: added plan9
+-  fdisk: remove empty links in chain of extended partitions
+-  hwclock: handle both /dev/rtc and /dev/efirtc (Bill Nottingham)
+-  script: added -f (flush) option (Ivan Schreter)
+-  script: added -q (quiet) option (Per Andreas Buer)
+-  getopt: updated to version 1.1.0 (Frodo Looijaard)
+-  Czech messages (Jiri Pavlovsky)
+- login.1 man page had not /var/spool/mail path (#16998).
+- sln.8 man page (but not executable) included (#10601).
+- teach fdisk 0xde(Dell), 0xee(EFI GPT), 0xef(EFI FAT) partitions (#17610).
 
 * Wed Aug 30 2000 Matt Wilson <msw@redhat.com>
 - rebuild to cope with glibc locale binary incompatibility, again
