@@ -3,7 +3,7 @@
 Summary: A collection of basic system utilities.
 Name: util-linux
 Version: 2.11f
-Release: 17.7.2
+Release: 18
 License: distributable
 Group: System Environment/Base
 Source0: ftp://ftp.kernel.org/pub/linux/utils/util-linux/util-linux-%{version}.tar.bz2
@@ -56,7 +56,7 @@ Patch77: util-linux-2.11f-loginctty2.patch
 Patch100: mkcramfs.patch
 Patch101: mkcramfs-quiet.patch
 
-Patch116: util-linux-2.11n-setpwrace.patch
+Patch104: util-linux-2.11n-mkswapprint-58799.patch
 
 Obsoletes: fdisk tunelp
 %ifarch alpha sparc sparc64 sparcv9 s390
@@ -111,14 +111,14 @@ cp %{SOURCE7} %{SOURCE6} .
 %patch100 -p1 -b .mkcramfs
 %patch101 -p1 -b .quiet
 
+%patch104 -p1 -b .mkswapprint
+
 # nologin
 cp %{SOURCE8} %{SOURCE9} .
 
 #%patch36 -p1 -b .pwent
 %patch37 -p1 -b .pwent2
 #%patch38 -p1 -b .ctty2
-
-%patch116 -p1 -b .setpwrace
 
 %build
 unset LINGUAS || :
@@ -421,8 +421,8 @@ fi
 %{_datadir}/misc/more.help
 
 %changelog
-* Mon Jun 24 2002 Elliot Lee <sopwith@redhat.com> 2.11f-17.7.2
-- Fix setpwnam race (patch116)
+* Wed Jan 30 2002 Tom Tromey <tromey@redhat.com> 2.11f-18
+- Added patch for #58799 from 2.11n-3
 
 * Tue Dec 04 2001 Elliot Lee <sopwith@redhat.com> 2.11f-17
 - Add patch38 (util-linux-2.11f-ctty2.patch) to ignore SIGINT/SIGTERM/SIGQUIT in the parent, so that ^\ won't break things.
