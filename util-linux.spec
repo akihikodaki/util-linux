@@ -1,12 +1,10 @@
 Summary: A collection of basic system utilities.
 Name: util-linux
 Version: 2.10m
-Release: 12tc1
+Release: 12.7.0
 Copyright: distributable
-Packager: Red Hat, Inc. <http://bugzilla.redhat.com/bugzilla>
-Vendor: Red Hat, Inc.
 Group: System Environment/Base
-Source0: ftp://ftp.kernel.org/mirrors/linux/utils/util-linux/util-linux-%{version}.tar.bz2
+Source0: ftp://ftp.kernel.org/mirrors/linux/utils/util-linux/util-linux-%{version}.tar.gz
 Source1: util-linux-2.7-login.pamd
 Source2: util-linux-2.7-chfn.pamd
 Source3: util-linux-2.7-chsh.pamd
@@ -33,7 +31,7 @@ Patch35: util-linux-2.10m-loginpath.patch
 Patch36: util-linux-2.10m-dict.patch
 Patch37: util-linux-2.10m-fdwronly.patch
 
-Patch50: util-linux-2.9o-8bit.patch
+Patch116: util-linux-2.11n-setpwrace.patch
 
 Obsoletes: fdisk tunelp
 %ifarch alpha sparc sparc64 sparcv9
@@ -81,7 +79,7 @@ the login program.
 %patch36 -p1 -b .dict
 %patch37 -p1 -b .fdwronly
 
-%patch50 -p1
+%patch116 -p1 -b .setpwrace
 
 %build
 unset LINGUAS || :
@@ -351,6 +349,9 @@ mv ${RPM_BUILD_ROOT}/sbin/cfdisk ${RPM_BUILD_ROOT}/usr/sbin
 %endif
 
 %changelog
+* Mon Jun 24 2002 Elliot Lee <sopwith@redhat.com>
+- Fix setpw race (patch116)
+
 * Wed Aug 30 2000 Matt Wilson <msw@redhat.com>
 - rebuild to cope with glibc locale binary incompatibility, again
 
