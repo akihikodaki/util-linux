@@ -300,6 +300,8 @@ ln -s consolehelper ${RPM_BUILD_ROOT}/usr/bin/kbdrate
 %endif
 %if %{include_raw}
 echo '.so man8/raw.8' > $RPM_BUILD_ROOT%{_mandir}/man8/rawdevices.8
+%else
+rm -f %{_bindir}/raw %{_mandir}/man8/raw.8*
 %endif
 
 install -m 755 partx/{addpart,delpart,partx} $RPM_BUILD_ROOT/sbin
