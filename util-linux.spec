@@ -3,7 +3,7 @@
 Summary: A collection of basic system utilities.
 Name: util-linux
 Version: 2.11n
-Release: 11
+Release: 12
 License: distributable
 Group: System Environment/Base
 Source0: ftp://ftp.kernel.org/pub/linux/utils/util-linux/util-linux-%{version}.tar.bz2
@@ -252,12 +252,12 @@ mkdir -p ${RPM_BUILD_ROOT}%{_sysconfdir}/{pam.d,security/console.apps}
 
 make \
         INSTALLDIR="install -d -m 755" \
-        INSTALLSUID="install -s -m 755" \
-        INSTALLBIN="install -s -m 755" \
+        INSTALLSUID="install -m 755" \
+        INSTALLBIN="install -m 755" \
         INSTALLMAN="install -m 644" \
 	install DESTDIR=${RPM_BUILD_ROOT}
 
-install -s -m 755 mount/pivot_root ${RPM_BUILD_ROOT}/sbin
+install -m 755 mount/pivot_root ${RPM_BUILD_ROOT}/sbin
 install -m 644 mount/pivot_root.8 ${RPM_BUILD_ROOT}%{_mandir}/man8
 install -m 755 rescuept/rescuept ${RPM_BUILD_ROOT}/sbin
 mv rescuept/README rescuept/README.rescuept
@@ -271,7 +271,7 @@ ln -s consolehelper ${RPM_BUILD_ROOT}/usr/bin/kbdrate
 %endif
 echo '.so man8/raw.8' > $RPM_BUILD_ROOT%{_mandir}/man8/rawdevices.8
 
-install -m 555 -s partx/{addpart,delpart,partx} $RPM_BUILD_ROOT/sbin
+install -m 555 partx/{addpart,delpart,partx} $RPM_BUILD_ROOT/sbin
 
 # Correct mail spool path.
 sed -e 's,/usr/spool/mail,/var/spool/mail,g' ${RPM_BUILD_ROOT}%{_mandir}/man1/login.1 > ${RPM_BUILD_ROOT}%{_mandir}/man1/login.1.new 
@@ -533,6 +533,9 @@ fi
 /sbin/losetup
 
 %changelog
+* Mon Apr 01 2002 Elliot Lee <sopwith@redhat.com> 2.11n-12
+- Don't strip binaries - rpm does it for us.
+
 * Sun Mar 31 2002 Elliot Lee <sopwith@redhat.com> 2.11n-11
 - Apply patch115 from ejb@ql.org for bug #61868
 
