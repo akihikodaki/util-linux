@@ -1,18 +1,22 @@
+# This 2.12pre package is not in a buildable state - it's in CVS here
+# to allow patch merging etc.
+
 # Upstream maintainer util-linux@math.uio.no
 
 %if %{?WITH_SELINUX:0}%{!?WITH_SELINUX:1}
-%define WITH_SELINUX 0
+%define WITH_SELINUX 1
 %endif
 
 %define with_kbdrate 0
 %define floppyver 0.12
+%define cramfsver 1.1
 %define no_hwclock_archs s390 s390x
 %define cytune_archs %{ix86} alpha armv4l
 
 Summary: A collection of basic system utilities.
 Name: util-linux
-Version: 2.11y
-Release: 29
+Version: 2.12
+Release: 14
 License: distributable
 Group: System Environment/Base
 
@@ -22,17 +26,24 @@ BuildRequires: ncurses-devel
 BuildRequires: libtermcap-devel
 BuildRequires: zlib-devel
 BuildRequires: slang-devel
+BuildRequires: texinfo
+%if %{WITH_SELINUX}
+BuildRequires: libselinux-devel
+%endif
 
-Source0: ftp://ftp.kernel.org/pub/linux/utils/util-linux/util-linux-%{version}.tar.bz2
+Source0: http://ftp.cwi.nl/aeb/util-linux/util-linux-%{version}.tar.gz
+%if %{WITH_SELINUX}
+Source1: util-linux-selinux.pamd
+%else
 Source1: util-linux-2.7-login.pamd
+%endif
 Source2: util-linux-2.7-chfn.pamd
 Source3: util-linux-2.7-chsh.pamd
-Source6: mkcramfs.c
-Source7: cramfs.h
 Source8: nologin.c
 Source9: nologin.8
 Source10: kbdrate.tar.gz
 Source11: http://download.sourceforge.net/floppyutil/floppy-%{floppyver}.tar.gz
+Source12: http://download.sourceforge.net/cramfs/cramfs-%{cramfsver}.tar.gz
 
 ##### Red Hat Linux-specific patches
 # Changes to MCONFIG build-time configuration
@@ -55,24 +66,13 @@ Patch27: util-linux-2.11w-moretc.patch
 # 2. Use O_LARGEFILE (I have no idea whether this has any effect given
 #    -D_FILE_OFFSET_BITS=64)
 # 3. Use the standard syscall() function instead of some bad hacks.
-Patch70: util-linux-2.11r-miscfixes.patch
-
-# Because we have our own mkcramfs, because the copyright/license is unclear
-Patch100: mkcramfs.patch
-Patch101: mkcramfs-quiet.patch
-Patch102: util-linux-2.11n-mkcramfs-pgsize.patch
+Patch70: util-linux-2.12pre-miscfixes.patch
 
 # Note on how to set up raw device mappings using RHL /etc/sysconfig/rawdevices
 Patch109: util-linux-2.11f-rawman.patch
 
 ######## Patches that should be upstream eventually
 Patch206: mount-2.10r-kudzu.patch
-#Patch207: util-linux-2.11w-swapon.patch
-#Patch211: mount-2.11e-user_label_umount.patch
-#Patch212: util-linux-2.11w-netdev.patch
-
-#Patch60: util-linux-2.10s-s390x.patch
-#Patch61: util-linux-2.11b-s390x.patch
 
 Patch103: util-linux-2.11r-ownerumount.patch
 Patch106: util-linux-2.11w-swaponsymlink-57300.patch
@@ -81,18 +81,12 @@ Patch113: util-linux-2.11r-ctty3.patch
 Patch116: util-linux-2.11n-loginutmp-66950.patch
 Patch117: util-linux-2.11y-moremisc.patch
 
-#Patch119: fdisk-add-primary.patch
-
 Patch120: util-linux-2.11y-skipraid2.patch
-#Patch121: util-linux-2.11r-hwclock-72140.patch
-#Patch122: util-linux-2.11r-hwclock_hammer.patch
-
-#Patch200: util-linux-2.11w-hammer.patch
 Patch123: util-linux-2.11y-blkgetsize-81069.patch
 Patch124: util-linux-2.11y-umount-75421.patch
 Patch125: util-linux-2.11y-umask-82552.patch
 Patch126: util-linux-2.11y-multibyte.patch
-Patch127: util-linux-2.11y-mcookie-83345.patch
+Patch127: util-linux-2.12pre-mcookie-83345.patch
 Patch128: util-linux-2.11y-ipcs-84243-86285.patch
 
 # Fixs wrong usage of BLKGETSIZE in mount_by_label
@@ -102,11 +96,21 @@ Patch131: util-linux-2.11y-sysmap-85407.patch
 Patch132: util-linux-2.11y-mount-97381.patch
 Patch133: util-linux-2.11y-partx-68284.patch
 Patch134: util-linux-2.11y-readprofile-100433.patch
-Patch135: util-linux-selinux.patch
-Patch136: util-linux-2.11y-urandom.patch
 Patch137: util-linux-2.11y-idecd-102114.patch
 Patch138: util-linux-2.11y-chsh-103004.patch
 Patch139: util-linux-2.11y-fdisksegv-103954.patch
+Patch140: util-linux-2.11y-alldevs-101772.patch
+Patch141: util-linux-selinux.patch
+Patch142: util-linux-2.11y-mountman-90588.patch
+
+Patch143: cramfs-1.1-blocksize_and_quiet.patch
+
+# patches required for NFSv4 support
+Patch1000: util-linux-2.11z-01-nfs.patch
+Patch1010: util-linux-2.11z-02-base-nfsv4.patch
+Patch1020: util-linux-2.11z-03-krb5.patch
+Patch1030: mount-2.11y-selinux.patch
+Patch1040: util-linux-2.12-nfs-mount.patch
 
 # When adding patches, please make sure that it is easy to find out what bug # the 
 # patch fixes.
@@ -126,6 +130,9 @@ Requires: usermode
 %endif
 Conflicts: kernel < 2.2.12-7, 
 Prereq: /sbin/install-info
+Obsoletes: mount losetup
+Provides: mount = %{version}
+Provides: losetup = %{version}
 
 %description
 The util-linux package contains a large variety of low-level system
@@ -133,6 +140,7 @@ utilities that are necessary for a Linux system to function. Among
 others, Util-linux contains the fdisk configuration tool and the login
 program.
 
+%if 0
 %package -n mount
 Group: System Environment/Base
 Summary: Programs for mounting and unmounting filesystems.
@@ -158,10 +166,11 @@ file to be used as a "virtual file system" inside another file.
 Losetup is used to associate loop devices with regular files or block
 devices, to detach loop devices and to query the status of a loop
 device.
+%endif
 
 %prep
 
-%setup -q -a 10 -a 11
+%setup -q -a 10 -a 11 -a 12
 
 %patch0 -p1 -b .rhconfig
 
@@ -178,27 +187,15 @@ device.
 # is under /usr and won't be accessable if / is mounted but /usr is not
 %patch27 -p1 -b .moretc
 
-#patch60 -p1 -b .s390x2
-#patch61 -p1 -b .s390x
-
 # No support for large numbers of cylinders in fdisk{sgi,sun}label.*
 # Too many places in those files assume that it is an unsigned short,
 # not worth fixing.
 %patch70 -p1 -b .miscfixes
 
-# mkcramfs
-cp %{SOURCE7} %{SOURCE6} .
-%patch100 -p1 -b .mkcramfs
-%patch101 -p1 -b .quiet
-%patch102 -p1 -b .blksize
-
 # nologin
 cp %{SOURCE8} %{SOURCE9} .
 
 %patch206 -p1 -b .kudzu
-#patch207 -p1 -b .swapon
-#patch211 -p2 -b .userumount
-#patch212 -p1 -b .netdev
 
 sed -e 's:^MAN_DIR=.*:MAN_DIR=%{_mandir}:' -e 's:^INFO_DIR=.*:INFO_DIR=%{_infodir}:' MCONFIG > MCONFIG.new
 mv MCONFIG.new MCONFIG
@@ -211,12 +208,7 @@ mv MCONFIG.new MCONFIG
 %patch113 -p1 -b .ctty3
 %patch116 -p1 -b .loginutmp
 %patch117 -p1 -b .moremisc
-#cd fdisk
-#patch119 -p0 -b .addprimary
-#cd ..
 %patch120 -p1 -b .skipraid2
-#patch121 -p1 -b .hwclock
-#patch122 -p1 -b .hammer_rtc
 
 #patch200 -p1 -b .hammer
 %patch123 -p1 -b .blkgetsize
@@ -226,20 +218,33 @@ mv MCONFIG.new MCONFIG
 %patch127 -p1 -b .mcookie-dumbness
 %patch128 -p1 -b .ipcs
 
-%patch129 -p1 -b .s390x
+#patch129 -p1 -b .s390x
 %patch130 -p1 -b .login32bitcompat
 %patch131 -p1 -b .sysmap
 %patch132 -p1 -b .mountnitpick
 %patch133 -p1 -b .partx
 %patch134 -p1 -b .readprofile
-%if %{WITH_SELINUX}
-#SELinux
-%patch135 -p1 -b .selinux
-%endif
-%patch136 -p1 -b .urandom
 %patch137 -p1
 %patch138 -p1
 %patch139 -p1
+%patch140 -p1
+%if %{WITH_SELINUX}
+#SELinux
+%patch141 -p1 -b .selinux
+%endif
+%patch142 -p1 -b .mountman
+
+# cramfs
+%patch143 -p0 -b .cramfs
+
+%patch1000 -p1 -b .nfsupdate
+%patch1010 -p1 -b .nfsv4
+%patch1020 -p1 -b .krb5
+%if %{WITH_SELINUX}
+#SELinux
+%patch1030 -p1 -b .mountselinux
+%endif
+%patch1040 -p1 -b .nfsmount
 
 %build
 unset LINGUAS || :
@@ -268,7 +273,7 @@ pushd floppy-%{floppyver}
 make %{?_smp_mflags}
 popd
 
-gcc $RPM_OPT_FLAGS -o mkcramfs mkcramfs.c -I. -lz
+make -C cramfs-%{cramfsver} %{?_smp_mflags}
 
 gcc $RPM_OPT_FLAGS -o nologin nologin.c
 
@@ -295,21 +300,26 @@ pushd floppy-%{floppyver}
 %makeinstall
 popd
 
+pushd cramfs-%{cramfsver}
+install -s -m 755 mkcramfs ${RPM_BUILD_ROOT}/sbin/mkfs.cramfs
+ln -s ../../sbin/mkfs.cramfs ${RPM_BUILD_ROOT}/usr/bin/mkcramfs
+install -s -m 755 cramfsck ${RPM_BUILD_ROOT}/sbin/fsck.cramfs
+popd
+
 install -m 755 mount/pivot_root ${RPM_BUILD_ROOT}/sbin
 install -m 644 mount/pivot_root.8 ${RPM_BUILD_ROOT}%{_mandir}/man8
 install -m 755 rescuept/rescuept ${RPM_BUILD_ROOT}/sbin
 mv rescuept/README rescuept/README.rescuept
-install -m 755 mkcramfs ${RPM_BUILD_ROOT}/usr/bin
 install -m 755 nologin ${RPM_BUILD_ROOT}/sbin
 install -m 644 nologin.8 ${RPM_BUILD_ROOT}%{_mandir}/man8
 %if %{with_kbdrate}
-install -m 555 kbdrate/kbdrate ${RPM_BUILD_ROOT}/sbin
+install -m 755 kbdrate/kbdrate ${RPM_BUILD_ROOT}/sbin
 install -m 644 kbdrate/kbdrate.8 ${RPM_BUILD_ROOT}%{_mandir}/man8
 ln -s consolehelper ${RPM_BUILD_ROOT}/usr/bin/kbdrate
 %endif
 echo '.so man8/raw.8' > $RPM_BUILD_ROOT%{_mandir}/man8/rawdevices.8
 
-install -m 555 partx/{addpart,delpart,partx} $RPM_BUILD_ROOT/sbin
+install -m 755 partx/{addpart,delpart,partx} $RPM_BUILD_ROOT/sbin
 
 # Correct mail spool path.
 sed -e 's,/usr/spool/mail,/var/spool/mail,g' ${RPM_BUILD_ROOT}%{_mandir}/man1/login.1 > ${RPM_BUILD_ROOT}%{_mandir}/man1/login.1.new 
@@ -346,7 +356,7 @@ install -m644 kbdrate/kbdrate.pam $RPM_BUILD_ROOT%{_sysconfdir}/pam.d/kbdrate
 %endif
 { 
   pushd ${RPM_BUILD_ROOT}%{_sysconfdir}/pam.d
-  install -m 644 ${RPM_SOURCE_DIR}/util-linux-2.7-login.pamd ./login
+  install -m 644 %{SOURCE1} ./login
   install -m 644 ${RPM_SOURCE_DIR}/util-linux-2.7-chsh.pamd ./chsh
   install -m 644 ${RPM_SOURCE_DIR}/util-linux-2.7-chsh.pamd ./chfn
   popd
@@ -360,9 +370,6 @@ ln -sf hwclock ${RPM_BUILD_ROOT}/sbin/clock
 chmod 644 ${RPM_BUILD_ROOT}%{_datadir}/misc/getopt/*
 rm -f fdisk/README.cfdisk
 
-mkdir -p $RPM_BUILD_ROOT%{_datadir}/misc
-install text-utils/more.help $RPM_BUILD_ROOT%{_datadir}/misc/
-
 # Final cleanup
 %ifnarch %cytune_archs
 rm -f $RPM_BUILD_ROOT%{_bindir}/cytune $RPM_BUILD_ROOT%{_mandir}/man8/cytune.8*
@@ -375,7 +382,8 @@ rm -f $RPM_BUILD_ROOT/usr/{bin,sbin}/{fdformat,tunelp,floppy,setfdprm} $RPM_BUIL
 rm -f $RPM_BUILD_ROOT/%{_sysconfdir}/fdprm
 %endif
 
-for I in /sbin/cfdisk /sbin/fsck.minix /sbin/mkfs.{bfs,minix} /sbin/sln %{_bindir}/line %{_bindir}/pg; do
+for I in /sbin/cfdisk /sbin/fsck.minix /sbin/mkfs.{bfs,minix} /sbin/sln \
+	%{_bindir}/line %{_bindir}/pg; do
 	rm -f $RPM_BUILD_ROOT$I
 done
 
@@ -385,6 +393,8 @@ rm -f $RPM_BUILD_ROOT%{_mandir}/man8/cfdisk.8*
 rm -f $RPM_BUILD_ROOT%{_mandir}/man8/fsck.minix.8*
 rm -f $RPM_BUILD_ROOT%{_mandir}/man8/mkfs.minix.8*
 rm -f $RPM_BUILD_ROOT%{_mandir}/man8/mkfs.bfs.8*
+
+ln -sf ../../bin/kill $RPM_BUILD_ROOT%{_bindir}/kill
 
 %find_lang %{name}
 
@@ -405,9 +415,9 @@ fi
 
 /bin/arch
 /bin/dmesg
-/bin/kill
 %attr(755,root,root)	/bin/login
 /bin/more
+/bin/kill
 
 %ifnarch s390 s390x
 %config %{_sysconfdir}/fdprm
@@ -472,6 +482,7 @@ fi
 %{_bindir}/ipcrm
 %{_bindir}/ipcs
 %{_bindir}/isosize
+%{_bindir}/kill
 %{_bindir}/logger
 %{_bindir}/look
 %{_bindir}/mcookie
@@ -497,6 +508,7 @@ fi
 %ifarch sparc sparc64 sparcv9
 %{_bindir}/sunhostid
 %endif
+%{_bindir}/tailf
 %{_bindir}/ul
 %{_bindir}/whereis
 %attr(2755,root,tty)	%{_bindir}/write
@@ -544,6 +556,7 @@ fi
 %{_mandir}/man1/rev.1*
 %{_mandir}/man1/script.1*
 %{_mandir}/man1/setterm.1*
+%{_mandir}/man1/tailf.1*
 %{_mandir}/man1/ul.1*
 %{_mandir}/man1/whereis.1*
 %{_mandir}/man1/write.1*
@@ -578,10 +591,9 @@ fi
 %{_mandir}/man8/vipw.8*
 
 %{_datadir}/misc/getopt
-%{_datadir}/misc/more.help
 
-%files -n mount
-%defattr(-,root,root)
+#files -n mount
+#defattr(-,root,root)
 %attr(4755,root,root)   /bin/mount
 %attr(4755,root,root)   /bin/umount
 /sbin/swapon
@@ -593,12 +605,108 @@ fi
 %{_mandir}/man8/swapon.8*
 %{_mandir}/man8/umount.8*
 
-%files -n losetup
-%defattr(-,root,root)
+#files -n losetup
+#defattr(-,root,root)
 %{_mandir}/man8/losetup.8*
 /sbin/losetup
 
 %changelog
+* Sat Mar 20 2004 <SteveD@RedHat.com>
+- Updated the nfs-mount.patch to correctly 
+  handle the mounthost option and to ignore 
+  servers that do not set auth flavors
+
+* Tue Mar 16 2004 Dan Walsh <dwalsh@RedHat.com> 2.12-13
+- Fix selinux ordering or pam for login
+
+* Tue Mar 16 2004 <SteveD@RedHat.com>
+- Make RPC error messages displayed with -v argument
+- Added two checks to the nfs4 path what will print warnings
+  when rpc.idmapd and rpc.gssd are not running
+- Ping NFS v4 servers before diving into kernel
+- Make v4 mount interruptible which also make the intr option on by default 
+
+* Sun Mar 13 2004  <SteveD@RedHat.com>
+- Reworked how the rpc.idmapd and rpc.gssd checks were
+  done due to review comments from upstream.
+- Added rpc_strerror() so the '-v' flag will show RPC errors.
+
+* Sat Mar 13 2004  <SteveD@RedHat.com>
+- Added two checks to the nfs4 path what will print warnings
+  when rpc.idmapd and rpc.gssd are not running.
+
+* Thu Mar 11 2004 <SteveD@RedHat.com>
+- Reworked and updated the nfsv4 patches.
+
+* Wed Mar 10 2004 Dan Walsh <dwalsh@RedHat.com>
+- Bump version
+
+* Wed Mar 10 2004 Steve Dickson <SteveD@RedHat.com>
+- Tried to make nfs error message a bit more meaninful
+- Cleaned up some warnings
+
+* Sun Mar  7 2004 Steve Dickson <SteveD@RedHat.com> 
+- Added pesudo flavors for nfsv4 mounts.
+- Added BuildRequires: libselinux-devel and Requires: libselinux
+  when WITH_SELINUX is set. 
+
+* Fri Feb 27 2004 Dan Walsh <dwalsh@redhat.com> 2.12-5
+- check for 2.6.3 kernel in mount options
+
+* Mon Feb 23 2004 Elliot Lee <sopwith@redhat.com> 2.12-4
+- Remove /bin/kill for #116100
+
+* Fri Feb 20 2004 Dan Walsh <dwalsh@redhat.com> 2.12-3
+- rebuilt
+
+* Fri Feb 13 2004 Elliot Lee <sopwith@redhat.com>
+- rebuilt
+
+* Thu Feb 12 2004 Elliot Lee <sopwith@redhat.com> 2.12-1
+- Final 2.12 has been out for ages - might as well use it.
+
+* Wed Jan 28 2004 Steve Dickson <SteveD@RedHat.com> 2.12pre-4
+- Added mount patches that have NFS version 4 support
+
+* Mon Jan 26 2004 Elliot Lee <sopwith@redhat.com> 2.12pre-3
+- Provides: mount losetup
+
+* Mon Jan 26 2004 Dan Walsh <dwalsh@redhat.com> 2.12pre-2
+- Add multiple to /etc/pam.d/login for SELinux
+
+* Thu Jan 15 2004 Elliot Lee <sopwith@redhat.com> 2.12pre-1
+- 2.12pre-1
+- Merge mount/losetup packages into the main package (#112324)
+- Lose separate 
+
+* Mon Nov 3 2003 Dan Walsh <dwalsh@redhat.com> 2.11y-35.sel
+- remove selinux code from login and use pam_selinux
+
+* Thu Oct 30 2003 Dan Walsh <dwalsh@redhat.com> 2.11y-34.sel
+- turn on selinux
+
+* Fri Oct 24 2003 Elliot Lee <sopwith@redhat.com> 2.11y-34
+- Add BuildRequires: texinfo (from a bug# I don't remember)
+- Fix #90588 with mountman patch142.
+
+* Mon Oct 6 2003 Dan Walsh <dwalsh@redhat.com> 2.11y-33
+- turn off selinux
+
+* Thu Sep 25 2003 Dan Walsh <dwalsh@redhat.com> 2.11y-32.sel
+- turn on selinux
+- remove context selection
+
+* Fri Sep 19 2003 Elliot Lee <sopwith@redhat.com> 2.11y-31
+- Add patch140 (alldevs) to fix #101772. Printing the total size of
+  all devices was deemed a lower priority than having all devices
+  (e.g. /dev/ida/c0d9) displayed.
+
+* Fri Sep 12 2003 Dan Walsh <dwalsh@redhat.com> 2.11y-31
+- turn off selinux
+
+* Fri Sep 12 2003 Dan Walsh <dwalsh@redhat.com> 2.11y-30.sel
+- turn on selinux
+
 * Fri Sep 5 2003 Elliot Lee <sopwith@redhat.com> 2.11y-28
 - Fix #103004, #103954
 
