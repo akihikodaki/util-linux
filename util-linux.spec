@@ -12,7 +12,7 @@
 Summary: A collection of basic system utilities.
 Name: util-linux
 Version: 2.12a
-Release: 12
+Release: 13
 License: distributable
 Group: System Environment/Base
 
@@ -342,12 +342,11 @@ rm -f $RPM_BUILD_ROOT/%{_sysconfdir}/fdprm
 %endif
 
 for I in /sbin/cfdisk /sbin/fsck.minix /sbin/mkfs.{bfs,minix} /sbin/sln /usr/bin/chkdupexe \
-	%{_bindir}/line %{_bindir}/pg %{_bindir}/raw; do
+	%{_bindir}/line %{_bindir}/pg; do
 	rm -f $RPM_BUILD_ROOT$I
 done
 
-for I in man1/chkdupexe.1 man1/line.1 man1/pg.1 man8/cfdisk.8 man8/fsck.minix.8 man8/mkfs.minix.8 man8/mkfs.bfs.8 \
-	man8/raw.8 man8/rawdevices.8; do
+for I in man1/chkdupexe.1 man1/line.1 man1/pg.1 man8/cfdisk.8 man8/fsck.minix.8 man8/mkfs.minix.8 man8/mkfs.bfs.8; do
 	rm -rf $RPM_BUILD_ROOT%{_mandir}/${I}*
 done
 
@@ -454,6 +453,7 @@ fi
 %endif
 %{_bindir}/namei
 %attr(4711,root,root)	%{_bindir}/newgrp
+%{_bindir}/raw
 %{_bindir}/rename
 %{_bindir}/renice
 %{_bindir}/rev
@@ -532,6 +532,8 @@ fi
 %{_mandir}/man8/mkfs.8*
 %{_mandir}/man8/mkswap.8*
 %{_mandir}/man8/pivot_root.8*
+%{_mandir}/man8/raw.8*
+%{_mandir}/man8/rawdevices.8*
 %{_mandir}/man8/renice.8*
 %ifnarch s390 s390x
 %{_mandir}/man8/setfdprm.8*
@@ -566,6 +568,9 @@ fi
 /sbin/losetup
 
 %changelog
+* Wed Oct 13 2004 Stephen C. Tweedie <sct@redhat.com> 2.12a-13
+- Restore raw utils (bugzilla #130016)
+
 * Mon Oct 11 2004 Phil Knirsch <pknirsch@redhat.com> 2.12a-12
 - Add the missing remote entry in pam.d
 
