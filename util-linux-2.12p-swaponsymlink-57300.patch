@@ -15,7 +15,7 @@
 + 		    || (!stat (swapFiles[i], &swapped)
 + 			&& !stat (fname, &swapping)
 + 			&& (swapped.st_dev == swapping.st_dev
-+ 			    && swapped.st_ino == swapping.st_ino)))
++ 			    && swapped.st_ino == swapping.st_ino))
 +		    )
  			return 1;
 +	}
