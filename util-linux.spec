@@ -27,7 +27,7 @@
 Summary: A collection of basic system utilities.
 Name: util-linux
 Version: 2.12p
-Release: 2
+Release: 3
 License: distributable
 Group: System Environment/Base
 
@@ -590,6 +590,9 @@ fi
 /sbin/losetup
 
 %changelog
+* Wed Mar 16 2005 Elliot Lee <sopwith@redhat.com>
+- rebuilt
+
 * Fri Feb 25 2005 Steve Dickson <SteveD@RedHat.com> 2.12p-2
 - Changed nfsmount to only use reserve ports when necessary
   (bz# 141773) 
