@@ -1,6 +1,15 @@
 # Upstream maintainer aeb@cwi.nl
 
-%define make_options HAVE_PIVOT_ROOT=yes HAVE_PAM=yes HAVE_SHADOW=no HAVE_PASSWD=yes ALLOW_VCS_USE=no ADD_RAW=yes HAVE_SLANG=yes HAVE_SELINUX=yes SLANGFLAGS=-I/usr/include/slang INSTALLSUID='$(INSTALL) -m $(SUIDMODE)' USE_TTY_GROUP=no
+# 'raw' support is deprecated, only ship it if we need compatibility stuff.
+%define include_raw 0
+
+%if %{include_raw}
+%define raw_options ADD_RAW=yes
+%else
+%define raw_options %{nil}
+%endif
+
+%define make_options HAVE_PIVOT_ROOT=yes HAVE_PAM=yes HAVE_SHADOW=no HAVE_PASSWD=yes ALLOW_VCS_USE=no %{raw_options} HAVE_SLANG=yes HAVE_SELINUX=yes SLANGFLAGS=-I/usr/include/slang INSTALLSUID='$(INSTALL) -m $(SUIDMODE)' USE_TTY_GROUP=no
 %define make_cflags -DUSE_TTY_GROUP -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64 
 
 %define with_kbdrate 0
@@ -12,7 +21,7 @@
 Summary: A collection of basic system utilities.
 Name: util-linux
 Version: 2.12a
-Release: 15
+Release: 16
 License: distributable
 Group: System Environment/Base
 
@@ -285,7 +294,9 @@ install -m 755 kbdrate/kbdrate ${RPM_BUILD_ROOT}/sbin
 install -m 644 kbdrate/kbdrate.8 ${RPM_BUILD_ROOT}%{_mandir}/man8
 ln -s consolehelper ${RPM_BUILD_ROOT}/usr/bin/kbdrate
 %endif
+%if %{include_raw}
 echo '.so man8/raw.8' > $RPM_BUILD_ROOT%{_mandir}/man8/rawdevices.8
+%endif
 
 install -m 755 partx/{addpart,delpart,partx} $RPM_BUILD_ROOT/sbin
 
@@ -463,7 +474,9 @@ fi
 %endif
 %{_bindir}/namei
 %attr(4711,root,root)	%{_bindir}/newgrp
+%if %{include_raw}
 %{_bindir}/raw
+%endif
 %{_bindir}/rename
 %{_bindir}/renice
 %{_bindir}/rev
@@ -542,8 +555,10 @@ fi
 %{_mandir}/man8/mkfs.8*
 %{_mandir}/man8/mkswap.8*
 %{_mandir}/man8/pivot_root.8*
+%if %{include_raw}
 %{_mandir}/man8/raw.8*
 %{_mandir}/man8/rawdevices.8*
+%endif
 %{_mandir}/man8/renice.8*
 %ifnarch s390 s390x
 %{_mandir}/man8/setfdprm.8*
@@ -578,6 +593,9 @@ fi
 /sbin/losetup
 
 %changelog
+* Thu Oct 14 2004 Elliot Lee <sopwith@redhat.com> 2.12a-16
+- Add include_raw macro, build with it off for Fedora
+
 * Wed Oct 13 2004 Stephen C. Tweedie <sct@redhat.com> - 2.12a-15
 - Add raw patch to allow binding of devices not yet in /dev
 
