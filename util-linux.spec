@@ -1,6 +1,6 @@
 # Upstream maintainer aeb@cwi.nl
 
-%define make_options HAVE_PIVOT_ROOT=yes HAVE_PAM=yes HAVE_SHADOW=no HAVE_PASSWD=yes ALLOW_VCS_USE=no ADD_RAW=yes HAVE_SLANG=yes SLANGFLAGS=-I/usr/include/slang INSTALLSUID='$(INSTALL) -m $(SUIDMODE)' USE_TTY_GROUP=no
+%define make_options HAVE_PIVOT_ROOT=yes HAVE_PAM=yes HAVE_SHADOW=no HAVE_PASSWD=yes ALLOW_VCS_USE=no ADD_RAW=yes HAVE_SLANG=yes HAVE_SELINUX=yes SLANGFLAGS=-I/usr/include/slang INSTALLSUID='$(INSTALL) -m $(SUIDMODE)' USE_TTY_GROUP=no
 %define make_cflags -DUSE_TTY_GROUP -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64 
 
 %define with_kbdrate 0
@@ -12,7 +12,7 @@
 Summary: A collection of basic system utilities.
 Name: util-linux
 Version: 2.12a
-Release: 7
+Release: 8
 License: distributable
 Group: System Environment/Base
 
@@ -573,6 +573,9 @@ fi
 /sbin/losetup
 
 %changelog
+* Wed Sep 15 2004 Nalin Dahybhai <nalin@redhat.com> 2.12a-8
+- Fix #132196 - turn on SELinux support at build-time.
+
 * Wed Sep 15 2004 Phil Knirsch <pknirsch@redhat.com> 2.12a-7
 - Fix #91174 with pamstart.patch
 
