@@ -1,0 +1,11 @@
+--- util-linux-2.12p/sys-utils/ipcs.c.ipcs-typo	2005-03-17 17:28:32.006952664 +0100
++++ util-linux-2.12p/sys-utils/ipcs.c	2005-03-17 17:28:48.823396176 +0100
+@@ -423,7 +423,7 @@
+ 		break;
+ 
+ 	case TIME:
+-		printf (_("------ Shared Memory Operation/Change Times --------\n"));
++		printf (_("------ Semaphore Operation/Change Times --------\n"));
+ 		printf (_("%-8s %-10s %-26.24s %-26.24s\n"),
+ 			_("shmid"),_("owner"),_("last-op"),_("last-changed"));
+ 		break;

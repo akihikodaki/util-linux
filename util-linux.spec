@@ -27,7 +27,7 @@
 Summary: A collection of basic system utilities.
 Name: util-linux
 Version: 2.12p
-Release: 3
+Release: 4
 License: distributable
 Group: System Environment/Base
 
@@ -95,13 +95,27 @@ Patch159: util-linux-2.12j-pamconsole.patch
 Patch160: raw-handle-nonpresent-devs.patch
 
 Patch164: util-linux-2.12j-113790-hotkeys.patch
-Patch168: util-linux-2.12j-143597-newgrp.patch
+
+# newgrp disabled
+#Patch168: util-linux-2.12j-143597-newgrp.patch
+
+# disable newgrp, in shadow-utils is better implementation (#149997, #151613)
+Patch169: util-linux-2.12p-newgrp-disable.patch
 
 # patches required for NFSv4 support
-Patch1000: util-linux-2.12p-nfsv4.patch
-Patch1001: util-linux-2.12a-mount-proto.patch
-Patch1002: util-linux-2.12a-nfsmount-overflow.patch
-Patch1003: util-linux-2.12a-nfsmount-reservp.patch
+Patch170: util-linux-2.12p-nfsv4.patch
+Patch171: util-linux-2.12a-mount-proto.patch
+Patch172: util-linux-2.12a-nfsmount-overflow.patch
+Patch173: util-linux-2.12a-nfsmount-reservp.patch
+
+# Makeing /var/log/lastlog (#151635)
+Patch180: util-linux-2.12p-login-lastlog.patch
+# Improved /etc/mtab lock (#143118)
+Patch181: util-linux-2.12p-mtab-lock.patch
+# Stupid typo (#151156)
+Patch182: util-linux-2.12p-ipcs-typo.patch
+# priority for duplicated labels (multipath) (#116300)
+Patch183: util-linux-2.12p-mount-duplabel.patch
 
 # When adding patches, please make sure that it is easy to find out what bug # the 
 # patch fixes.
@@ -207,12 +221,20 @@ mv MCONFIG.new MCONFIG
 %endif
 
 %patch164 -p1
-%patch168 -p1
 
-%patch1000 -p1 -b .nfsv4
-%patch1001 -p1
-%patch1002 -p1
-%patch1003 -p1
+# newgrp disabled
+#%patch168 -p1
+
+%patch169 -p1
+%patch170 -p1 -b .nfsv4
+%patch171 -p1
+%patch172 -p1
+%patch173 -p1
+
+%patch180 -p1 -b .lastlog
+%patch181 -p1
+%patch182 -p1
+%patch183 -p1 -b .duplabel
 
 %build
 unset LINGUAS || :
@@ -256,6 +278,8 @@ mkdir -p ${RPM_BUILD_ROOT}%{_infodir}
 mkdir -p ${RPM_BUILD_ROOT}%{_mandir}/man{1,6,8,5}
 mkdir -p ${RPM_BUILD_ROOT}%{_sbindir}
 mkdir -p ${RPM_BUILD_ROOT}%{_sysconfdir}/{pam.d,security/console.apps}
+mkdir -p ${RPM_BUILD_ROOT}/var/log/
+touch ${RPM_BUILD_ROOT}/var/log/lastlog
 
 make \
 	OPT="$RPM_OPT_FLAGS %{make_cflags}" \
@@ -375,6 +399,9 @@ ln -sf ../../bin/kill $RPM_BUILD_ROOT%{_bindir}/kill
 
 %post
 /sbin/install-info %{_infodir}/ipc.info* %{_infodir}/dir
+touch /var/log/lastlog
+chown root:root /var/log/lastlog
+chmod 0400 /var/log/lastlog
 
 %postun
 if [ "$1" = 0 ]; then
@@ -426,6 +453,7 @@ fi
 /sbin/rescuept
 /sbin/nologin
 %{_mandir}/man8/nologin.8*
+%ghost %attr(0400,root,root) /var/log/lastlog
 
 # Begin kbdrate stuff
 %if %{with_kbdrate}
@@ -469,7 +497,10 @@ fi
 %{_mandir}/man8/floppy.8*
 %endif
 %{_bindir}/namei
-%attr(4711,root,root)	%{_bindir}/newgrp
+
+# newgrp disabled
+#%attr(4711,root,root)	%{_bindir}/newgrp
+
 %if %{include_raw}
 %{_bindir}/raw
 %endif
@@ -528,7 +559,10 @@ fi
 %{_mandir}/man1/mcookie.1*
 %{_mandir}/man1/more.1*
 %{_mandir}/man1/namei.1*
-%{_mandir}/man1/newgrp.1*
+
+# newgrp disabled
+#%{_mandir}/man1/newgrp.1*
+
 %{_mandir}/man1/readprofile.1*
 %{_mandir}/man1/rename.1*
 %{_mandir}/man1/rev.1*
@@ -590,7 +624,14 @@ fi
 /sbin/losetup
 
 %changelog
-* Wed Mar 16 2005 Elliot Lee <sopwith@redhat.com>
+* Fri Mar 25 2005 Karel Zak <kzak@redhat.com> 2.12p-4
+- added /var/log/lastlog to util-linux (#151635)
+- disabled 'newgrp' in util-linux (enabled in shadow-utils) (#149997, #151613)
+- improved mtab lock (#143118)
+- fixed ipcs typo (#151156)
+- implemented mount workaround for duplicated labels (#116300)
+
+* Wed Mar 16 2005 Elliot Lee <sopwith@redhat.com> 2.12p-3
 - rebuilt
 
 * Fri Feb 25 2005 Steve Dickson <SteveD@RedHat.com> 2.12p-2
