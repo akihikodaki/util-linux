@@ -1,7 +1,7 @@
 # Upstream maintainer aeb@cwi.nl
 
 # 'raw' support is deprecated, only ship it if we need compatibility stuff.
-%define include_raw 1
+%define include_raw 0
 
 %if %{include_raw}
 %define raw_options ADD_RAW=yes
@@ -21,7 +21,7 @@
 Summary: A collection of basic system utilities.
 Name: util-linux
 Version: 2.12a
-Release: 16.EL4
+Release: 17
 License: distributable
 Group: System Environment/Base
 
@@ -102,6 +102,9 @@ Patch159: util-linux-2.12a-console.patch
 
 # Allow raw(8) to bind raw devices whose device nodes do not yet exist.
 Patch160: raw-handle-nonpresent-devs.patch
+
+# Handle the new Solaris partition ID
+Patch161: util-linux-2.12a-solarispart.patch
 
 # patches required for NFSv4 support
 Patch1000: util-linux-2.12-nfsv4.patch
@@ -222,6 +225,8 @@ mv MCONFIG.new MCONFIG
 %if %{include_raw}
 %patch160 -p1
 %endif
+
+%patch161 -p1
 
 %patch1000 -p1 -b .nfsv4
 
