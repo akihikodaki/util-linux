@@ -21,7 +21,7 @@
 Summary: A collection of basic system utilities.
 Name: util-linux
 Version: 2.12a
-Release: 18
+Release: 19
 License: distributable
 Group: System Environment/Base
 
@@ -105,6 +105,11 @@ Patch160: raw-handle-nonpresent-devs.patch
 
 # Handle the new Solaris partition ID
 Patch161: util-linux-2.12a-solarispart.patch
+
+Patch162: util-linux-2.12a-140933-loopoffset.patch
+Patch163: util-linux-2.12a-140437-sgisectors.patch
+Patch164: util-linux-2.12a-113790-hotkeys.patch
+Patch165: util-linux-2.12a-117855-mountman.patch
 
 # patches required for NFSv4 support
 Patch1000: util-linux-2.12-nfsv4.patch
@@ -228,6 +233,11 @@ mv MCONFIG.new MCONFIG
 %endif
 
 %patch161 -p1
+
+%patch162 -p1
+%patch163 -p1
+%patch164 -p1
+%patch165 -p1
 
 %patch1000 -p1 -b .nfsv4
 %patch1001 -p1
@@ -606,6 +616,9 @@ fi
 /sbin/losetup
 
 %changelog
+* Wed Dec 01 2004 Elliot Lee <sopwith@redhat.com> 2.12a-19
+- Patches for various bugs.
+
 * Mon Nov 29 2004 Steve Dickson <SteveD@RedHat.com>
 - Made NFS mounts adhere to the IP protocol if specified on
   command line as well as made NFS umounts adhere to the
