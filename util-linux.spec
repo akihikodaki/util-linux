@@ -227,7 +227,7 @@ mv MCONFIG.new MCONFIG
 %patch160 -p1
 %endif
 
-%patch163 -p1
+%patch163 -p1 -b .sopwith
 %patch164 -p1
 %patch165 -p1
 %patch166 -p1
