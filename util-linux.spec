@@ -3,7 +3,7 @@
 Summary: A collection of basic system utilities.
 Name: util-linux
 Version: 2.11f
-Release: 9
+Release: 12
 Copyright: distributable
 Group: System Environment/Base
 Source0: ftp://ftp.kernel.org/pub/linux/utils/util-linux/util-linux-%{version}.tar.bz2
@@ -34,10 +34,13 @@ Patch9: util-linux-2.11f-vipw.patch
 Patch21: util-linux-2.9v-nonroot.patch
 Patch27: util-linux-2.11a-moretc.patch
 Patch35: util-linux-2.10m-loginpath.patch
+Patch36: util-linux-2.11f-pwent.patch
 Patch60: util-linux-2.10s-s390x.patch
 Patch61: util-linux-2.11b-s390x.patch
 
 Patch70: util-linux-2.11f-miscfixes.patch
+
+Patch71: fdisk.diff
 
 # This patch got added upstream in 2.11. Then we reverted it from our
 # local 2.10s copy. Oops.
@@ -76,6 +79,7 @@ program.
 #%patch4 -p1 -b .mount
 
 %patch8 -p1 -b .nomount
+%patch9 -p1 -b .vipw
 %patch21 -p1 -b .nonroot
 
 %patch27 -p1 -b .moretc
@@ -87,6 +91,7 @@ program.
 %endif
 
 %patch70 -p1
+%patch71 -p1
 
 %patch75 -p1
 
@@ -97,6 +102,8 @@ cp %{SOURCE7} %{SOURCE6} .
 
 # nologin
 cp %{SOURCE8} %{SOURCE9} .
+
+%patch36 -p1 -b .pwent
 
 %build
 unset LINGUAS || :
@@ -358,7 +365,6 @@ fi
 %{_mandir}/man1/whereis.1*
 %{_mandir}/man1/write.1*
 
-%{_mandir}/man1/arch.1*
 %{_mandir}/man6/banner.6*
 
 %{_mandir}/man8/agetty.8*
@@ -391,6 +397,15 @@ fi
 %{_datadir}/misc/more.help
 
 %changelog
+* Thu Oct 11 2001 Bill Nottingham <notting@redhat.com>
+- fix permissions problem with vipw & shadow files, again (doh!)
+
+* Tue Oct 09 2001 Erik Troan <ewt@redhat.com>
+- added patch from Olaf Kirch to fix possible pwent structure overwriting
+
+* Fri Sep 28 2001 Elliot Lee <sopwith@redhat.com> 2.11f-10
+- fdisk patch from arjan
+
 * Sun Aug 26 2001 Elliot Lee <sopwith@redhat.com> 2.11f-9
 - Don't include cfdisk, since it appears to be an even bigger pile of junk than fdisk? :)
 
