@@ -66,7 +66,6 @@ Patch100: util-linux-2.12a-managed.patch
 Patch106: util-linux-2.11w-swaponsymlink-57300.patch
 Patch107: util-linux-2.11y-procpartitions-37436.patch
 Patch113: util-linux-2.11r-ctty3.patch
-#Patch117: util-linux-2.11y-moremisc.patch
 
 Patch120: util-linux-2.11y-skipraid2.patch
 Patch125: util-linux-2.11y-umask-82552.patch
@@ -193,7 +192,6 @@ mv MCONFIG.new MCONFIG
 %endif
 
 %patch113 -p1
-#%patch117 -p1
 %patch120 -p1
 
 %patch125 -p1
