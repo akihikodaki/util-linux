@@ -12,7 +12,7 @@
 Summary: A collection of basic system utilities.
 Name: util-linux
 Version: 2.12a
-Release: 14
+Release: 15
 License: distributable
 Group: System Environment/Base
 
@@ -90,6 +90,9 @@ Patch158: util-linux-2.12a-moreswaplabel.patch
 
 # Patch to enable the pamconsole flag for restricting mounting to users at the console (#133941)
 Patch159: util-linux-2.12a-console.patch
+
+# Allow raw(8) to bind raw devices whose device nodes do not yet exist.
+Patch160: raw-handle-nonpresent-devs.patch
 
 # patches required for NFSv4 support
 Patch1000: util-linux-2.12-nfsv4.patch
@@ -204,6 +207,8 @@ mv MCONFIG.new MCONFIG
 %patch158 -p1
 
 %patch159 -p1 -b .console
+
+%patch160 -p1
 
 %patch1000 -p1 -b .nfsv4
 
@@ -573,6 +578,9 @@ fi
 /sbin/losetup
 
 %changelog
+* Wed Oct 13 2004 Stephen C. Tweedie <sct@redhat.com> - 2.12a-15
+- Add raw patch to allow binding of devices not yet in /dev
+
 * Wed Oct 13 2004 John (J5) Palmieri <johnp@redhat.com> 2.12a-14
 - Add David Zeuthen's patch to enable the pamconsole flag #133941
 
