@@ -180,7 +180,9 @@ mv MCONFIG.new MCONFIG
 
 %patch106 -p1
 %patch107 -p1
+%if %{include_raw}
 %patch109 -p1
+%endif
 
 %patch113 -p1
 %patch117 -p1
@@ -217,7 +219,9 @@ mv MCONFIG.new MCONFIG
 
 %patch159 -p1 -b .console
 
+%if %{include_raw}
 %patch160 -p1
+%endif
 
 %patch1000 -p1 -b .nfsv4
 
