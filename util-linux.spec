@@ -1,7 +1,7 @@
 # Upstream maintainer aeb@cwi.nl
 
 # 'raw' support is deprecated, only ship it if we need compatibility stuff.
-%define include_raw 0
+%define include_raw 1
 
 %if %{include_raw}
 %define raw_options ADD_RAW=yes
@@ -21,7 +21,7 @@
 Summary: A collection of basic system utilities.
 Name: util-linux
 Version: 2.12a
-Release: 16
+Release: 16.EL4
 License: distributable
 Group: System Environment/Base
 

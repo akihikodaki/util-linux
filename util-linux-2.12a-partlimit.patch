@@ -16,7 +16,7 @@
  #define MAX_SECTOR_SIZE	2048
  #define SECTOR_SIZE	512	/* still used in BSD code */
 -#define MAXIMUM_PARTS	60
-+#define MAXIMUM_PARTS	16
++#define MAXIMUM_PARTS	15
  
  #define ACTIVE_FLAG     0x80
  
