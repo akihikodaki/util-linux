@@ -1,0 +1,44 @@
+--- util-linux-2.12j/po/ca.po.sopwith	2004-12-05 14:08:08.000000000 -0500
++++ util-linux-2.12j/po/ca.po	2004-12-10 13:10:52.411668785 -0500
+@@ -7183,7 +7183,7 @@
+ #: login-utils/vipw.c:354
+ #, c-format
+ msgid "Would you like to edit %s now [y/n]? "
+-msgstr "Desitgeu editar %s ara? [s/n] "
++msgstr "Desitgeu editar %s ara? [y/n] "
+ 
+ #: login-utils/wall.c:104
+ #, c-format
+--- util-linux-2.12j/po/da.po.sopwith	2004-12-05 14:08:09.000000000 -0500
++++ util-linux-2.12j/po/da.po	2004-12-10 13:09:50.382880759 -0500
+@@ -1470,7 +1470,7 @@
+ 
+ #: fdisk/cfdisk.c:1526
+ msgid "Do you wish to start with a zero table [y/N] ?"
+-msgstr "Vil du starte med nulstillet tabel [j/N] ?"
++msgstr "Vil du starte med nulstillet tabel [y/N] ?"
+ 
+ #: fdisk/cfdisk.c:1574
+ msgid "You specified more cylinders than fit on disk"
+--- util-linux-2.12j/po/nl.po.sopwith	2004-12-05 14:08:15.000000000 -0500
++++ util-linux-2.12j/po/nl.po	2004-12-10 13:09:50.390878282 -0500
+@@ -1493,7 +1493,7 @@
+ 
+ #: fdisk/cfdisk.c:1526
+ msgid "Do you wish to start with a zero table [y/N] ?"
+-msgstr "Wilt u met een lege tabel beginnen [j/N] ?"
++msgstr "Wilt u met een lege tabel beginnen [y/N] ?"
+ 
+ #: fdisk/cfdisk.c:1574
+ msgid "You specified more cylinders than fit on disk"
+--- util-linux-2.12j/po/pt_BR.po.sopwith	2004-12-05 14:08:15.000000000 -0500
++++ util-linux-2.12j/po/pt_BR.po	2004-12-10 13:11:47.560587674 -0500
+@@ -7161,7 +7161,7 @@
+ #: login-utils/vipw.c:354
+ #, c-format
+ msgid "Would you like to edit %s now [y/n]? "
+-msgstr "Você gostaria de editar %s agora [s/n]"
++msgstr "Você gostaria de editar %s agora [y/n]"
+ 
+ #: login-utils/wall.c:104
+ #, c-format

@@ -20,8 +20,8 @@
 
 Summary: A collection of basic system utilities.
 Name: util-linux
-Version: 2.12a
-Release: 20
+Version: 2.12j
+Release: 1
 License: distributable
 Group: System Environment/Base
 
@@ -63,7 +63,7 @@ Patch100: util-linux-2.12a-managed.patch
 Patch106: util-linux-2.11w-swaponsymlink-57300.patch
 Patch107: util-linux-2.11y-procpartitions-37436.patch
 Patch113: util-linux-2.11r-ctty3.patch
-Patch117: util-linux-2.11y-moremisc.patch
+#Patch117: util-linux-2.11y-moremisc.patch
 
 Patch120: util-linux-2.11y-skipraid2.patch
 Patch125: util-linux-2.11y-umask-82552.patch
@@ -73,24 +73,22 @@ Patch128: util-linux-2.12a-ipcs-84243-86285.patch
 Patch131: util-linux-2.11y-sysmap-85407.patch
 Patch138: util-linux-2.11y-chsh-103004.patch
 Patch139: util-linux-2.11y-fdisksegv-103954.patch
-Patch140: util-linux-2.11y-alldevs-101772.patch
-Patch142: util-linux-2.11y-mountman-90588.patch
+Patch142: util-linux-2.12j-mountman-90588.patch
 
 Patch143: cramfs-1.1-blocksize_and_quiet.patch
 Patch144: cramfs-1.1-pagesize.patch
 
-Patch145: util-linux-2.12.pam.patch
 Patch147: util-linux-2.12a-126572-fdiskman.patch
 Patch148: util-linux-2.12a-127097-labelcrash.patch
-Patch149: util-linux-2.12a-125531-swaplabel.patch
+Patch149: util-linux-2.12j-125531-swaplabel.patch
 Patch150: floppy-0.12-locale.patch
 
 Patch151: util-linux-2.12a-mountbylabel-dm.patch
-Patch152: util-linux-2.12a-mountnolabel.patch
+Patch152: util-linux-2.12j-mountnolabel.patch
 Patch153: util-linux-2.12a-16415-rdevman.patch
 Patch154: util-linux-2.11y-102566-loginman.patch
 Patch155: util-linux-2.12a-104321-rescuept.patch
-Patch156: util-linux-2.12a-fdiskmessage-107824.patch
+Patch156: util-linux-2.12j-fdiskmessage-107824.patch
 
 # Patch to enabled remote service for login/pam (#91174)
 Patch157: util-linux-2.12a-pamstart.patch
@@ -98,16 +96,12 @@ Patch157: util-linux-2.12a-pamstart.patch
 Patch158: util-linux-2.12a-moreswaplabel.patch
 
 # Patch to enable the pamconsole flag for restricting mounting to users at the console (#133941)
-Patch159: util-linux-2.12a-console.patch
+Patch159: util-linux-2.12j-pamconsole.patch
 
 # Allow raw(8) to bind raw devices whose device nodes do not yet exist.
 Patch160: raw-handle-nonpresent-devs.patch
 
-# Handle the new Solaris partition ID
-Patch161: util-linux-2.12a-solarispart.patch
-
-Patch162: util-linux-2.12a-140933-loopoffset.patch
-Patch163: util-linux-2.12a-140437-sgisectors.patch
+Patch163: util-linux-2.12j-140437-sgisectors.patch
 Patch164: util-linux-2.12a-113790-hotkeys.patch
 Patch165: util-linux-2.12a-117855-mountman.patch
 Patch166: util-linux-2.12a-134860-sldocs.patch
@@ -197,7 +191,7 @@ mv MCONFIG.new MCONFIG
 %endif
 
 %patch113 -p1
-%patch117 -p1
+#%patch117 -p1
 %patch120 -p1
 
 %patch125 -p1
@@ -207,14 +201,12 @@ mv MCONFIG.new MCONFIG
 %patch131 -p1
 %patch138 -p1
 %patch139 -p1
-%patch140 -p1
 %patch142 -p1
 
 # cramfs
 %patch143 -p0
 %patch144 -p1
 
-%patch145 -p1
 %patch147 -p1
 %patch148 -p1
 %patch149 -p1
@@ -235,11 +227,8 @@ mv MCONFIG.new MCONFIG
 %patch160 -p1
 %endif
 
-%patch161 -p1
-
-%patch162 -p1
 %patch163 -p1
-%patch164 -p1
+%patch164 -p1 -b .sopwith
 %patch165 -p1
 %patch166 -p1
 %patch167 -p1
