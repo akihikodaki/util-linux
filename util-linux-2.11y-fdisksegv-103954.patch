@@ -1,0 +1,31 @@
+*** util-linux-2.11y/fdisk/fdisk.c.000	2003-09-08 14:47:41.000000000 +0200
+--- util-linux-2.11y/fdisk/fdisk.c	2003-09-08 15:01:42.000000000 +0200
+***************
+*** 2020,2028 ****
+  	for (i = 0; i < 4; i++)
+  		free_primary += !ptes[i].part_table->sys_ind;
+  
+! 	if (!free_primary && partitions >= MAXIMUM_PARTS) {
+! 		printf(_("The maximum number of partitions has been created\n"));
+! 		return;
+  	}
+  
+  	if (!free_primary) {
+--- 2020,2036 ----
+  	for (i = 0; i < 4; i++)
+  		free_primary += !ptes[i].part_table->sys_ind;
+  
+! 	// Fix to only add primary partition if all logical partions are used <leonardjo@hetnet.nl>
+! 	if (partitions >= MAXIMUM_PARTS) {
+! 		if (!free_primary) {
+! 			printf(_("The maximum number of partitions has been created\n"));
+! 			return;
+! 		}
+! 		else {
+! 			add_partition(get_partition(0, 4),
+! 				      LINUX_NATIVE);
+! 			return;
+! 		}
+  	}
+  
+  	if (!free_primary) {

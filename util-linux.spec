@@ -1,15 +1,18 @@
 # Upstream maintainer util-linux@math.uio.no
 
+%if %{?WITH_SELINUX:0}%{!?WITH_SELINUX:1}
+%define WITH_SELINUX 0
+%endif
+
 %define with_kbdrate 0
 %define floppyver 0.12
-%define no_sfdisk_archs ppc ppc64
 %define no_hwclock_archs s390 s390x
 %define cytune_archs %{ix86} alpha armv4l
 
 Summary: A collection of basic system utilities.
 Name: util-linux
 Version: 2.11y
-Release: 9.1
+Release: 29
 License: distributable
 Group: System Environment/Base
 
@@ -57,6 +60,7 @@ Patch70: util-linux-2.11r-miscfixes.patch
 # Because we have our own mkcramfs, because the copyright/license is unclear
 Patch100: mkcramfs.patch
 Patch101: mkcramfs-quiet.patch
+Patch102: util-linux-2.11n-mkcramfs-pgsize.patch
 
 # Note on how to set up raw device mappings using RHL /etc/sysconfig/rawdevices
 Patch109: util-linux-2.11f-rawman.patch
@@ -89,8 +93,20 @@ Patch124: util-linux-2.11y-umount-75421.patch
 Patch125: util-linux-2.11y-umask-82552.patch
 Patch126: util-linux-2.11y-multibyte.patch
 Patch127: util-linux-2.11y-mcookie-83345.patch
-Patch128: util-linux-2.11y-ipcs-84243.patch
-Patch129: util-linux-2.11y-login-32bit-lastlog-88574.patch
+Patch128: util-linux-2.11y-ipcs-84243-86285.patch
+
+# Fixs wrong usage of BLKGETSIZE in mount_by_label
+Patch129: util-linux-2.11y-s390x.patch
+Patch130: util-linux-2.11y-login-32bit-lastlog-88574.patch
+Patch131: util-linux-2.11y-sysmap-85407.patch
+Patch132: util-linux-2.11y-mount-97381.patch
+Patch133: util-linux-2.11y-partx-68284.patch
+Patch134: util-linux-2.11y-readprofile-100433.patch
+Patch135: util-linux-selinux.patch
+Patch136: util-linux-2.11y-urandom.patch
+Patch137: util-linux-2.11y-idecd-102114.patch
+Patch138: util-linux-2.11y-chsh-103004.patch
+Patch139: util-linux-2.11y-fdisksegv-103954.patch
 
 # When adding patches, please make sure that it is easy to find out what bug # the 
 # patch fixes.
@@ -174,6 +190,7 @@ device.
 cp %{SOURCE7} %{SOURCE6} .
 %patch100 -p1 -b .mkcramfs
 %patch101 -p1 -b .quiet
+%patch102 -p1 -b .blksize
 
 # nologin
 cp %{SOURCE8} %{SOURCE9} .
@@ -207,15 +224,28 @@ mv MCONFIG.new MCONFIG
 %patch125 -p1 -b .umask
 %patch126 -p1 -b .multibyte
 %patch127 -p1 -b .mcookie-dumbness
-%patch129 -p1 -b .login32bitcompat
+%patch128 -p1 -b .ipcs
 
-# All of this patch is in except a 'max swap size' change, which
-# doesn't seem to be needed
+%patch129 -p1 -b .s390x
+%patch130 -p1 -b .login32bitcompat
+%patch131 -p1 -b .sysmap
+%patch132 -p1 -b .mountnitpick
+%patch133 -p1 -b .partx
+%patch134 -p1 -b .readprofile
+%if %{WITH_SELINUX}
+#SELinux
+%patch135 -p1 -b .selinux
+%endif
+%patch136 -p1 -b .urandom
+%patch137 -p1
+%patch138 -p1
+%patch139 -p1
 
 %build
 unset LINGUAS || :
 
 %configure
+make -C mount loop.h
 
 make "OPT=$RPM_OPT_FLAGS -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64" \
 	LDFLAGS="" \
@@ -337,9 +367,6 @@ install text-utils/more.help $RPM_BUILD_ROOT%{_datadir}/misc/
 %ifnarch %cytune_archs
 rm -f $RPM_BUILD_ROOT%{_bindir}/cytune $RPM_BUILD_ROOT%{_mandir}/man8/cytune.8*
 %endif
-%ifarch %no_sfdisk_archs
-rm -f $RPM_BUILD_ROOT/sbin/sfdisk $RPM_BUILD_ROOT%{_mandir}/man8/sfdisk.8*
-%endif
 %ifarch %no_hwclock_archs
 rm -f $RPM_BUILD_ROOT/sbin/{hwclock,clock} $RPM_BUILD_ROOT%{_mandir}/man8/hwclock.8*
 %endif
@@ -398,11 +425,9 @@ fi
 /sbin/delpart
 /sbin/partx
 
-%ifnarch %no_sfdisk_archs
 /sbin/sfdisk
 %{_mandir}/man8/sfdisk.8*
 %doc fdisk/sfdisk.examples
-%endif
 
 /sbin/fdisk
 %{_mandir}/man8/fdisk.8*
@@ -574,8 +599,54 @@ fi
 /sbin/losetup
 
 %changelog
-* Thu Apr 10 2003 Matt Wilson <msw@redhat.com> 2.11y-9.1
+* Fri Sep 5 2003 Elliot Lee <sopwith@redhat.com> 2.11y-28
+- Fix #103004, #103954
+
+* Fri Sep 5 2003 Dan Walsh <dwalsh@redhat.com> 2.11y-27
+- turn off selinux
+
+* Thu Sep 4 2003 Dan Walsh <dwalsh@redhat.com> 2.11y-26.sel
+- build with selinux
+
+* Mon Aug 11 2003 Elliot Lee <sopwith@redhat.com> 2.11y-25
+- Use urandom instead for mkcramfs
+
+* Tue Jul 29 2003 Dan Walsh <dwalsh@redhat.com> 2.11y-24
+- add SELINUX 2.5 support
+
+* Wed Jul 23 2003 Elliot Lee <sopwith@redhat.com> 2.11y-22
+- #100433 patch
+
+* Mon Jun 14 2003 Elliot Lee <sopwith@redhat.com> 2.11y-20
+- #97381 patch
+
+* Wed Jun 04 2003 Elliot Lee <sopwith@redhat.com>
+- rebuilt
+
+* Mon Apr 21 2003 Elliot Lee <sopwith@redhat.com> 2.11y-17
+- Change patch128 to improve ipcs -l
+
+* Fri Apr 11 2003 Elliot Lee <sopwith@redhat.com> 2.11y-16
+- Fix #85407
+
+* Fri Apr 11 2003 Elliot Lee <sopwith@redhat.com> 2.11y-15
+- Change patch128 to util-linux-2.11f-ipcs-84243-86285.patch to get all
+ipcs fixes
+
+* Thu Apr 10 2003 Matt Wilson <msw@redhat.com> 2.11y-14
 - fix last login date display on AMD64 (#88574)
+
+* Mon Apr  7 2003 Jeremy Katz <katzj@redhat.com> 2.11y-13
+- include sfdisk on ppc
+
+* Fri Mar 28 2003 Jeremy Katz <katzj@redhat.com> 2.11y-12
+- add patch from msw to change mkcramfs blocksize with a command line option
+
+* Tue Mar 25 2003 Phil Knirsch <pknirsch@redhat.com> 2.11y-11
+- Fix segfault on s390x due to wrong usage of BLKGETSIZE.
+
+* Thu Mar 13 2003 Elliot Lee <sopwith@redhat.com> 2.11y-10
+- Really apply the ipcs patch. Doh.
 
 * Mon Feb 24 2003 Elliot Lee <sopwith@redhat.com>
 - rebuilt
