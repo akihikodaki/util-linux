@@ -1,7 +1,7 @@
 Summary: A collection of basic system utilities.
 Name: util-linux
 Version: 2.10s
-Release: 12
+Release: 13.7
 Copyright: distributable
 Group: System Environment/Base
 Source0: ftp://ftp.kernel.org/pub/linux/utils/util-linux/util-linux-%{version}.tar.gz
@@ -370,6 +370,9 @@ fi
 %{_datadir}/misc/more.help
 
 %changelog
+* Wed Jul 11 2001 Bill Nottingham <notting@redhat.com>
+- fix vipw to not create world-readable shadow files
+
 * Sun Apr  8 2001 Matt Wilson <msw@redhat.com>
 - changed Requires: kernel >= 2.2.12-7 to Conflicts: kernel < 2.2.12-7
   (fixes a initscripts -> util-linux -> kernel -> initscripts prereq loop)
