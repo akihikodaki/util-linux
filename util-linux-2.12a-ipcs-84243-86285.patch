@@ -15,7 +15,7 @@
 -		printf (_("max total shared memory (pages) = %lu\n"),
 -			(unsigned long) shminfo.shmall);
 +		printf (_("max total shared memory (kbytes) = %lu\n"),
-+			getpagesize()*((unsigned long) shminfo.shmall/1024UL));
++			(getpagesize()*((unsigned long) shminfo.shmall)/1024UL);
  		printf (_("min seg size (bytes) = %lu\n"),
  			(unsigned long) shminfo.shmmin);
  		return;
