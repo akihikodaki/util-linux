@@ -2,8 +2,8 @@
 
 Summary: A collection of basic system utilities.
 Name: util-linux
-Version: 2.11f
-Release: 18
+Version: 2.11n
+Release: 11
 License: distributable
 Group: System Environment/Base
 Source0: ftp://ftp.kernel.org/pub/linux/utils/util-linux/util-linux-%{version}.tar.bz2
@@ -16,6 +16,7 @@ Source8: nologin.c
 Source9: nologin.8
 Source10: kbdrate.tar.gz
 
+BuildRequires: sed
 BuildRequires: pam-devel
 BuildRequires: ncurses-devel
 BuildRequires: libtermcap-devel
@@ -23,25 +24,24 @@ BuildRequires: slang-devel
 BuildRequires: zlib-devel
 
 Patch0: util-linux-2.11a-rhconfig.patch
-Patch1: util-linux-2.10e-nochkdupexe.patch
+Patch1: util-linux-2.11n-nochkdupexe.patch
 Patch2: util-linux-2.11a-gecossize.patch
 
 # XXX apply next patch to enable mount-2.8 from util-linux (not applied)
-Patch4: util-linux-2.9i-mount.patch
+Patch4: util-linux-2.11n-mount.patch
 
 Patch8: util-linux-2.9i-nomount.patch
-Patch9: util-linux-2.11f-vipw.patch
+#Patch9: util-linux-2.11f-vipw.patch
+
 Patch21: util-linux-2.9v-nonroot.patch
 Patch27: util-linux-2.11a-moretc.patch
 Patch35: util-linux-2.10m-loginpath.patch
-# Patch36 no longer used
-Patch36: util-linux-2.11f-pwent.patch
-Patch37: util-linux-2.11f-pwent2.patch
+Patch39: util-linux-2.11n-ctty.patch
 Patch38: util-linux-2.11f-ctty2.patch
 Patch60: util-linux-2.10s-s390x.patch
 Patch61: util-linux-2.11b-s390x.patch
 
-Patch70: util-linux-2.11f-miscfixes.patch
+Patch70: util-linux-2.11n-miscfixes.patch
 
 Patch71: fdisk.diff
 
@@ -56,7 +56,43 @@ Patch77: util-linux-2.11f-loginctty2.patch
 Patch100: mkcramfs.patch
 Patch101: mkcramfs-quiet.patch
 
+# Patch36 no longer used
+Patch36: util-linux-2.11f-pwent.patch
+# Patch37 is no longer used
+Patch37: util-linux-2.11f-pwent2.patch
+
+Patch102: util-linux-2.11n-colrm.patch
+
+########### START UNSUBMITTED
+Patch103: util-linux-2.11n-ownerumount.patch
 Patch104: util-linux-2.11n-mkswapprint-58799.patch
+Patch105: util-linux-2.11n-hexdump-58471.patch
+Patch106: util-linux-2.11g-swaponsymlink-57300.patch
+Patch107: util-linux-2.10r-procpartitions-37436.patch
+Patch108: util-linux-2.11n-autosmb-32132.patch
+Patch109: util-linux-2.11f-rawman.patch
+Patch110: util-linux-2.11n-skipraid.patch
+Patch111: util-linux-2.11n-mkfsman.patch
+Patch112: util-linux-2.11n-ipcrmman.patch
+Patch113: util-linux-2.11n-ctty3.patch
+Patch114: util-linux-2.11n-dumboctal.patch
+Patch115: util-linux-2.11n-fstabperm-61868.patch
+########### END UNSUBMITTED
+
+########
+# Mount patches
+Patch200: mount-2.10r-alphahack.patch
+Patch201: mount-2.10m-nolock-docs.patch
+Patch202: mount-2.10o-nfsman.patch
+Patch204: mount-2.10r-2gb.patch
+Patch205: mount-2.10r-ia64.patch
+Patch206: mount-2.10r-kudzu.patch
+Patch207: mount-2.10r-swapon.patch
+Patch209: mount-2.11b-swapoff.patch
+Patch210: util-linux-2.11b-largefile.patch
+Patch211: mount-2.11e-user_label_umount.patch
+Patch212: mount-2.11m-netdev.patch
+Patch220: util-linux-2.11n-makej.patch
 
 Obsoletes: fdisk tunelp
 %ifarch alpha sparc sparc64 sparcv9 s390
@@ -67,6 +103,7 @@ Conflicts: initscripts <= 4.58, timeconfig <= 3.0.1
 %endif
 BuildRoot: %{_tmppath}/%{name}-root
 Requires: pam >= 0.66-4, /etc/pam.d/system-auth
+Requires: usermode
 Conflicts: kernel < 2.2.12-7, 
 Prereq: /sbin/install-info
 
@@ -75,6 +112,33 @@ The util-linux package contains a large variety of low-level system
 utilities that are necessary for a Linux system to function. Among
 others, Util-linux contains the fdisk configuration tool and the login
 program.
+
+%package -n mount
+Group: System Environment/Base
+Summary: Programs for mounting and unmounting filesystems.
+ExclusiveOS: Linux
+Prereq: mktemp /bin/awk /usr/bin/cmp textutils fileutils
+
+%description -n mount
+The mount package contains the mount, umount, swapon, and swapoff
+programs. Accessible files on your system are arranged in one big tree
+or hierarchy. These files can be spread out over several devices. The
+mount command attaches a filesystem on some device to your system's
+file tree. The umount command detaches a filesystem from the
+tree. Swapon and swapoff, respectively, specify and disable devices
+and files for paging and swapping.
+
+%package -n losetup
+Summary: Programs for setting up and configuring loopback devices.
+Group: System Environment/Base
+
+%description -n losetup
+Linux supports a special block device called the loop device, which
+maps a normal file onto a virtual block device. This allows for the
+file to be used as a "virtual file system" inside another file.
+Losetup is used to associate loop devices with regular files or block
+devices, to detach loop devices and to query the status of a loop
+device.
 
 %prep
 
@@ -85,10 +149,10 @@ program.
 %patch2 -p1 -b .gecos
 
 # mount comes from its own rpm (again)
-#%patch4 -p1 -b .mount
+%patch4 -p1 -b .mount
+#%patch8 -p1 -b .nomount
 
-%patch8 -p1 -b .nomount
-%patch9 -p1 -b .vipw
+#%patch9 -p1 -b .vipw
 %patch21 -p1 -b .nonroot
 
 %patch27 -p1 -b .moretc
@@ -99,7 +163,7 @@ program.
 %patch61 -p1 -b .s390x
 %endif
 
-%patch70 -p1
+%patch70 -p1 -b .miscfixes
 %patch71 -p1
 
 #%patch75 -p1
@@ -111,25 +175,56 @@ cp %{SOURCE7} %{SOURCE6} .
 %patch100 -p1 -b .mkcramfs
 %patch101 -p1 -b .quiet
 
-%patch104 -p1 -b .mkswapprint
-
 # nologin
 cp %{SOURCE8} %{SOURCE9} .
 
-#%patch36 -p1 -b .pwent
-%patch37 -p1 -b .pwent2
+%patch102 -p1 -b .colrmeof
+
+#%patch200 -p0 -b .alphahack # Doesn't make sense
+%patch201 -p1 -b .docbug
+%patch202 -p1 -b .nfsman
+%patch204 -p1 -b .2gb
+#%patch205 -p1 -b .ia64 # Already integrated/doesn't make sense
+%patch206 -p1 -b .kudzu
+%patch207 -p1 -b .swapon
+%patch209 -p2 -b .swapoff
+%patch210 -p1 -b .largefile
+%patch211 -p2 -b .userumount
+%patch212 -p2 -b .netdev
+%patch220 -p1 -b .makej
+
+sed -e 's:^MAN_DIR=.*:MAN_DIR=%{_mandir}:' -e 's:^INFO_DIR=.*:INFO_DIR=%{_infodir}:' MCONFIG > MCONFIG.new
+mv MCONFIG.new MCONFIG
+
+%patch103 -p1 -b .ownerumount
+%patch104 -p1 -b .mkswapprint
+%patch105 -p1 -b .hexdump
+%patch106 -p1 -b .swaponsymlink
+%patch107 -p1 -b .procpartitions
+%patch108 -p1 -b .autosmb
+%patch109 -p1 -b .rawman
+%patch110 -p1 -b .skipraid
+%patch111 -p1 -b .mkfsman
+%patch112 -p1 -b .ipcrmman
+
+#%patch39 -p1 -b .ctty
 #%patch38 -p1 -b .ctty2
+# Third time's the charm
+%patch113 -p1 -b .ctty3
+%patch114 -p1 -b .dumboctal
+%patch115 -p1 -b .fstabperm
 
 %build
 unset LINGUAS || :
 
 %configure
 
-make "OPT=$RPM_OPT_FLAGS -g -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE" \
+make "OPT=$RPM_OPT_FLAGS -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE" \
+	HAVE_PIVOT_ROOT=yes \
 	%{?_smp_mflags}
-make "OPT=$RPM_OPT_FLAGS -g -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE" HAVE_PIVOT_ROOT=yes -C mount pivot_root
+make CFLAGS="$RPM_OPT_FLAGS" -C partx %{?_smp_mflags}
 cd rescuept
-gcc $RPM_OPT_FLAGS -o rescuept rescuept.c
+cc $RPM_OPT_FLAGS -o rescuept rescuept.c
 cd ..
 
 %ifnarch s390 s390x
@@ -151,15 +246,21 @@ rm -rf ${RPM_BUILD_ROOT}
 mkdir -p ${RPM_BUILD_ROOT}/{bin,sbin}
 mkdir -p ${RPM_BUILD_ROOT}%{_bindir}
 mkdir -p ${RPM_BUILD_ROOT}%{_infodir}
-mkdir -p ${RPM_BUILD_ROOT}%{_mandir}/man{1,6,8}
+mkdir -p ${RPM_BUILD_ROOT}%{_mandir}/man{1,6,8,5}
 mkdir -p ${RPM_BUILD_ROOT}%{_sbindir}
 mkdir -p ${RPM_BUILD_ROOT}%{_sysconfdir}/{pam.d,security/console.apps}
 
-make install DESTDIR=${RPM_BUILD_ROOT}
+make \
+        INSTALLDIR="install -d -m 755" \
+        INSTALLSUID="install -s -m 755" \
+        INSTALLBIN="install -s -m 755" \
+        INSTALLMAN="install -m 644" \
+	install DESTDIR=${RPM_BUILD_ROOT}
 
 install -s -m 755 mount/pivot_root ${RPM_BUILD_ROOT}/sbin
 install -m 644 mount/pivot_root.8 ${RPM_BUILD_ROOT}%{_mandir}/man8
 install -m 755 rescuept/rescuept ${RPM_BUILD_ROOT}/sbin
+mv rescuept/README rescuept/README.rescuept
 install -m 755 mkcramfs ${RPM_BUILD_ROOT}/usr/bin
 install -m 755 nologin ${RPM_BUILD_ROOT}/sbin
 install -m 644 nologin.8 ${RPM_BUILD_ROOT}%{_mandir}/man8
@@ -168,15 +269,13 @@ install -m 555 kbdrate/kbdrate ${RPM_BUILD_ROOT}/sbin
 install -m 644 kbdrate/kbdrate.8 ${RPM_BUILD_ROOT}%{_mandir}/man8
 ln -s consolehelper ${RPM_BUILD_ROOT}/usr/bin/kbdrate
 %endif
+echo '.so man8/raw.8' > $RPM_BUILD_ROOT%{_mandir}/man8/rawdevices.8
 
-if [ "%{_mandir}" != "%{_prefix}/man" -a -d ${RPM_BUILD_ROOT}%{_prefix}/man ]; then
-   ( cd ${RPM_BUILD_ROOT}%{_prefix}/man; tar cf - ./* ) |
-   ( cd ${RPM_BUILD_ROOT}%{_mandir}; tar xf - )
-   ( cd ${RPM_BUILD_ROOT}%{_prefix}; rm -rf ./man )
-fi
+install -m 555 -s partx/{addpart,delpart,partx} $RPM_BUILD_ROOT/sbin
 
 # Correct mail spool path.
-perl -pi -e 's,/usr/spool/mail,/var/spool/mail,' ${RPM_BUILD_ROOT}%{_mandir}/man1/login.1
+sed -e 's,/usr/spool/mail,/var/spool/mail,g' ${RPM_BUILD_ROOT}%{_mandir}/man1/login.1 > ${RPM_BUILD_ROOT}%{_mandir}/man1/login.1.new 
+mv ${RPM_BUILD_ROOT}%{_mandir}/man1/login.1.new ${RPM_BUILD_ROOT}%{_mandir}/man1/login.1
 
 if [ "%{_infodir}" != "%{_prefix}/info" -a -d ${RPM_BUILD_ROOT}%{_prefix}/info ]; then
    ( cd ${RPM_BUILD_ROOT}%{_prefix}/info; tar cf - ./* ) |
@@ -221,11 +320,7 @@ ln -sf hwclock ${RPM_BUILD_ROOT}/sbin/clock
 
 # We do not want dependencies on csh
 chmod 644 ${RPM_BUILD_ROOT}%{_datadir}/misc/getopt/*
-
-# This has dependencies on stuff in /usr
-%ifnarch sparc sparc64 sparcv9
-mv ${RPM_BUILD_ROOT}/sbin/cfdisk ${RPM_BUILD_ROOT}/usr/sbin
-%endif
+rm -f fdisk/README.cfdisk
 
 %find_lang %{name}
 
@@ -264,6 +359,9 @@ fi
 /sbin/ctrlaltdel
 /sbin/elvtune
 /sbin/fdisk
+/sbin/addpart
+/sbin/delpart
+/sbin/partx
 
 %ifarch %{ix86} alpha ia64 s390 s390x
 /sbin/fsck.minix
@@ -288,6 +386,8 @@ fi
 #/sbin/sln
 /sbin/nologin
 %{_mandir}/man8/nologin.8*
+
+# Begin kbdrate stuff
 %ifnarch s390 s390x
 /sbin/kbdrate
 /usr/bin/kbdrate
@@ -335,13 +435,6 @@ fi
 %{_bindir}/whereis
 %attr(2755,root,tty)	%{_bindir}/write
 
-%{_prefix}/games/banner
-
-%ifnarch sparc sparc64 sparcv9
-#%{_sbindir}/cfdisk
-#%{_mandir}/man8/cfdisk.8*
-%endif
-
 %ifarch %{ix86}
 %{_sbindir}/rdev
 %{_sbindir}/ramsize
@@ -353,7 +446,9 @@ fi
 %{_mandir}/man8/vidmode.8*
 %endif
 %{_sbindir}/readprofile
+%ifnarch s390
 %{_sbindir}/tunelp
+%endif
 %{_sbindir}/vipw
 %{_sbindir}/vigr
 
@@ -389,8 +484,6 @@ fi
 %{_mandir}/man1/whereis.1*
 %{_mandir}/man1/write.1*
 
-%{_mandir}/man6/banner.6*
-
 %{_mandir}/man8/agetty.8*
 %{_mandir}/man8/blockdev.8*
 %{_mandir}/man8/ctrlaltdel.8*
@@ -408,6 +501,7 @@ fi
 %{_mandir}/man8/mkswap.8*
 %{_mandir}/man8/pivot_root.8*
 %{_mandir}/man8/raw.8*
+%{_mandir}/man8/rawdevices.8*
 %{_mandir}/man8/renice.8*
 %{_mandir}/man8/setfdprm.8*
 %{_mandir}/man8/setsid.8*
@@ -420,9 +514,69 @@ fi
 %{_datadir}/misc/getopt
 %{_datadir}/misc/more.help
 
+%files -n mount
+%defattr(-,root,root)
+%attr(4755,root,root)   /bin/mount
+%attr(4755,root,root)   /bin/umount
+/sbin/swapon
+/sbin/swapoff
+%{_mandir}/man5/fstab.5*
+%{_mandir}/man5/nfs.5*
+%{_mandir}/man8/mount.8*
+%{_mandir}/man8/swapoff.8*
+%{_mandir}/man8/swapon.8*
+%{_mandir}/man8/umount.8*
+
+%files -n losetup
+%defattr(-,root,root)
+%{_mandir}/man8/losetup.8*
+/sbin/losetup
+
 %changelog
-* Wed Jan 30 2002 Tom Tromey <tromey@redhat.com> 2.11f-18
-- Added patch for #58799 from 2.11n-3
+* Sun Mar 31 2002 Elliot Lee <sopwith@redhat.com> 2.11n-11
+- Apply patch115 from ejb@ql.org for bug #61868
+
+* Wed Mar 27 2002 Elliot Lee <sopwith@redhat.com> 2.11n-10
+- Finish fixing #60675 (ipcrm man page), updated the patch.
+- Fix #61203 (patch114 - dumboctal.patch).
+
+* Tue Mar 12 2002 Elliot Lee <sopwith@redhat.com> 2.11n-9
+- Update ctty3 patch to ignore SIGHUP while dropping controlling terminal
+
+* Fri Mar 08 2002 Elliot Lee <sopwith@redhat.com> 2.11n-8
+- Update ctty3 patch to drop controlling terminal before forking.
+
+* Fri Mar 08 2002 Elliot Lee <sopwith@redhat.com> 2.11n-7
+  Fix various bugs:
+- Add patch110 (skipraid) to properly skip devices that are part of a RAID array.
+- Add patch111 (mkfsman) to update the mkfs man page's "SEE ALSO" section.
+- remove README.cfdisk
+- Include partx
+- Fix 54741 and related bugs for good(hah!) with patch113 (ctty3)
+
+* Wed Mar 06 2002 Elliot Lee <sopwith@redhat.com> 2.11n-6
+- Put kbdrate in, add usermode dep.
+
+* Tue Feb 26 2002 Elliot Lee <sopwith@redhat.com> 2.11n-5
+- Fix #60363 (tweak raw.8 man page, make rawdevices.8 symlink).
+
+* Tue Jan 28 2002 Bill Nottingham <notting@redhat.com> 2.11n-4
+- remove kbdrate (fixes kbd conflict)
+
+* Fri Dec 28 2001 Elliot Lee <sopwith@redhat.com> 2.11n-3
+- Add util-linux-2.11n-ownerumount.patch (#56593)
+- Add patch102 (util-linux-2.11n-colrm.patch) to fix #51887
+- Fix #53452 nits.
+- Fix #56953 (remove tunelp on s390)
+- Fix #56459, and in addition switch to using sed instead of perl.
+- Fix #58471
+- Fix #57300
+- Fix #37436
+- Fix #32132
+
+* Wed Dec 26 2001 Elliot Lee <sopwith@redhat.com> 2.11n-1
+- Update to 2.11n
+- Merge mount/losetup back in.
 
 * Tue Dec 04 2001 Elliot Lee <sopwith@redhat.com> 2.11f-17
 - Add patch38 (util-linux-2.11f-ctty2.patch) to ignore SIGINT/SIGTERM/SIGQUIT in the parent, so that ^\ won't break things.
