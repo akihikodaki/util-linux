@@ -12,7 +12,7 @@
 Summary: A collection of basic system utilities.
 Name: util-linux
 Version: 2.12a
-Release: 11
+Release: 12
 License: distributable
 Group: System Environment/Base
 
@@ -315,6 +315,7 @@ install -m644 kbdrate/kbdrate.pam $RPM_BUILD_ROOT%{_sysconfdir}/pam.d/kbdrate
 { 
   pushd ${RPM_BUILD_ROOT}%{_sysconfdir}/pam.d
   install -m 644 %{SOURCE1} ./login
+  install -m 644 %{SOURCE1} ./remote
   install -m 644 ${RPM_SOURCE_DIR}/util-linux-2.7-chsh.pamd ./chsh
   install -m 644 ${RPM_SOURCE_DIR}/util-linux-2.7-chsh.pamd ./chfn
   popd
@@ -564,6 +565,9 @@ fi
 /sbin/losetup
 
 %changelog
+* Mon Oct 11 2004 Phil Knirsch <pknirsch@redhat.com> 2.12a-12
+- Add the missing remote entry in pam.d
+
 * Wed Oct  6 2004 Steve Dickson <SteveD@RedHat.com>
 - Rechecked in some missing NFS mounting code.
 
