@@ -12,7 +12,7 @@
 Summary: A collection of basic system utilities.
 Name: util-linux
 Version: 2.12a
-Release: 10
+Release: 11
 License: distributable
 Group: System Environment/Base
 
@@ -564,6 +564,9 @@ fi
 /sbin/losetup
 
 %changelog
+* Wed Oct  6 2004 Steve Dickson <SteveD@RedHat.com>
+- Rechecked in some missing NFS mounting code.
+
 * Wed Sep 29 2004 Elliot Lee <sopwith@redhat.com> 2.12a-10
 - Make swaplabel support work with swapon -a -e
 
