@@ -27,7 +27,7 @@
 Summary: A collection of basic system utilities.
 Name: util-linux
 Version: 2.12p
-Release: 6
+Release: 7
 License: distributable
 Group: System Environment/Base
 
@@ -625,7 +625,7 @@ fi
 /sbin/losetup
 
 %changelog
-* Tue Apr  5 2005 Karel Zak <kzak@redhat.com> 2.12p-6
+* Tue Apr  5 2005 Karel Zak <kzak@redhat.com> 2.12p-7
 - enable build with libblkid from e2fsprogs-devel
 - remove workaround for duplicated labels
 
