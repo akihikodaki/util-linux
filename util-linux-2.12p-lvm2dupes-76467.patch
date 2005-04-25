@@ -1,0 +1,27 @@
+--- util-linux-2.12p/mount/mount_by_label.c.lvm2dupes	2005-04-25 11:33:53.657880224 +0200
++++ util-linux-2.12p/mount/mount_by_label.c	2005-04-25 11:36:32.075797040 +0200
+@@ -195,6 +195,15 @@
+ 	return 1;
+ }
+ 
++/* We need to avoid listing /dev/dm-X devices, because they are added to the uuidcache separately by the
++   uuidcache_init_dm routine. Duplicate entries cause mount-by-label to fail.
++ */
++static int
++is_lvm2(char *ptname)
++{
++	return !strncmp(ptname, "dm-", 3);
++}
++
+ static void
+ uuidcache_init(void) {
+ 	char line[100];
+@@ -266,7 +275,7 @@
+ 		/* devfs has .../disc and .../part1 etc. */
+ 
+ 		for (s = ptname; *s; s++);
+-		if (isdigit(s[-1]) || is_xvm(ptname)) {
++		if ((isdigit(s[-1]) || is_xvm(ptname)) && !is_lvm2(ptname)) {
+ 			
+ 		/*
+ 		 * Note: this is a heuristic only - there is no reason

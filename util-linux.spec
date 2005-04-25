@@ -27,7 +27,7 @@
 Summary: A collection of basic system utilities.
 Name: util-linux
 Version: 2.12p
-Release: 7
+Release: 8
 License: distributable
 Group: System Environment/Base
 
@@ -116,6 +116,16 @@ Patch180: util-linux-2.12p-login-lastlog.patch
 Patch181: util-linux-2.12p-mtab-lock.patch
 # Stupid typo (#151156)
 Patch182: util-linux-2.12p-ipcs-typo.patch
+# 154498 - util-linux login & pam session
+Patch183: util-linux-2.12a-pamsession.patch
+# 155293 - man 5 nfs should include vers as a mount option
+Patch184: util-linux-2.12p-nfsman.patch
+# 76467 - At boot time, fsck chokes on LVs listed by label in fstab
+Patch185: util-linux-2.12p-lvm2dupes-76467.patch
+# add note about ATAPI IDE floppy to fdformat.8
+Patch186: util-linux-2.12p-fdformat-ide.patch
+# 145355 - Man pages for fstab and fstab-sync in conflict.
+Patch187: util-linux-2.12p-fstab-man.patch
 
 # When adding patches, please make sure that it is easy to find out what bug # the 
 # patch fixes.
@@ -235,6 +245,12 @@ mv MCONFIG.new MCONFIG
 %patch180 -p1 -b .lastlog
 %patch181 -p1
 %patch182 -p1 -b .typo
+
+%patch183 -p1
+%patch184 -p1
+%patch185 -p1
+%patch186 -p1
+%patch187 -p1
 
 %build
 unset LINGUAS || :
@@ -625,6 +641,14 @@ fi
 /sbin/losetup
 
 %changelog
+* Mon Apr 25 2005 Karel Zak <kzak@redhat.com> 2.12p-8
+- fix #154498 - util-linux login & pam session
+- fix #155293 - man 5 nfs should include vers as a mount option
+- fix #76467 - At boot time, fsck chokes on LVs listed by label in fstab
+- new Source URL
+- added note about ATAPI IDE floppy to fdformat.8
+- fix #145355 - Man pages for fstab and fstab-sync in conflict
+
 * Tue Apr  5 2005 Karel Zak <kzak@redhat.com> 2.12p-7
 - enable build with libblkid from e2fsprogs-devel
 - remove workaround for duplicated labels

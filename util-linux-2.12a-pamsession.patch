@@ -1,0 +1,12 @@
+diff -urb util-linux-2.12a.orig/login-utils/login.c util-linux-2.12a/login-utils/login.c
+--- util-linux-2.12a.orig/login-utils/login.c	2005-04-08 09:43:37.000000000 -0400
++++ util-linux-2.12a/login-utils/login.c	2005-04-08 11:14:37.850579656 -0400
+@@ -703,6 +703,8 @@
+     PAM_FAIL_CHECK;
+ 
+     retcode = pam_setcred(pamh, PAM_ESTABLISH_CRED);
++    if (retcode != PAM_SUCCESS)
++	    pam_close_session(pamh, 0);
+     PAM_FAIL_CHECK;
+ 
+ #else /* ! USE_PAM */
