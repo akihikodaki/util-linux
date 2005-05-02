@@ -27,7 +27,7 @@
 Summary: A collection of basic system utilities.
 Name: util-linux
 Version: 2.12p
-Release: 9.1
+Release: 9.2
 License: distributable
 Group: System Environment/Base
 
@@ -644,7 +644,7 @@ fi
 /sbin/losetup
 
 %changelog
-* Mon May  2 2005 Karel Zak <kzak@redhat.com> 2.12p-9.1
+* Mon May  2 2005 Karel Zak <kzak@redhat.com> 2.12p-9.2
 - rebuild
 
 * Mon May  2 2005 Karel Zak <kzak@redhat.com> 2.12p-9
