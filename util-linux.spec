@@ -27,7 +27,7 @@
 Summary: A collection of basic system utilities.
 Name: util-linux
 Version: 2.12p
-Release: 8
+Release: 9
 License: distributable
 Group: System Environment/Base
 
@@ -126,6 +126,8 @@ Patch185: util-linux-2.12p-lvm2dupes-76467.patch
 Patch186: util-linux-2.12p-fdformat-ide.patch
 # 145355 - Man pages for fstab and fstab-sync in conflict.
 Patch187: util-linux-2.12p-fstab-man.patch
+# 156597 - look - doesn't work with separators
+Patch188: util-linux-2.12p-look-separator.patch
 
 # When adding patches, please make sure that it is easy to find out what bug # the 
 # patch fixes.
@@ -251,6 +253,7 @@ mv MCONFIG.new MCONFIG
 %patch185 -p1
 %patch186 -p1
 %patch187 -p1
+%patch188 -p1
 
 %build
 unset LINGUAS || :
@@ -641,6 +644,9 @@ fi
 /sbin/losetup
 
 %changelog
+* Mon May  2 2005 Karel Zak <kzak@redhat.com> 2.12p-9
+- fix #156597 - look - doesn't work with separators
+
 * Mon Apr 25 2005 Karel Zak <kzak@redhat.com> 2.12p-8
 - fix #154498 - util-linux login & pam session
 - fix #155293 - man 5 nfs should include vers as a mount option
