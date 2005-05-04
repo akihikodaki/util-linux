@@ -27,7 +27,7 @@
 Summary: A collection of basic system utilities.
 Name: util-linux
 Version: 2.12p
-Release: 9.2
+Release: 9.3
 License: distributable
 Group: System Environment/Base
 
@@ -644,6 +644,9 @@ fi
 /sbin/losetup
 
 %changelog
+* Wed May  4 2005 Jeremy Katz <katzj@redhat.com> - 2.12p-9.3
+- rebuild against new libe2fsprogs (and libblkid) to fix cramfs auto-detection
+
 * Mon May  2 2005 Karel Zak <kzak@redhat.com> 2.12p-9.2
 - rebuild
 
