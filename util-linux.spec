@@ -27,7 +27,7 @@
 Summary: A collection of basic system utilities.
 Name: util-linux
 Version: 2.12p
-Release: 9.3
+Release: 9.4
 License: distributable
 Group: System Environment/Base
 
