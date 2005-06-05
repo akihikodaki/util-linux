@@ -1010,7 +1010,7 @@ totally useless.
 * Tue Jul  2 2002 Bill Nottingham <notting@redhat.com> 2.11r-4
 - only require usermode if we're shipping kbdrate here
 
-* Fri Jun 28 2002 Trond Eivind Glomsrød <teg@redhat.com> 2.11r-3
+* Fri Jun 28 2002 Trond Eivind Glomsrod <teg@redhat.com> 2.11r-3
 - Port the large swap patch to new util-linux... the off_t changes 
   now in main aren't sufficient
 
@@ -1039,7 +1039,7 @@ slang-devel.
 - Fix mount.8 man page notes on vfat shortname option (#65628) (patch117)
 - Fix possible cal overflow with widechars (#67090) (patch117)
 
-* Tue Jun 11 2002 Trond Eivind Glomsrød <teg@redhat.com> 2.11n-16
+* Tue Jun 11 2002 Trond Eivind Glomsrod <teg@redhat.com> 2.11n-16
 - support large swap partitions
 - add '-d' option to autodetect available swap partitions
 
@@ -1409,7 +1409,7 @@ acquisition of controlling terminal).
 
 * Fri Jul 16 1999 Jeff Johnson <jbj@redhat.com>
 - update to 2.9u:
--   Czech more.help and messages (Jiøí Pavlovský)
+-   Czech more.help and messages (Jiri Pavlovsky)
 -   Japanese messages (Daisuke Yamashita)
 -   fdisk fix (Klaus G. Wagner)
 -   mount fix (Hirokazu Takahashi)
@@ -1423,7 +1423,7 @@ acquisition of controlling terminal).
 -   national language support for hwclock
 -   Japanese messages (both by Daisuke Yamashita)
 -   German messages and some misc i18n fixes (Elrond)
--   Czech messages (Jiøí Pavlovský)
+-   Czech messages (Jiri Pavlovsky)
 -   wall fixed for /dev/pts/xx ttys
 -   make last and wall use getutent() (Sascha Schumann)
     [Maybe this is bad: last reading all of wtmp may be too slow.
