@@ -27,7 +27,7 @@
 Summary: A collection of basic system utilities.
 Name: util-linux
 Version: 2.12p
-Release: 9.4
+Release: 10
 License: distributable
 Group: System Environment/Base
 
@@ -128,6 +128,12 @@ Patch186: util-linux-2.12p-fdformat-ide.patch
 Patch187: util-linux-2.12p-fstab-man.patch
 # 156597 - look - doesn't work with separators
 Patch188: util-linux-2.12p-look-separator.patch
+# 157656 - CRM 546998 : Possible bug in vipw, changes permissions of /etc/shadow
+Patch189: util-linux-2.12p-vipw-perm.patch
+# 159418 – sfdisk unusable - crashes immediately on invocation
+Patch200: util-linux-2.12p-sfdisk-fgets.patch
+# 157674 – sync option on VFAT mount destroys flash drives
+Patch201: util-linux-2.12p-mount-man-sync.patch
 
 # When adding patches, please make sure that it is easy to find out what bug # the 
 # patch fixes.
@@ -254,6 +260,9 @@ mv MCONFIG.new MCONFIG
 %patch186 -p1
 %patch187 -p1
 %patch188 -p1
+%patch189 -p1
+%patch200 -p1
+%patch201 -p1
 
 %build
 unset LINGUAS || :
@@ -382,7 +391,8 @@ install -m644 kbdrate/kbdrate.pam $RPM_BUILD_ROOT%{_sysconfdir}/pam.d/kbdrate
 }
 
 ln -sf ../../sbin/hwclock ${RPM_BUILD_ROOT}/usr/sbin/hwclock
-ln -sf ../../sbin/clock ${RPM_BUILD_ROOT}/usr/sbin/clock
+# we needn't /usr/sbin/clock in 'install' section if we ignore it in 'files' section [24-Jun-2005, Karel Zak]
+#ln -sf ../../sbin/clock ${RPM_BUILD_ROOT}/usr/sbin/clock
 ln -sf hwclock ${RPM_BUILD_ROOT}/sbin/clock
 
 # We do not want dependencies on csh
@@ -394,7 +404,7 @@ rm -f fdisk/README.cfdisk
 rm -f $RPM_BUILD_ROOT%{_bindir}/cytune $RPM_BUILD_ROOT%{_mandir}/man8/cytune.8*
 %endif
 %ifarch %no_hwclock_archs
-rm -f $RPM_BUILD_ROOT/sbin/{hwclock,clock} $RPM_BUILD_ROOT%{_mandir}/man8/hwclock.8*
+rm -f $RPM_BUILD_ROOT/sbin/{hwclock,clock} $RPM_BUILD_ROOT%{_mandir}/man8/hwclock.8* $RPM_BUILD_ROOT/usr/sbin/{hwclock,clock}
 %endif
 %ifarch s390 s390x
 rm -f $RPM_BUILD_ROOT/usr/{bin,sbin}/{fdformat,tunelp,floppy,setfdprm} $RPM_BUILD_ROOT%{_mandir}/man8/{fdformat,tunelp,floppy,setfdprm}.8*
@@ -644,6 +654,13 @@ fi
 /sbin/losetup
 
 %changelog
+* Thu Jun 16 2005 Karel Zak <kzak@redhat.com> 2.12p-10
+- fix #157656 – CRM 546998: Possible bug in vipw, changes permissions of /etc/shadow and /etc/gshadow
+- fix #159339 - util-linux updates for new audit system (pam_loginuid.so added to util-linux-selinux.pamd)
+- fix #159418 - sfdisk unusable - crashes immediately on invocation
+- fix #157674 – sync option on VFAT mount destroys flash drives
+- fix .spec file /usr/sbin/{hwclock,clock} symlinks
+
 * Wed May  4 2005 Jeremy Katz <katzj@redhat.com> - 2.12p-9.3
 - rebuild against new libe2fsprogs (and libblkid) to fix cramfs auto-detection
 
