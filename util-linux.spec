@@ -655,10 +655,10 @@ fi
 
 %changelog
 * Thu Jun 16 2005 Karel Zak <kzak@redhat.com> 2.12p-10
-- fix #157656 – CRM 546998: Possible bug in vipw, changes permissions of /etc/shadow and /etc/gshadow
+- fix #157656 - CRM 546998: Possible bug in vipw, changes permissions of /etc/shadow and /etc/gshadow
 - fix #159339 - util-linux updates for new audit system (pam_loginuid.so added to util-linux-selinux.pamd)
 - fix #159418 - sfdisk unusable - crashes immediately on invocation
-- fix #157674 – sync option on VFAT mount destroys flash drives
+- fix #157674 - sync option on VFAT mount destroys flash drives
 - fix .spec file /usr/sbin/{hwclock,clock} symlinks
 
 * Wed May  4 2005 Jeremy Katz <katzj@redhat.com> - 2.12p-9.3
