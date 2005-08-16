@@ -1,36 +1,38 @@
 # Rules for hacking:
-# When you add a patch to fix a bug, include the bug number in its filename.
+# 	- when adding patches, please make sure that it is easy to find out what bug ID
+#	patch fixes. Tip: cut&past bug title with bug ID from bugzilla.
+#
+# Notes:
+# 	- upstream maintainer Adrian Bunk <bunk@kernel.org>
 #
 # TODO:
-# Investigate turning on HAVE_BLKID - it's the right idea, it just needs verifying.
+#	- remove deprecated (since release 2.13) the arch command
 #
-# Upstream maintainer Adrian Bunk <bunk@stusta.de>
 
-# 'raw' support is deprecated, only ship it if we need compatibility stuff.
+### Features
 %define include_raw 0
-
-%if %{include_raw}
-%define raw_options ADD_RAW=yes
-%else
-%define raw_options %{nil}
-%endif
-
-%define make_options HAVE_BLKID=yes HAVE_PIVOT_ROOT=yes HAVE_PAM=yes HAVE_SHADOW=no HAVE_PASSWD=yes ALLOW_VCS_USE=no %{raw_options} HAVE_SLANG=yes HAVE_SELINUX=yes SLANGFLAGS=-I/usr/include/slang INSTALLSUID='$(INSTALL) -m $(SUIDMODE)' USE_TTY_GROUP=no
-%define make_cflags -DUSE_TTY_GROUP -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64 
-
 %define with_kbdrate 0
+
+### Macros
 %define floppyver 0.12
 %define cramfsver 1.1
 %define no_hwclock_archs s390 s390x
 %define cytune_archs %{ix86} alpha armv4l
 
+### Paths
+BuildRoot: %{_tmppath}/%{name}-root
+# see build section for _prefix
+
+### Header 
+# note: this is experimental unstable package. See "TODO [stable]" notes.  -- kzak
 Summary: A collection of basic system utilities.
 Name: util-linux
-Version: 2.12p
-Release: 10
+Version: 2.13
+Release: 0.1.pre1
 License: distributable
 Group: System Environment/Base
 
+### Dependences
 BuildRequires: sed
 BuildRequires: pam-devel
 BuildRequires: ncurses-devel
@@ -41,34 +43,50 @@ BuildRequires: texinfo
 BuildRequires: gettext
 BuildRequires: libselinux-devel
 BuildRequires: e2fsprogs-devel >= 1.36
+BuildRequires: audit-libs-devel
 
-Source0: ftp://ftp.win.tue.nl/pub/linux-local/utils/util-linux/util-linux-%{version}.tar.gz
+### Sources
+# TODO [stable]: s/2.13-pre1/%{version}/
+Source0: ftp://ftp.win.tue.nl/pub/linux-local/utils/util-linux/util-linux-2.13-pre1.tar.bz2
 Source1: util-linux-selinux.pamd
-Source4: util-linux-2.7-login.pamd
-Source2: util-linux-2.7-chfn.pamd
-Source3: util-linux-2.7-chsh.pamd
+Source2: util-linux-chsh-chfn.pamd
 Source8: nologin.c
 Source9: nologin.8
 Source10: kbdrate.tar.gz
 Source11: http://download.sourceforge.net/floppyutil/floppy-%{floppyver}.tar.gz
 Source12: http://download.sourceforge.net/cramfs/cramfs-%{cramfsver}.tar.gz
 
-##### Red Hat Linux-specific patches
-# Not really RH-specific
-Patch: util-linux-2.12a-moretc.patch 
+### Obsoletes & Conflicts & Provides
+Obsoletes: fdisk tunelp mount losetup schedutils
+%ifarch alpha sparc sparc64 sparcv9 s390
+Obsoletes: clock
+%endif
+%ifarch alpha
+Conflicts: initscripts <= 4.58, timeconfig <= 3.0.1
+%endif
+Requires: pam >= 0.66-4, /etc/pam.d/system-auth
+%if %{with_kbdrate}
+Requires: usermode
+%endif
+Conflicts: kernel < 2.2.12-7, 
+Prereq: /sbin/install-info
+Provides: mount = %{version}
+Provides: losetup = %{version}
+Provides: schedutils
 
+### Patches
+# let's use -ltermcap from the more command
+Patch1: util-linux-2.13-moretc.patch
 # Reduce MAX_PARTS to 16 (upstream reasonably won't take it)
 Patch70: util-linux-2.12a-partlimit.patch
-
 # Note on how to set up raw device mappings using RHL /etc/sysconfig/rawdevices
 Patch109: util-linux-2.11f-rawman.patch
 
-######## Patches that should be upstream eventually
 Patch100: util-linux-2.12j-managed.patch
 
 Patch106: util-linux-2.12p-swaponsymlink-57300.patch
 Patch107: util-linux-2.11y-procpartitions-37436.patch
-Patch113: util-linux-2.11r-ctty3.patch
+Patch113: util-linux-2.13-ctty3.patch
 
 Patch120: util-linux-2.11y-skipraid2.patch
 Patch126: util-linux-2.11y-multibyte.patch
@@ -88,23 +106,15 @@ Patch153: util-linux-2.12a-16415-rdevman.patch
 
 # Patch to enabled remote service for login/pam (#91174)
 Patch157: util-linux-2.12a-pamstart.patch
-
 # Patch to enable the pamconsole flag for restricting mounting to users at the console (#133941)
 Patch159: util-linux-2.12j-pamconsole.patch
-
 # Allow raw(8) to bind raw devices whose device nodes do not yet exist.
 Patch160: raw-handle-nonpresent-devs.patch
 
 Patch164: util-linux-2.12j-113790-hotkeys.patch
 
-# newgrp disabled
-#Patch168: util-linux-2.12j-143597-newgrp.patch
-
-# disable newgrp, in shadow-utils is better implementation (#149997, #151613)
-Patch169: util-linux-2.12p-newgrp-disable.patch
-
 # patches required for NFSv4 support
-Patch170: util-linux-2.12p-nfsv4.patch
+Patch170: util-linux-2.13-nfsv4.patch
 Patch171: util-linux-2.12a-mount-proto.patch
 Patch172: util-linux-2.12a-nfsmount-overflow.patch
 Patch173: util-linux-2.12a-nfsmount-reservp.patch
@@ -130,32 +140,24 @@ Patch187: util-linux-2.12p-fstab-man.patch
 Patch188: util-linux-2.12p-look-separator.patch
 # 157656 - CRM 546998 : Possible bug in vipw, changes permissions of /etc/shadow
 Patch189: util-linux-2.12p-vipw-perm.patch
-# 159418 – sfdisk unusable - crashes immediately on invocation
-Patch200: util-linux-2.12p-sfdisk-fgets.patch
-# 157674 – sync option on VFAT mount destroys flash drives
-Patch201: util-linux-2.12p-mount-man-sync.patch
+# 159339 - util-linux updates for new audit system
+Patch202: util-linux-2.13-audit-hwclock.patch
+# 158737 - sfdisk warning for large partitions, gpt
+Patch203: util-linux-2.13-fdisk-gpt.patch
+# 150912 - Add ocfs2 support
+Patch204: util-linux-2.12p-mount-ocfs2.patch
+# NULL is better than zero at end of execl()
+Patch205: util-linux-2.12p-execl.patch
+# deprecated the arch command (for compatibility only)
+Patch206: util-linux-2.13-arch.patch
+# upstream mistakes
+Patch207: util-linux-2.13-agetty-man.patch
+Patch208: util-linux-2.13-init.patch
 
 # When adding patches, please make sure that it is easy to find out what bug # the 
 # patch fixes.
 ########### END upstreamable
 
-Obsoletes: fdisk tunelp
-%ifarch alpha sparc sparc64 sparcv9 s390
-Obsoletes: clock
-%endif
-%ifarch alpha
-Conflicts: initscripts <= 4.58, timeconfig <= 3.0.1
-%endif
-BuildRoot: %{_tmppath}/%{name}-root
-Requires: pam >= 0.66-4, /etc/pam.d/system-auth
-%if %{with_kbdrate}
-Requires: usermode
-%endif
-Conflicts: kernel < 2.2.12-7, 
-Prereq: /sbin/install-info
-Obsoletes: mount losetup
-Provides: mount = %{version}
-Provides: losetup = %{version}
 
 %description
 The util-linux package contains a large variety of low-level system
@@ -163,97 +165,47 @@ utilities that are necessary for a Linux system to function. Among
 others, Util-linux contains the fdisk configuration tool and the login
 program.
 
-%if 0
-%package -n mount
-Group: System Environment/Base
-Summary: Programs for mounting and unmounting filesystems.
-ExclusiveOS: Linux
-
-%description -n mount
-The mount package contains the mount, umount, swapon, and swapoff
-programs. Accessible files on your system are arranged in one big tree
-or hierarchy. These files can be spread out over several devices. The
-mount command attaches a filesystem on some device to your system's
-file tree. The umount command detaches a filesystem from the
-tree. Swapon and swapoff, respectively, specify and disable devices
-and files for paging and swapping.
-
-%package -n losetup
-Summary: Programs for setting up and configuring loopback devices.
-Group: System Environment/Base
-
-%description -n losetup
-Linux supports a special block device called the loop device, which
-maps a normal file onto a virtual block device. This allows for the
-file to be used as a "virtual file system" inside another file.
-Losetup is used to associate loop devices with regular files or block
-devices, to detach loop devices and to query the status of a loop
-device.
-%endif
-
 %prep
+# TODO [stable]: remove -n
+%setup -q -a 10 -a 11 -a 12 -n util-linux-2.13-pre1
 
-%setup -q -a 10 -a 11 -a 12
-
-%patch0 -p1
-
+%patch1 -p1 -b .moretc
 %patch70 -p1
-
 # nologin
 cp %{SOURCE8} %{SOURCE9} .
-
 %patch100 -p1
-
-sed -e 's:^MAN_DIR=.*:MAN_DIR=%{_mandir}:' -e 's:^INFO_DIR=.*:INFO_DIR=%{_infodir}:' MCONFIG > MCONFIG.new
-mv MCONFIG.new MCONFIG
-
 %patch106 -p1
 %patch107 -p1
 %if %{include_raw}
 %patch109 -p1
 %endif
-
-%patch113 -p1
+%patch113 -p1 -b .ctty3
 %patch120 -p1
-
 %patch126 -p1
 %patch128 -p1
-
 %patch138 -p1
 %patch139 -p1
-
 # cramfs
 %patch143 -p0
 %patch144 -p1
-
 %patch147 -p1
 %patch150 -p0
-
 %patch151 -p1
 %patch153 -p1
 %patch157 -p1 -b .pamstart
 %patch159 -p1 -b .console
-
 %if %{include_raw}
 %patch160 -p1
 %endif
-
 %patch164 -p1
-
-# newgrp disabled
-#%patch168 -p1
-
-%patch169 -p1
 %patch170 -p1 -b .nfsv4
 %patch171 -p1
 %patch172 -p1
 %patch173 -p1
 %patch174 -p1
-
 %patch180 -p1 -b .lastlog
 %patch181 -p1
 %patch182 -p1 -b .typo
-
 %patch183 -p1
 %patch184 -p1
 %patch185 -p1
@@ -261,39 +213,70 @@ mv MCONFIG.new MCONFIG
 %patch187 -p1
 %patch188 -p1
 %patch189 -p1
-%patch200 -p1
-%patch201 -p1
+%patch202 -p1 -b .audit
+%patch203 -p1 -b .gpt
+%patch204 -p1
+%patch205 -p1
+%patch206 -p1
+%patch207 -p1
+%patch208 -p1
 
 %build
 unset LINGUAS || :
 
-%configure
+# rebuild build system
+aclocal
+automake -a
+autoconf
 
-make OPT="$RPM_OPT_FLAGS %{make_cflags}" \
-	LDFLAGS="" \
-	%{make_options} \
-	%{?_smp_mflags}
-make LDFLAGS="" CFLAGS="$RPM_OPT_FLAGS" -C partx %{?_smp_mflags}
-cd rescuept
-cc -D_FILE_OFFSET_BITS=64 $RPM_OPT_FLAGS -o rescuept rescuept.c
-cd ..
+# CFLAGS
+%define make_cflags -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64
 
+# note: we install to /bin and /usr/bin, so there's $bindir and $usrbindir in
+# util-linux build system. It's better follow package build-system than rpm
+# macros (where is prefix=/usr)
+%define _prefix	""
+
+# configure
+export CFLAGS="%{make_cflags} $RPM_OPT_FLAGS" %{?_smp_mflags}
+%configure \
+	--disable-wall \
+	--enable-partx \
+	--enable-login-utils \
+	--enable-kill \
+	--enable-write \
+%if %{include_raw}
+	--enable-raw \
+%endif
+	--enable-rdev
+
+# reset to original 
+%define _prefix	/usr
+
+# build util-linux
+make
+
+# build kbdrate
 %if %{with_kbdrate}
 pushd kbdrate
     cc $RPM_OPT_FLAGS -o kbdrate kbdrate.c
 popd
 %endif
 
+# build floppy stuff
 pushd floppy-%{floppyver}
 # We have to disable floppygtk somehow...
 %configure --with-gtk-prefix=/asfd/jkl
 make %{?_smp_mflags}
 popd
 
+# build cramfs 1.1
 make -C cramfs-%{cramfsver} %{?_smp_mflags}
 
+# build nologin
 gcc $RPM_OPT_FLAGS -o nologin nologin.c
 
+# build docs
 pushd sys-utils
     makeinfo --number-sections ipc.texi
 popd
@@ -310,43 +293,34 @@ mkdir -p %{buildroot}/var/log
 touch %{buildroot}/var/log/lastlog
 chmod 0400 %{buildroot}/var/log/lastlog
 
-make \
-	OPT="$RPM_OPT_FLAGS %{make_cflags}" \
-	LDFLAGS="" \
-	%{make_options} \
-        INSTALLDIR="install -d -m 755" \
-        INSTALLSUID="install -m 755" \
-        INSTALLBIN="install -m 755" \
-        INSTALLMAN="install -m 644" \
-	install DESTDIR=${RPM_BUILD_ROOT}
+# install util-linux
+make install DESTDIR=${RPM_BUILD_ROOT}
+
+# inslall floppy stuff
 pushd floppy-%{floppyver}
 %makeinstall
 popd
 
+# install cramfs 1.1
 pushd cramfs-%{cramfsver}
 install -s -m 755 mkcramfs ${RPM_BUILD_ROOT}/sbin/mkfs.cramfs
 ln -s ../../sbin/mkfs.cramfs ${RPM_BUILD_ROOT}/usr/bin/mkcramfs
 install -s -m 755 cramfsck ${RPM_BUILD_ROOT}/sbin/fsck.cramfs
 popd
 
-install -m 755 mount/pivot_root ${RPM_BUILD_ROOT}/sbin
-install -m 644 mount/pivot_root.8 ${RPM_BUILD_ROOT}%{_mandir}/man8
-install -m 755 rescuept/rescuept ${RPM_BUILD_ROOT}/sbin
-mv rescuept/README rescuept/README.rescuept
+# install no login
 install -m 755 nologin ${RPM_BUILD_ROOT}/sbin
 install -m 644 nologin.8 ${RPM_BUILD_ROOT}%{_mandir}/man8
+
 %if %{with_kbdrate}
 install -m 755 kbdrate/kbdrate ${RPM_BUILD_ROOT}/sbin
 install -m 644 kbdrate/kbdrate.8 ${RPM_BUILD_ROOT}%{_mandir}/man8
 ln -s consolehelper ${RPM_BUILD_ROOT}/usr/bin/kbdrate
 %endif
+
 %if %{include_raw}
 echo '.so man8/raw.8' > $RPM_BUILD_ROOT%{_mandir}/man8/rawdevices.8
-%else
-rm -f $RPM_BUILD_ROOT%{_bindir}/raw $RPM_BUILD_ROOT%{_mandir}/man8/raw.8*
 %endif
-
-install -m 755 partx/{addpart,delpart,partx} $RPM_BUILD_ROOT/sbin
 
 # Correct mail spool path.
 sed -e 's,/usr/spool/mail,/var/spool/mail,g' ${RPM_BUILD_ROOT}%{_mandir}/man1/login.1 > ${RPM_BUILD_ROOT}%{_mandir}/man1/login.1.new 
@@ -381,23 +355,20 @@ gzip -9nf ${RPM_BUILD_ROOT}%{_infodir}/ipc.info
 install -m644 kbdrate/kbdrate.apps $RPM_BUILD_ROOT%{_sysconfdir}/security/console.apps/kbdrate
 install -m644 kbdrate/kbdrate.pam $RPM_BUILD_ROOT%{_sysconfdir}/pam.d/kbdrate
 %endif
+
+# PAM settings
 { 
   pushd ${RPM_BUILD_ROOT}%{_sysconfdir}/pam.d
   install -m 644 %{SOURCE1} ./login
   install -m 644 %{SOURCE1} ./remote
-  install -m 644 ${RPM_SOURCE_DIR}/util-linux-2.7-chsh.pamd ./chsh
-  install -m 644 ${RPM_SOURCE_DIR}/util-linux-2.7-chsh.pamd ./chfn
+  install -m 644 %{SOURCE2} ./chsh
+  install -m 644 %{SOURCE2} ./chfn
   popd
 }
 
 ln -sf ../../sbin/hwclock ${RPM_BUILD_ROOT}/usr/sbin/hwclock
-# we needn't /usr/sbin/clock in 'install' section if we ignore it in 'files' section [24-Jun-2005, Karel Zak]
-#ln -sf ../../sbin/clock ${RPM_BUILD_ROOT}/usr/sbin/clock
 ln -sf hwclock ${RPM_BUILD_ROOT}/sbin/clock
 
-# We do not want dependencies on csh
-chmod 644 ${RPM_BUILD_ROOT}%{_datadir}/misc/getopt/*
-rm -f fdisk/README.cfdisk
 
 # Final cleanup
 %ifnarch %cytune_archs
@@ -407,20 +378,49 @@ rm -f $RPM_BUILD_ROOT%{_bindir}/cytune $RPM_BUILD_ROOT%{_mandir}/man8/cytune.8*
 rm -f $RPM_BUILD_ROOT/sbin/{hwclock,clock} $RPM_BUILD_ROOT%{_mandir}/man8/hwclock.8* $RPM_BUILD_ROOT/usr/sbin/{hwclock,clock}
 %endif
 %ifarch s390 s390x
-rm -f $RPM_BUILD_ROOT/usr/{bin,sbin}/{fdformat,tunelp,floppy,setfdprm} $RPM_BUILD_ROOT%{_mandir}/man8/{fdformat,tunelp,floppy,setfdprm}.8*
+rm -f $RPM_BUILD_ROOT/usr/{bin,sbin}/{fdformat,tunelp,floppy} $RPM_BUILD_ROOT%{_mandir}/man8/{fdformat,tunelp,floppy}.8*
 rm -f $RPM_BUILD_ROOT/%{_sysconfdir}/fdprm
 %endif
 
-for I in /sbin/cfdisk /sbin/fsck.minix /sbin/mkfs.{bfs,minix} /sbin/sln /usr/bin/chkdupexe \
-	%{_bindir}/line %{_bindir}/pg; do
+# deprecated commands
+for I in /sbin/cfdisk /sbin/fsck.minix /sbin/mkfs.{bfs,minix} /sbin/sln \
+	/usr/bin/chkdupexe %{_bindir}/line %{_bindir}/pg %{_bindir}/newgrp \
+	/sbin/shutdown %{_bindir}/wall %{_bindir}/scriptreplay; do
 	rm -f $RPM_BUILD_ROOT$I
 done
 
-for I in man1/chkdupexe.1 man1/line.1 man1/pg.1 man8/cfdisk.8 man8/fsck.minix.8 man8/mkfs.minix.8 man8/mkfs.bfs.8; do
+# deprecated man pages
+for I in man1/chkdupexe.1 man1/line.1 man1/pg.1 man1/newgrp.1 man8/cfdisk.8 \
+	man8/fsck.minix.8 man8/mkfs.minix.8 man8/mkfs.bfs.8 man1/wall.1; do
 	rm -rf $RPM_BUILD_ROOT%{_mandir}/${I}*
 done
 
+# deprecated docs
+for I in fdisk/README.cfdisk text-utils/README.pg text-utils/README.reset; do
+	rm -rf $I
+done
+
+# we install getopt/getopt-*.{bash,tcsh} as doc files
+# note: versions <=2.12 use path "%{_datadir}/misc/getopt/*"
+chmod 644 getopt/getopt-*.{bash,tcsh}
+rm -f ${RPM_BUILD_ROOT}%{_datadir}/getopt/*
+rmdir ${RPM_BUILD_ROOT}%{_datadir}/getopt
+
 ln -sf ../../bin/kill $RPM_BUILD_ROOT%{_bindir}/kill
+
+# /bin -> /sbin
+for I in pivot_root losetup swapon swapoff; do
+	if [ -e $RPM_BUILD_ROOT/bin/$I -o -h $RPM_BUILD_ROOT/bin/$I ]; then
+		mv $RPM_BUILD_ROOT/bin/$I $RPM_BUILD_ROOT/sbin/$I
+	fi
+done
+
+# /usr/sbin -> /sbin
+for I in addpart delpart partx; do
+	if [ -e $RPM_BUILD_ROOT/usr/sbin/$I ]; then
+		mv $RPM_BUILD_ROOT/usr/sbin/$I $RPM_BUILD_ROOT/sbin/$I
+	fi
+done
 
 %find_lang %{name}
 
@@ -440,7 +440,8 @@ fi
 
 %files -f %{name}.lang
 %defattr(-,root,root)
-%doc */README.* HISTORY MAINTAINER
+%doc */README.* NEWS AUTHORS
+%doc getopt/getopt-*.{bash,tcsh}
 
 /bin/arch
 /bin/dmesg
@@ -461,7 +462,6 @@ fi
 /sbin/blockdev
 /sbin/pivot_root
 /sbin/ctrlaltdel
-/sbin/elvtune
 /sbin/addpart
 /sbin/delpart
 /sbin/partx
@@ -480,7 +480,6 @@ fi
 %endif
 /sbin/mkfs
 /sbin/mkswap
-/sbin/rescuept
 /sbin/nologin
 %{_mandir}/man8/nologin.8*
 %ghost %attr(0400,root,root) %verify(not md5 size mtime) /var/log/lastlog
@@ -493,6 +492,10 @@ fi
 %{_sysconfdir}/pam.d/kbdrate
 %{_sysconfdir}/security/console.apps/kbdrate
 %endif
+
+%{_bindir}/chrt
+%{_bindir}/ionice
+%{_bindir}/taskset
 
 %{_bindir}/cal
 %attr(4711,root,root)	%{_bindir}/chfn
@@ -528,9 +531,6 @@ fi
 %endif
 %{_bindir}/namei
 
-# newgrp disabled
-#%attr(4711,root,root)	%{_bindir}/newgrp
-
 %if %{include_raw}
 %{_bindir}/raw
 %endif
@@ -538,9 +538,6 @@ fi
 %{_bindir}/renice
 %{_bindir}/rev
 %{_bindir}/script
-%ifnarch s390 s390x
-%{_bindir}/setfdprm
-%endif
 %{_bindir}/setsid
 %{_bindir}/setterm
 %ifarch sparc sparc64 sparcv9
@@ -589,10 +586,6 @@ fi
 %{_mandir}/man1/mcookie.1*
 %{_mandir}/man1/more.1*
 %{_mandir}/man1/namei.1*
-
-# newgrp disabled
-#%{_mandir}/man1/newgrp.1*
-
 %{_mandir}/man1/readprofile.1*
 %{_mandir}/man1/rename.1*
 %{_mandir}/man1/rev.1*
@@ -603,10 +596,13 @@ fi
 %{_mandir}/man1/whereis.1*
 %{_mandir}/man1/write.1*
 
+%{_mandir}/man1/chrt.1*
+%{_mandir}/man1/ionice.1*
+%{_mandir}/man1/taskset.1*
+
 %{_mandir}/man8/blockdev.8*
 %{_mandir}/man8/ctrlaltdel.8*
 %{_mandir}/man8/dmesg.8*
-%{_mandir}/man8/elvtune.8*
 %ifnarch s390 s390x
 %{_mandir}/man8/fdformat.8*
 %endif
@@ -621,22 +617,13 @@ fi
 %{_mandir}/man8/rawdevices.8*
 %endif
 %{_mandir}/man8/renice.8*
-%ifnarch s390 s390x
-%{_mandir}/man8/setfdprm.8*
-%endif
 %{_mandir}/man8/setsid.8*
-# XXX this man page should be moved to glibc.
-%{_mandir}/man8/sln.8*
 %ifnarch s390 s390x
 %{_mandir}/man8/tunelp.8*
 %endif
 %{_mandir}/man8/vigr.8*
 %{_mandir}/man8/vipw.8*
 
-%{_datadir}/misc/getopt
-
-#files -n mount
-#defattr(-,root,root)
 %attr(4755,root,root)   /bin/mount
 %attr(4755,root,root)   /bin/umount
 /sbin/swapon
@@ -647,14 +634,26 @@ fi
 %{_mandir}/man8/swapoff.8*
 %{_mandir}/man8/swapon.8*
 %{_mandir}/man8/umount.8*
-
-#files -n losetup
-#defattr(-,root,root)
 %{_mandir}/man8/losetup.8*
 /sbin/losetup
 
 %changelog
-* Thu Jun 16 2005 Karel Zak <kzak@redhat.com> 2.12p-10
+* Tue Aug 16 2005 Karel Zak <kzak@redhat.com> 2.13-0.1.pre1
+- /usr/share/misc/getopt/* -move-> /usr/share/doc/util-linux-2.13/getopt-*
+- the arch command marked as deprecated
+- removed: elvtune, rescuept and setfdprm
+- removed: man8/sln.8 (moved to man-pages, see #10601)
+- removed REDAME.pg and README.reset
+- .spec file cleanup
+- added schedutils (commands: chrt, ionice and taskset)
+
+* Tue Jul 12 2005 Karel Zak <kzak@redhat.com> 2.12p-9.7
+- fix #159339 - util-linux updates for new audit system
+- fix #158737 - sfdisk warning for large partitions, gpt
+- fix #150912 – Add ocfs2 support
+- NULL is better than zero at end of execl()
+
+* Thu Jun 16 2005 Karel Zak <kzak@redhat.com> 2.12p-9.5
 - fix #157656 - CRM 546998: Possible bug in vipw, changes permissions of /etc/shadow and /etc/gshadow
 - fix #159339 - util-linux updates for new audit system (pam_loginuid.so added to util-linux-selinux.pamd)
 - fix #159418 - sfdisk unusable - crashes immediately on invocation

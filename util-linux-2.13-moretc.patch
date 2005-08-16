@@ -1,0 +1,107 @@
+--- util-linux-2.13-pre1/text-utils/Makefile.am.moretc	2005-08-01 20:11:07.000000000 +0200
++++ util-linux-2.13-pre1/text-utils/Makefile.am	2005-08-15 13:36:12.000000000 +0200
+@@ -7,16 +7,13 @@
+ man_MANS = col.1 colcrt.1 colrm.1 column.1 hexdump.1 rev.1 line.1 tailf.1
+ 
+ if HAVE_NCURSES
+-bin_PROGRAMS = more
+ usrbin_PROGRAMS += ul pg
+-more_LDADD = -lncurses
+ pg_LDADD = -lncurses
+ ul_LDADD = -lncurses
+-man_MANS += ul.1 more.1 pg.1
+-else
++man_MANS += ul.1 pg.1
++endif
+ if HAVE_TERMCAP
+ bin_PROGRAMS = more
+ more_LDADD = -ltermcap
+ man_MANS += more.1
+ endif
+-endif
+\ No newline at end of file
+--- util-linux-2.13-pre1/text-utils/more.c.moretc	2005-07-28 23:49:31.000000000 +0200
++++ util-linux-2.13-pre1/text-utils/more.c	2005-08-15 13:40:55.000000000 +0200
+@@ -59,6 +59,8 @@
+ #include "nls.h"
+ #include "widechar.h"
+ 
++#include "../config.h"
++
+ #define _REGEX_RE_COMP
+ #include <regex.h>
+ #undef _REGEX_RE_COMP
+@@ -165,19 +167,60 @@
+ } context, screen_start;
+ extern char	PC;		/* pad character */
+ 
++#ifdef HAVE_LIBTERMCAP
++
++#include <termcap.h>
++
++char termbuffer[4096];
++char tcbuffer[4096];
++char *strbuf = termbuffer;
++
++static void
++my_putstring(char *s) {
++     tputs (s, 1, putchar);
++}
++
++static void
++my_setupterm(const char *term, int fildes, int *errret) {
++     *errret = tgetent(tcbuffer, term);
++}
++
++static int
++my_tgetnum(char *s, char *ss) {
++     return tgetnum(s);
++}
++
++static int
++my_tgetflag(char *s, char *ss) {
++     return tgetflag(s);
++}
++
++static char *
++my_tgetstr(char *s, char *ss) {
++     return tgetstr(s, &strbuf);
++}
++
++static char *
++my_tgoto(const char *cap, int col, int row) {
++     return tgoto(cap, col, row);
++}
++
++#else /* !HAVE_TERMCAP */
++
+ #ifdef HAVE_NCURSES_H
+-#include <ncurses.h>
++# include <ncurses.h>
++# include <term.h>
+ #elif defined(HAVE_NCURSES_NCURSES_H)
+-#include <ncurses/ncurses.h>
++# include <ncurses/ncurses.h>
++# include <term.h>
+ #endif
+ 
+-#include <term.h>			/* include after <curses.h> */
+-
+ static void
+ my_putstring(char *s) {
+ 	tputs (s, 1, putchar);		/* putp(s); */
+ }
+ 
++
+ static void
+ my_setupterm(const char *term, int fildes, int *errret) {
+      setupterm(term, fildes, errret);
+@@ -203,6 +246,8 @@
+      return tparm(cap, col, row);
+ }
+ 
++#endif /* !HAVE_TERMCAP */
++
+ static void
+ idummy(int *kk) {}
+ 
