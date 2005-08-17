@@ -242,7 +242,7 @@ autoconf
 # note: we disable tty group (USE_TTY_GROUP) in Makefiles to prevent call chgrp 
 # during the "make install". But we define -DUSE_TTY_GROUP that enable tty groups in
 # *.c files only.
-export CFLAGS="%{make_cflags} -DUSE_TTY_GROUP $RPM_OPT_FLAGS" %{?_smp_mflags}
+export CFLAGS="%{make_cflags} -DUSE_TTY_GROUP $RPM_OPT_FLAGS %{?_smp_mflags}"
 %configure \
 	--disable-wall \
 	--disable-use-tty-group \
