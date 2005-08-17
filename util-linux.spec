@@ -28,7 +28,7 @@ BuildRoot: %{_tmppath}/%{name}-root
 Summary: A collection of basic system utilities.
 Name: util-linux
 Version: 2.13
-Release: 0.1.pre1
+Release: 0.2.pre2
 License: distributable
 Group: System Environment/Base
 
@@ -46,8 +46,8 @@ BuildRequires: e2fsprogs-devel >= 1.36
 BuildRequires: audit-libs-devel
 
 ### Sources
-# TODO [stable]: s/2.13-pre1/%{version}/
-Source0: ftp://ftp.win.tue.nl/pub/linux-local/utils/util-linux/util-linux-2.13-pre1.tar.bz2
+# TODO [stable]: s/2.13-pre2/%{version}/
+Source0: ftp://ftp.win.tue.nl/pub/linux-local/utils/util-linux/util-linux-2.13-pre2.tar.bz2
 Source1: util-linux-selinux.pamd
 Source2: util-linux-chsh-chfn.pamd
 Source8: nologin.c
@@ -150,9 +150,10 @@ Patch204: util-linux-2.12p-mount-ocfs2.patch
 Patch205: util-linux-2.12p-execl.patch
 # deprecated the arch command (for compatibility only)
 Patch206: util-linux-2.13-arch.patch
+
 # upstream mistakes
 Patch207: util-linux-2.13-agetty-man.patch
-Patch208: util-linux-2.13-init.patch
+Patch208: util-linux-2.13-usrsbin.patch
 
 # When adding patches, please make sure that it is easy to find out what bug # the 
 # patch fixes.
@@ -167,7 +168,7 @@ program.
 
 %prep
 # TODO [stable]: remove -n
-%setup -q -a 10 -a 11 -a 12 -n util-linux-2.13-pre1
+%setup -q -a 10 -a 11 -a 12 -n util-linux-2.13-pre2
 
 %patch1 -p1 -b .moretc
 %patch70 -p1
@@ -238,9 +239,13 @@ autoconf
 %define _prefix	""
 
 # configure
-export CFLAGS="%{make_cflags} $RPM_OPT_FLAGS" %{?_smp_mflags}
+# note: we disable tty group (USE_TTY_GROUP) in Makefiles to prevent call chgrp 
+# during the "make install". But we define -DUSE_TTY_GROUP that enable tty groups in
+# *.c files only.
+export CFLAGS="%{make_cflags} -DUSE_TTY_GROUP $RPM_OPT_FLAGS" %{?_smp_mflags}
 %configure \
 	--disable-wall \
+	--disable-use-tty-group \
 	--enable-partx \
 	--enable-login-utils \
 	--enable-kill \
@@ -379,7 +384,6 @@ rm -f $RPM_BUILD_ROOT/sbin/{hwclock,clock} $RPM_BUILD_ROOT%{_mandir}/man8/hwcloc
 %endif
 %ifarch s390 s390x
 rm -f $RPM_BUILD_ROOT/usr/{bin,sbin}/{fdformat,tunelp,floppy} $RPM_BUILD_ROOT%{_mandir}/man8/{fdformat,tunelp,floppy}.8*
-rm -f $RPM_BUILD_ROOT/%{_sysconfdir}/fdprm
 %endif
 
 # deprecated commands
@@ -449,9 +453,6 @@ fi
 /bin/more
 /bin/kill
 
-%ifnarch s390 s390x
-%config %{_sysconfdir}/fdprm
-%endif
 %config %{_sysconfdir}/pam.d/chfn
 %config %{_sysconfdir}/pam.d/chsh
 %config %{_sysconfdir}/pam.d/login
@@ -638,7 +639,7 @@ fi
 /sbin/losetup
 
 %changelog
-* Tue Aug 16 2005 Karel Zak <kzak@redhat.com> 2.13-0.1.pre1
+* Tue Aug 16 2005 Karel Zak <kzak@redhat.com> 2.13-0.2.pre2
 - /usr/share/misc/getopt/* -move-> /usr/share/doc/util-linux-2.13/getopt-*
 - the arch command marked as deprecated
 - removed: elvtune, rescuept and setfdprm
