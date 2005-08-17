@@ -426,6 +426,9 @@ for I in addpart delpart partx; do
 	fi
 done
 
+# omit info/dir file
+rm -f ${RPM_BUILD_ROOT}%{_infodir}/dir
+
 %find_lang %{name}
 
 %clean
