@@ -151,9 +151,12 @@ Patch205: util-linux-2.12p-execl.patch
 # deprecated the arch command (for compatibility only)
 Patch206: util-linux-2.13-arch.patch
 
-# upstream mistakes
+# upstream build system mistakes
 Patch207: util-linux-2.13-agetty-man.patch
 Patch208: util-linux-2.13-usrsbin.patch
+
+#159410 - mkswap(8) claims max swap area size is 2 GB
+Patch209: util-linux-2.12p-mkswap-man.patch
 
 # When adding patches, please make sure that it is easy to find out what bug # the 
 # patch fixes.
@@ -221,6 +224,7 @@ cp %{SOURCE8} %{SOURCE9} .
 %patch206 -p1
 %patch207 -p1
 %patch208 -p1
+%patch209 -p1
 
 %build
 unset LINGUAS || :
@@ -642,6 +646,10 @@ fi
 /sbin/losetup
 
 %changelog
+* Tue Aug 30 2005 Karel Zak <kzak@redhat.com> 2.13-0.3.pre2
+- fix #166923 - hwclock will not run on a non audit-enabled kernel
+- fix #159410 - mkswap(8) claims max swap area size is 2 GB
+
 * Tue Aug 16 2005 Karel Zak <kzak@redhat.com> 2.13-0.2.pre2
 - /usr/share/misc/getopt/* -move-> /usr/share/doc/util-linux-2.13/getopt-*
 - the arch command marked as deprecated
