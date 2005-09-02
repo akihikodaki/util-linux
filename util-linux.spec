@@ -28,7 +28,7 @@ BuildRoot: %{_tmppath}/%{name}-root
 Summary: A collection of basic system utilities.
 Name: util-linux
 Version: 2.13
-Release: 0.2.pre2
+Release: 0.3.pre2
 License: distributable
 Group: System Environment/Base
 
@@ -157,6 +157,8 @@ Patch208: util-linux-2.13-usrsbin.patch
 
 #159410 - mkswap(8) claims max swap area size is 2 GB
 Patch209: util-linux-2.12p-mkswap-man.patch
+#165863 - swsusp swaps should be reinitialized
+Patch210: util-linux-2.13-swapon-suspend.patch
 
 # When adding patches, please make sure that it is easy to find out what bug # the 
 # patch fixes.
@@ -225,6 +227,7 @@ cp %{SOURCE8} %{SOURCE9} .
 %patch207 -p1
 %patch208 -p1
 %patch209 -p1
+%patch210 -p1 -b .swsuspend
 
 %build
 unset LINGUAS || :
@@ -646,9 +649,10 @@ fi
 /sbin/losetup
 
 %changelog
-* Tue Aug 30 2005 Karel Zak <kzak@redhat.com> 2.13-0.3.pre2
+* Fri Sep  2 2005 Karel Zak <kzak@redhat.com> 2.13-0.3.pre2
 - fix #166923 - hwclock will not run on a non audit-enabled kernel
 - fix #159410 - mkswap(8) claims max swap area size is 2 GB
+- fix #165863 - swsusp swaps should be reinitialized
 
 * Tue Aug 16 2005 Karel Zak <kzak@redhat.com> 2.13-0.2.pre2
 - /usr/share/misc/getopt/* -move-> /usr/share/doc/util-linux-2.13/getopt-*
