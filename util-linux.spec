@@ -653,6 +653,7 @@ fi
 - fix #166923 - hwclock will not run on a non audit-enabled kernel
 - fix #159410 - mkswap(8) claims max swap area size is 2 GB
 - fix #165863 - swsusp swaps should be reinitialized
+- change /var/log/lastlog perms to 0644
 
 * Tue Aug 16 2005 Karel Zak <kzak@redhat.com> 2.13-0.2.pre2
 - /usr/share/misc/getopt/* -move-> /usr/share/doc/util-linux-2.13/getopt-*
