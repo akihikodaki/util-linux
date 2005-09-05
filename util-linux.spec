@@ -303,7 +303,7 @@ mkdir -p ${RPM_BUILD_ROOT}%{_sbindir}
 mkdir -p ${RPM_BUILD_ROOT}%{_sysconfdir}/{pam.d,security/console.apps}
 mkdir -p %{buildroot}/var/log
 touch %{buildroot}/var/log/lastlog
-chmod 0400 %{buildroot}/var/log/lastlog
+chmod 0644 %{buildroot}/var/log/lastlog
 
 # install util-linux
 make install DESTDIR=${RPM_BUILD_ROOT}
@@ -445,7 +445,7 @@ rm -f ${RPM_BUILD_ROOT}%{_infodir}/dir
 /sbin/install-info %{_infodir}/ipc.info* %{_infodir}/dir
 touch /var/log/lastlog
 chown root:root /var/log/lastlog
-chmod 0400 /var/log/lastlog
+chmod 0644 /var/log/lastlog
 
 %postun
 if [ "$1" = 0 ]; then
@@ -493,7 +493,7 @@ fi
 /sbin/mkswap
 /sbin/nologin
 %{_mandir}/man8/nologin.8*
-%ghost %attr(0400,root,root) %verify(not md5 size mtime) /var/log/lastlog
+%ghost %attr(0644,root,root) %verify(not md5 size mtime) /var/log/lastlog
 
 # Begin kbdrate stuff
 %if %{with_kbdrate}
