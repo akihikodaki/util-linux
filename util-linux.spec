@@ -667,7 +667,7 @@ fi
 * Tue Jul 12 2005 Karel Zak <kzak@redhat.com> 2.12p-9.7
 - fix #159339 - util-linux updates for new audit system
 - fix #158737 - sfdisk warning for large partitions, gpt
-- fix #150912 – Add ocfs2 support
+- fix #150912 - Add ocfs2 support
 - NULL is better than zero at end of execl()
 
 * Thu Jun 16 2005 Karel Zak <kzak@redhat.com> 2.12p-9.5
