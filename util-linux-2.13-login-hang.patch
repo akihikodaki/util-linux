@@ -1,0 +1,20 @@
+--- util-linux-2.13-pre2/login-utils/login.c.hang	2005-10-03 16:02:54.000000000 +0200
++++ util-linux-2.13-pre2/login-utils/login.c	2005-10-03 16:16:16.000000000 +0200
+@@ -223,7 +223,8 @@
+ 
+ 	if (lstat(ttyn, &statbuf)
+ 	    || !S_ISCHR(statbuf.st_mode)
+-	    || (statbuf.st_nlink > 1 && strncmp(ttyn, "/dev/", 5))) {
++	    || (statbuf.st_nlink > 1 && strncmp(ttyn, "/dev/", 5))
++	    || (access(ttyn, R_OK | W_OK) != 0)) {
+ 		syslog(LOG_ERR, _("FATAL: bad tty"));
+ 		sleep(1);
+ 		exit(1);
+@@ -332,6 +333,7 @@
+     pid = getpid();
+ 
+     signal(SIGALRM, timedout);
++    siginterrupt(SIGALRM,1);		/* we have to interrupt syscalls like ioclt() */
+     alarm((unsigned int)timeout);
+     signal(SIGQUIT, SIG_IGN);
+     signal(SIGINT, SIG_IGN);

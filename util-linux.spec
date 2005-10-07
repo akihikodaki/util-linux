@@ -6,12 +6,11 @@
 # 	- upstream maintainer Adrian Bunk <bunk@kernel.org>
 #
 # TODO:
-#	- remove deprecated (since release 2.13) the arch command
+#	- remove deprecated the arch command (since release 2.13)
 #
 
 ### Features
 %define include_raw 0
-%define with_kbdrate 0
 
 ### Macros
 %define floppyver 0.12
@@ -28,7 +27,7 @@ BuildRoot: %{_tmppath}/%{name}-root
 Summary: A collection of basic system utilities.
 Name: util-linux
 Version: 2.13
-Release: 0.3.pre3
+Release: 0.4.pre4
 License: distributable
 Group: System Environment/Base
 
@@ -46,13 +45,12 @@ BuildRequires: e2fsprogs-devel >= 1.36
 BuildRequires: audit-libs-devel
 
 ### Sources
-# TODO [stable]: s/2.13-pre2/%{version}/
-Source0: ftp://ftp.win.tue.nl/pub/linux-local/utils/util-linux/util-linux-2.13-pre2.tar.bz2
+# TODO [stable]: s/2.13-pre4/%{version}/
+Source0: ftp://ftp.win.tue.nl/pub/linux-local/utils/util-linux/util-linux-2.13-pre4.tar.bz2
 Source1: util-linux-selinux.pamd
 Source2: util-linux-chsh-chfn.pamd
 Source8: nologin.c
 Source9: nologin.8
-Source10: kbdrate.tar.gz
 Source11: http://download.sourceforge.net/floppyutil/floppy-%{floppyver}.tar.gz
 Source12: http://download.sourceforge.net/cramfs/cramfs-%{cramfsver}.tar.gz
 
@@ -65,9 +63,6 @@ Obsoletes: clock
 Conflicts: initscripts <= 4.58, timeconfig <= 3.0.1
 %endif
 Requires: pam >= 0.66-4, /etc/pam.d/system-auth
-%if %{with_kbdrate}
-Requires: usermode
-%endif
 Conflicts: kernel < 2.2.12-7, 
 Prereq: /sbin/install-info
 Provides: mount = %{version}
@@ -150,22 +145,21 @@ Patch204: util-linux-2.12p-mount-ocfs2.patch
 Patch205: util-linux-2.12p-execl.patch
 # deprecated the arch command (for compatibility only)
 Patch206: util-linux-2.13-arch.patch
-
-# upstream build system mistakes
-Patch207: util-linux-2.13-agetty-man.patch
-Patch208: util-linux-2.13-usrsbin.patch
-
-#159410 - mkswap(8) claims max swap area size is 2 GB
-Patch209: util-linux-2.12p-mkswap-man.patch
-#165863 - swsusp swaps should be reinitialized
+# 165863 - swsusp swaps should be reinitialized
 Patch210: util-linux-2.13-swapon-suspend.patch
-#170110 - Documentation for 'rsize' and 'wsize' NFS mount options is misleading
+# 170110 - Documentation for 'rsize' and 'wsize' NFS mount options is misleading
 Patch211: util-linux-2.12p-nfs-manupdate.patch
+# 169628 - /usr/bin/floppy doesn't work with /dev/fd0
+Patch212: util-linux-2.12p-floppy-generic.patch
+# 168436 - login will attempt to run if it has no read/write access to its terminal
+# 168434 - login's timeout can fail - needs to call siginterrupt(SIGALRM,1)
+Patch213: util-linux-2.13-login-hang.patch
+# 165253 – losetup missing option -a [new feature]
+Patch214: util-linux-2.13-losetup-all.patch
 
 # When adding patches, please make sure that it is easy to find out what bug # the 
 # patch fixes.
 ########### END upstreamable
-
 
 %description
 The util-linux package contains a large variety of low-level system
@@ -175,7 +169,7 @@ program.
 
 %prep
 # TODO [stable]: remove -n
-%setup -q -a 10 -a 11 -a 12 -n util-linux-2.13-pre2
+%setup -q -a 11 -a 12 -n util-linux-2.13-pre4
 
 %patch1 -p1 -b .moretc
 %patch70 -p1
@@ -225,12 +219,12 @@ cp %{SOURCE8} %{SOURCE9} .
 %patch203 -p1 -b .gpt
 %patch204 -p1
 %patch205 -p1
-%patch206 -p1
-%patch207 -p1
-%patch208 -p1
-%patch209 -p1
+%patch206 -p1 -b .arch
 %patch210 -p1 -b .swsuspend
 %patch211 -p1
+%patch212 -p1
+%patch213 -p1
+%patch214 -p1
 
 %build
 unset LINGUAS || :
@@ -270,13 +264,6 @@ export CFLAGS="%{make_cflags} -DUSE_TTY_GROUP $RPM_OPT_FLAGS"
 
 # build util-linux
 make %{?_smp_mflags}
-
-# build kbdrate
-%if %{with_kbdrate}
-pushd kbdrate
-    cc $RPM_OPT_FLAGS -o kbdrate kbdrate.c
-popd
-%endif
 
 # build floppy stuff
 pushd floppy-%{floppyver}
@@ -327,12 +314,6 @@ popd
 install -m 755 nologin ${RPM_BUILD_ROOT}/sbin
 install -m 644 nologin.8 ${RPM_BUILD_ROOT}%{_mandir}/man8
 
-%if %{with_kbdrate}
-install -m 755 kbdrate/kbdrate ${RPM_BUILD_ROOT}/sbin
-install -m 644 kbdrate/kbdrate.8 ${RPM_BUILD_ROOT}%{_mandir}/man8
-ln -s consolehelper ${RPM_BUILD_ROOT}/usr/bin/kbdrate
-%endif
-
 %if %{include_raw}
 echo '.so man8/raw.8' > $RPM_BUILD_ROOT%{_mandir}/man8/rawdevices.8
 %endif
@@ -365,11 +346,6 @@ chmod 755 ${RPM_BUILD_ROOT}%{_bindir}/sunhostid
 %endif
 
 gzip -9nf ${RPM_BUILD_ROOT}%{_infodir}/ipc.info
-
-%if %{with_kbdrate}
-install -m644 kbdrate/kbdrate.apps $RPM_BUILD_ROOT%{_sysconfdir}/security/console.apps/kbdrate
-install -m644 kbdrate/kbdrate.pam $RPM_BUILD_ROOT%{_sysconfdir}/pam.d/kbdrate
-%endif
 
 # PAM settings
 { 
@@ -497,15 +473,6 @@ fi
 /sbin/nologin
 %{_mandir}/man8/nologin.8*
 %ghost %attr(0644,root,root) %verify(not md5 size mtime) /var/log/lastlog
-
-# Begin kbdrate stuff
-%if %{with_kbdrate}
-/sbin/kbdrate
-/usr/bin/kbdrate
-%{_mandir}/man8/kbdrate.8*
-%{_sysconfdir}/pam.d/kbdrate
-%{_sysconfdir}/security/console.apps/kbdrate
-%endif
 
 %{_bindir}/chrt
 %{_bindir}/ionice
@@ -652,9 +619,19 @@ fi
 /sbin/losetup
 
 %changelog
+* Fri Oct  7 2005 Karel Zak <kzak@redhat.com> 2.13-0.4.pre4
+- fix #169628 - /usr/bin/floppy doesn't work with /dev/fd0
+- fix #168436 - login will attempt to run if it has no read/write access to its terminal
+- fix #168434 - login's timeout can fail - needs to call siginterrupt(SIGALRM,1)
+- fix #165253 – losetup missing option -a [new feature]
+- update PAM files (replace pam_stack with new "include" PAM directive)
+- remove kbdrate from src.rpm
+- update to 2.13pre4
+
 * Fri Oct  7 2005 Steve Dickson <steved@redhat.com> 2.13-0.3.pre3
-- fix #170110 - Documentation for 'rsize' and 'wsize' NFS mount options 
+- fix #170110 - Documentation for 'rsize' and 'wsize' NFS mount options
                 is misleading
+
 * Fri Sep  2 2005 Karel Zak <kzak@redhat.com> 2.13-0.3.pre2
 - fix #166923 - hwclock will not run on a non audit-enabled kernel
 - fix #159410 - mkswap(8) claims max swap area size is 2 GB

@@ -1,0 +1,102 @@
+--- util-linux-2.12p/floppy-0.12/floppyfloppy.c.generic	2001-02-13 01:15:38.000000000 +0100
++++ util-linux-2.12p/floppy-0.12/floppyfloppy.c	2005-09-30 15:38:08.000000000 +0200
+@@ -264,6 +264,33 @@
+ #endif
+ }
+ 
++/* -1=error, 1=true, 0=false */
++static int check_generic(const char *dev, int n)
++{
++	struct floppy_struct param;
++	int fd;
++	
++	if ((fd=open(dev, O_RDONLY)) < 0)
++	{
++		perror(dev);
++		return -1;
++	}
++	if (ioctl(fd,FDGETPRM,(long) &param) < 0)
++	{
++		perror(dev);
++		close(fd);
++		return -1;
++	}
++	close(fd);
++	
++	if (param.sect==floppy_type[n].sectors && 
++	    param.head==floppy_type[n].heads &&
++	    param.track==floppy_type[n].tracks)
++		/* generic device uses expected format */
++		return 1;
++
++	return 0;
++}
+ 
+ static int do_format(const char *dev, int fmtnum,
+ 		     int (*fmt_func)(const char *, int), int flags)
+@@ -275,6 +302,7 @@
+ 	struct format_descr curtrack;
+ 	int pct;
+ 	struct stat stat_buf;
++	int gen = 0;
+ 
+ 	int i, j;
+ 	char *devname;
+@@ -297,23 +325,52 @@
+ 
+ 	strcat(strcpy(devname, dev), floppy_type[fmtnum].dev);
+ 
++	if (stat(devname, &stat_buf)==-1 && errno==ENOENT)
++	{
++		/* /dev/fd0xxxxx doesn't exist ...try to use generic device 
++		 *
++		 * Note: we needn't size specific device if the generic device uses
++		 *       right floppy format (FDGETPRM).    -- Karel Zak [30/09/2005]
++		 */
++		if ((gen = check_generic(dev, fmtnum))==1)	/* true */
++		{
++			fprintf(stderr, _("WARNING: size specific device %s doesn't exist, using generic device: %s\n"),
++					devname, dev);
++			strcpy(devname, dev);
++		}
++		else if (gen==0)	/* false */
++		{
++			fprintf(stderr, _("ERROR: size specific device %1$s doesn't exist. Use \"MAKEDEV %1$s\" and try it again.\n"), devname);
++			return (1);
++		}
++		else 			/* error -- no floppy medium or device? */
++			return(1);
++	}
+ 	fd=open(devname, O_WRONLY);
+ 	if (fd < 0)
+ 	{
+ 		perror(devname);
+ 		return (1);
+ 	}
+-
+-	if (fstat(fd, &stat_buf) ||
+-	    !S_ISBLK(stat_buf.st_mode) ||
+-	    MINOR_DEV(stat_buf.st_rdev) != fmtnum)
++	if (fstat(fd, &stat_buf) < 0)
++	{
++		perror(devname);
++		close(fd);
++		return (1);
++	}
++	if (!S_ISBLK(stat_buf.st_mode))
++	{
++		fprintf(stderr,_("%s: not a block device\n"), devname);
++		close(fd);
++		return (1);
++	}
++	if (gen==0 && MINOR_DEV(stat_buf.st_rdev) != fmtnum)
+ 	{
+ 		errno=EINVAL;
+ 		perror(devname);
+ 		close(fd);
+ 		return (1);
+ 	}
+-
+ 	if (ioctl(fd, FDGETPRM, &geo) < 0)
+ 	{
+ 		perror(devname);
