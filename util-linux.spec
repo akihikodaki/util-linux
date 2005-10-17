@@ -27,7 +27,7 @@ BuildRoot: %{_tmppath}/%{name}-root
 Summary: A collection of basic system utilities.
 Name: util-linux
 Version: 2.13
-Release: 0.4.pre4
+Release: 0.5.pre4
 License: distributable
 Group: System Environment/Base
 
@@ -42,7 +42,7 @@ BuildRequires: texinfo
 BuildRequires: gettext
 BuildRequires: libselinux-devel
 BuildRequires: e2fsprogs-devel >= 1.36
-BuildRequires: audit-libs-devel
+BuildRequires: audit-libs-devel >= 1.0.6
 
 ### Sources
 # TODO [stable]: s/2.13-pre4/%{version}/
@@ -63,6 +63,7 @@ Obsoletes: clock
 Conflicts: initscripts <= 4.58, timeconfig <= 3.0.1
 %endif
 Requires: pam >= 0.66-4, /etc/pam.d/system-auth
+Requires: audit-libs >= 1.0.6
 Conflicts: kernel < 2.2.12-7, 
 Prereq: /sbin/install-info
 Provides: mount = %{version}
@@ -154,8 +155,10 @@ Patch212: util-linux-2.12p-floppy-generic.patch
 # 168436 - login will attempt to run if it has no read/write access to its terminal
 # 168434 - login's timeout can fail - needs to call siginterrupt(SIGALRM,1)
 Patch213: util-linux-2.13-login-hang.patch
-# 165253 – losetup missing option -a [new feature]
+# 165253 - losetup missing option -a [new feature]
 Patch214: util-linux-2.13-losetup-all.patch
+# 170564 - add audit message to login
+Patch215: util-linux-2.13-audit-login.patch
 
 # When adding patches, please make sure that it is easy to find out what bug # the 
 # patch fixes.
@@ -225,6 +228,7 @@ cp %{SOURCE8} %{SOURCE9} .
 %patch212 -p1
 %patch213 -p1
 %patch214 -p1
+%patch215 -p1
 
 %build
 unset LINGUAS || :
@@ -619,11 +623,14 @@ fi
 /sbin/losetup
 
 %changelog
+* Mon Oct 17 2005 Karel Zak <kzak@redhat.com> 2.13-0.5.pre4
+* fix #170564 - add audit message to login
+
 * Fri Oct  7 2005 Karel Zak <kzak@redhat.com> 2.13-0.4.pre4
 - fix #169628 - /usr/bin/floppy doesn't work with /dev/fd0
 - fix #168436 - login will attempt to run if it has no read/write access to its terminal
 - fix #168434 - login's timeout can fail - needs to call siginterrupt(SIGALRM,1)
-- fix #165253 – losetup missing option -a [new feature]
+- fix #165253 - losetup missing option -a [new feature]
 - update PAM files (replace pam_stack with new "include" PAM directive)
 - remove kbdrate from src.rpm
 - update to 2.13pre4
