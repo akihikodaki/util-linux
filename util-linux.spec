@@ -14,7 +14,6 @@
 
 ### Macros
 %define floppyver 0.12
-%define cramfsver 1.1
 %define no_hwclock_archs s390 s390x
 %define cytune_archs %{ix86} alpha armv4l
 
@@ -23,11 +22,10 @@ BuildRoot: %{_tmppath}/%{name}-root
 # see build section for _prefix
 
 ### Header 
-# note: this is experimental unstable package. See "TODO [stable]" notes.  -- kzak
 Summary: A collection of basic system utilities.
 Name: util-linux
 Version: 2.13
-Release: 0.5.pre4
+Release: 0.6.pre5
 License: distributable
 Group: System Environment/Base
 
@@ -45,14 +43,13 @@ BuildRequires: e2fsprogs-devel >= 1.36
 BuildRequires: audit-libs-devel >= 1.0.6
 
 ### Sources
-# TODO [stable]: s/2.13-pre4/%{version}/
-Source0: ftp://ftp.win.tue.nl/pub/linux-local/utils/util-linux/util-linux-2.13-pre4.tar.bz2
+# TODO [stable]: s/2.13-pre5/%{version}/
+Source0: ftp://ftp.win.tue.nl/pub/linux-local/utils/util-linux/util-linux-2.13-pre5.tar.bz2
 Source1: util-linux-selinux.pamd
 Source2: util-linux-chsh-chfn.pamd
 Source8: nologin.c
 Source9: nologin.8
 Source11: http://download.sourceforge.net/floppyutil/floppy-%{floppyver}.tar.gz
-Source12: http://download.sourceforge.net/cramfs/cramfs-%{cramfsver}.tar.gz
 
 ### Obsoletes & Conflicts & Provides
 Obsoletes: fdisk tunelp mount losetup schedutils
@@ -90,9 +87,6 @@ Patch128: util-linux-2.12a-ipcs-84243-86285.patch
 
 Patch138: util-linux-2.11y-chsh-103004.patch
 Patch139: util-linux-2.11y-fdisksegv-103954.patch
-
-Patch143: cramfs-1.1-blocksize_and_quiet.patch
-Patch144: cramfs-1.1-pagesize.patch
 
 Patch147: util-linux-2.12a-126572-fdiskman.patch
 Patch150: floppy-0.12-locale.patch
@@ -159,6 +153,8 @@ Patch213: util-linux-2.13-login-hang.patch
 Patch214: util-linux-2.13-losetup-all.patch
 # 170564 - add audit message to login
 Patch215: util-linux-2.13-audit-login.patch
+# 170171 - ipcs -lm always report "max total shared memory (kbytes) = 0"
+Patch216: util-linux-2.13-ipcs-shmax.patch
 
 # When adding patches, please make sure that it is easy to find out what bug # the 
 # patch fixes.
@@ -172,7 +168,7 @@ program.
 
 %prep
 # TODO [stable]: remove -n
-%setup -q -a 11 -a 12 -n util-linux-2.13-pre4
+%setup -q -a 11 -n util-linux-2.13-pre5
 
 %patch1 -p1 -b .moretc
 %patch70 -p1
@@ -190,9 +186,6 @@ cp %{SOURCE8} %{SOURCE9} .
 %patch128 -p1
 %patch138 -p1
 %patch139 -p1
-# cramfs
-%patch143 -p0
-%patch144 -p1
 %patch147 -p1
 %patch150 -p0
 %patch151 -p1
@@ -229,6 +222,7 @@ cp %{SOURCE8} %{SOURCE9} .
 %patch213 -p1
 %patch214 -p1
 %patch215 -p1
+%patch216 -p1
 
 %build
 unset LINGUAS || :
@@ -276,9 +270,6 @@ pushd floppy-%{floppyver}
 make %{?_smp_mflags}
 popd
 
-# build cramfs 1.1
-make -C cramfs-%{cramfsver} %{?_smp_mflags}
-
 # build nologin
 gcc $RPM_OPT_FLAGS -o nologin nologin.c
 
@@ -305,13 +296,6 @@ make install DESTDIR=${RPM_BUILD_ROOT}
 # inslall floppy stuff
 pushd floppy-%{floppyver}
 %makeinstall
-popd
-
-# install cramfs 1.1
-pushd cramfs-%{cramfsver}
-install -s -m 755 mkcramfs ${RPM_BUILD_ROOT}/sbin/mkfs.cramfs
-ln -s ../../sbin/mkfs.cramfs ${RPM_BUILD_ROOT}/usr/bin/mkcramfs
-install -s -m 755 cramfsck ${RPM_BUILD_ROOT}/sbin/fsck.cramfs
 popd
 
 # install no login
@@ -507,7 +491,6 @@ fi
 %{_bindir}/logger
 %{_bindir}/look
 %{_bindir}/mcookie
-%{_bindir}/mkcramfs
 /sbin/fsck.cramfs
 /sbin/mkfs.cramfs
 %ifnarch s390 s390x
@@ -623,6 +606,12 @@ fi
 /sbin/losetup
 
 %changelog
+* Thu Oct 20 2005 Karel Zak <kzak@redhat.com> 2.13-0.6.pre5
+- update to upstream 2.13pre5
+- remove separated cramfs1.1 (already in upstream package)
+- remove odd symlink /usr/bin/mkcramfs -> ../../sbin/mkfs.cramfs
+- fix #170171 - ipcs -lm always report "max total shared memory (kbytes) = 0"
+
 * Mon Oct 17 2005 Karel Zak <kzak@redhat.com> 2.13-0.5.pre4
 * fix #170564 - add audit message to login
 
