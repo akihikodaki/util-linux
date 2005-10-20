@@ -25,7 +25,7 @@ BuildRoot: %{_tmppath}/%{name}-root
 Summary: A collection of basic system utilities.
 Name: util-linux
 Version: 2.13
-Release: 0.6.pre5
+Release: 0.7.pre5
 License: distributable
 Group: System Environment/Base
 
@@ -155,6 +155,8 @@ Patch214: util-linux-2.13-losetup-all.patch
 Patch215: util-linux-2.13-audit-login.patch
 # 170171 - ipcs -lm always report "max total shared memory (kbytes) = 0"
 Patch216: util-linux-2.13-ipcs-shmax.patch
+# 171337 - mkfs.cramfs dies creating installer image
+Patch217: util-linux-2.13-cramfs-maxentries.patch
 
 # When adding patches, please make sure that it is easy to find out what bug # the 
 # patch fixes.
@@ -221,8 +223,10 @@ cp %{SOURCE8} %{SOURCE9} .
 %patch212 -p1
 %patch213 -p1
 %patch214 -p1
+# audit
 %patch215 -p1
 %patch216 -p1
+%patch217 -p1
 
 %build
 unset LINGUAS || :
@@ -606,6 +610,9 @@ fi
 /sbin/losetup
 
 %changelog
+* Thu Oct 20 2005 Karel Zak <kzak@redhat.com> 2.13-0.7.pre5
+- fix #171337 - mkfs.cramfs dies creating installer image
+
 * Thu Oct 20 2005 Karel Zak <kzak@redhat.com> 2.13-0.6.pre5
 - update to upstream 2.13pre5
 - remove separated cramfs1.1 (already in upstream package)
