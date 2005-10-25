@@ -1,5 +1,115 @@
---- util-linux-2.13-pre2/hwclock/hwclock.c.audit	2005-07-31 22:15:18.000000000 +0200
-+++ util-linux-2.13-pre2/hwclock/hwclock.c	2005-08-30 11:11:11.000000000 +0200
+diff -urN util-linux-2.13-pre5.orig/hwclock/audit.c util-linux-2.13-pre5/hwclock/audit.c
+--- util-linux-2.13-pre5.orig/hwclock/audit.c	1969-12-31 19:00:00.000000000 -0500
++++ util-linux-2.13-pre5/hwclock/audit.c	2005-10-25 17:14:46.000000000 -0400
+@@ -0,0 +1,50 @@
++/* audit.c -- This file contains the audit system extensions
++ *
++ * Copyright 2005 Red Hat Inc., Durham, North Carolina.
++ * All Rights Reserved.
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, write to the Free Software
++ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++ *
++ * Authors:
++ *     Steve Grubb <sgrubb@redhat.com>
++ */
++
++#include <stdio.h>
++#include <string.h>
++#include <stdlib.h>
++#include <unistd.h>
++#include <libaudit.h>
++#include "audit.h"
++
++int audit_fd = -1;
++static int audit_this = 0;
++
++
++void auditable_event(int i)
++{
++	audit_this = i;
++}
++
++
++void audit_exit(int status)
++{
++	if (audit_this) {
++		audit_log_user_message(audit_fd, AUDIT_USYS_CONFIG, 
++			"changing system time", NULL, NULL, NULL, status);
++		close(audit_fd);
++	}
++	exit(status);
++}
++
+diff -urN util-linux-2.13-pre5.orig/hwclock/audit.h util-linux-2.13-pre5/hwclock/audit.h
+--- util-linux-2.13-pre5.orig/hwclock/audit.h	1969-12-31 19:00:00.000000000 -0500
++++ util-linux-2.13-pre5/hwclock/audit.h	2005-10-25 17:09:40.000000000 -0400
+@@ -0,0 +1,34 @@
++/* audit.h -- This file contains the function prototypes for audit calls
++ * Copyright 2005 Red Hat Inc., Durham, North Carolina.
++ * All Rights Reserved.
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, write to the Free Software
++ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
++ *
++ * Author:
++ *   Steve Grubb <sgrubb@redhat.com>
++ *
++ */
++
++#ifndef HW_AUDIT_H
++#define HW_AUDIT_H
++
++/* This is the file descriptor used by the audit system */
++extern int audit_fd;
++
++/* This is the logging functions */
++void auditable_event(int i);
++void audit_exit(int status);
++
++#endif
+diff -urN util-linux-2.13-pre5.orig/hwclock/clock.h util-linux-2.13-pre5/hwclock/clock.h
+--- util-linux-2.13-pre5.orig/hwclock/clock.h	2005-10-25 17:08:26.000000000 -0400
++++ util-linux-2.13-pre5/hwclock/clock.h	2005-10-25 17:09:40.000000000 -0400
+@@ -24,7 +24,12 @@
+ extern char *progname;
+ extern int debug;
+ extern int epoch_option;
+-extern void outsyserr(char *msg, ...);
++extern void outsyserr(char *msg, ...)
++#ifdef __GNUC__
++        __attribute__ ((format (printf, 1, 2)));
++#else
++        ;
++#endif
+ 
+ /* cmos.c */
+ extern void set_cmos_epoch(int ARCconsole, int SRM);
+diff -urN util-linux-2.13-pre5.orig/hwclock/hwclock.c util-linux-2.13-pre5/hwclock/hwclock.c
+--- util-linux-2.13-pre5.orig/hwclock/hwclock.c	2005-10-25 17:08:26.000000000 -0400
++++ util-linux-2.13-pre5/hwclock/hwclock.c	2005-10-25 17:09:40.000000000 -0400
 @@ -81,9 +81,11 @@
  #include <stdarg.h>
  #include <getopt.h>
@@ -123,84 +233,9 @@
  }
  
  /* A single routine for greater uniformity */
---- /dev/null	2005-08-29 11:11:19.415613608 +0200
-+++ util-linux-2.13-pre2/hwclock/audit.c	2005-08-30 11:10:38.000000000 +0200
-@@ -0,0 +1,73 @@
-+/* audit.c -- This file contains the audit system extensions
-+ *
-+ * Copyright 2005 Red Hat Inc., Durham, North Carolina.
-+ * All Rights Reserved.
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License as published by
-+ * the Free Software Foundation; either version 2 of the License, or
-+ * (at your option) any later version.
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU General Public License
-+ * along with this program; if not, write to the Free Software
-+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-+ *
-+ * Authors:
-+ *     Steve Grubb <sgrubb@redhat.com>
-+ */
-+
-+#include <stdio.h>
-+#include <string.h>
-+#include <stdlib.h>
-+#include <unistd.h>
-+#include <libaudit.h>
-+#include "audit.h"
-+
-+int audit_fd = -1;
-+
-+/*
-+ * This function will log a message to the audit system using a predefined
-+ * message format. Parameter usage is as follows:
-+ *
-+ * op  -  operation. "adding user", "changing finger info", "deleting group"
-+ * result - 0 = "success"  or  1 = "failed"
-+ */
-+static void audit_logger(const char *op, int result) 
-+{
-+	char msg_buf[256]; /* Common buffer for messaging */
-+	const char *success;
-+	extern char *progname;
-+
-+	if (audit_fd < 0)
-+		return;		/* kernel without audit support */
-+
-+	if (!result)
-+		success = "success";
-+	else
-+		success = "failed";
-+
-+	/* Add some audit info & log it.  */
-+	snprintf(msg_buf, sizeof(msg_buf),
-+		"%s: op=%s id=%u res=%s", progname, op, getuid(), success);
-+	audit_send_user_message(audit_fd, AUDIT_USYS_CONFIG, msg_buf);
-+	close(audit_fd);
-+}
-+
-+static int audit_this = 0;
-+void auditable_event(int i)
-+{
-+	audit_this = i;
-+}
-+
-+void audit_exit(int status)
-+{
-+	if (audit_this)
-+		audit_logger("changing system time", status);
-+	exit(status);
-+}
-+
---- util-linux-2.13-pre2/hwclock/kd.c.audit	2005-07-31 18:01:20.000000000 +0200
-+++ util-linux-2.13-pre2/hwclock/kd.c	2005-08-30 11:06:38.000000000 +0200
+diff -urN util-linux-2.13-pre5.orig/hwclock/kd.c util-linux-2.13-pre5/hwclock/kd.c
+--- util-linux-2.13-pre5.orig/hwclock/kd.c	2005-10-25 17:08:26.000000000 -0400
++++ util-linux-2.13-pre5/hwclock/kd.c	2005-10-25 17:09:40.000000000 -0400
 @@ -19,6 +19,7 @@
  
  #include "clock.h"
@@ -227,72 +262,21 @@
    }
    return 0;
  }
---- util-linux-2.13-pre2/hwclock/Makefile.am.audit	2005-01-30 00:18:46.000000000 +0100
-+++ util-linux-2.13-pre2/hwclock/Makefile.am	2005-08-30 11:06:38.000000000 +0200
+diff -urN util-linux-2.13-pre5.orig/hwclock/Makefile.am util-linux-2.13-pre5/hwclock/Makefile.am
+--- util-linux-2.13-pre5.orig/hwclock/Makefile.am	2005-10-25 17:08:26.000000000 -0400
++++ util-linux-2.13-pre5/hwclock/Makefile.am	2005-10-25 17:09:40.000000000 -0400
 @@ -4,4 +4,5 @@
  
  sbin_PROGRAMS = hwclock
  
 -hwclock_SOURCES = hwclock.c cmos.c rtc.c kd.c
-\ Chybí znak konce řádku na konci souboru
+\ No newline at end of file
 +hwclock_SOURCES = hwclock.c cmos.c rtc.c kd.c audit.c
 +hwclock_LDADD = -laudit
-\ Chybí znak konce řádku na konci souboru
---- /dev/null	2005-08-29 11:11:19.415613608 +0200
-+++ util-linux-2.13-pre2/hwclock/audit.h	2005-08-30 11:06:38.000000000 +0200
-@@ -0,0 +1,34 @@
-+/* audit.h -- This file contains the function prototypes for audit calls
-+ * Copyright 2005 Red Hat Inc., Durham, North Carolina.
-+ * All Rights Reserved.
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License as published by
-+ * the Free Software Foundation; either version 2 of the License, or
-+ * (at your option) any later version.
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU General Public License
-+ * along with this program; if not, write to the Free Software
-+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-+ *
-+ * Author:
-+ *   Steve Grubb <sgrubb@redhat.com>
-+ *
-+ */
-+
-+#ifndef HW_AUDIT_H
-+#define HW_AUDIT_H
-+
-+/* This is the file descriptor used by the audit system */
-+extern int audit_fd;
-+
-+/* This is the logging functions */
-+void auditable_event(int i);
-+void audit_exit(int status);
-+
-+#endif
---- util-linux-2.13-pre2/hwclock/clock.h.audit	2000-12-07 17:39:53.000000000 +0100
-+++ util-linux-2.13-pre2/hwclock/clock.h	2005-08-30 11:06:38.000000000 +0200
-@@ -24,7 +24,12 @@
- extern char *progname;
- extern int debug;
- extern int epoch_option;
--extern void outsyserr(char *msg, ...);
-+extern void outsyserr(char *msg, ...)
-+#ifdef __GNUC__
-+        __attribute__ ((format (printf, 1, 2)));
-+#else
-+        ;
-+#endif
- 
- /* cmos.c */
- extern void set_cmos_epoch(int ARCconsole, int SRM);
---- util-linux-2.13-pre2/hwclock/rtc.c.audit	2005-07-31 22:15:45.000000000 +0200
-+++ util-linux-2.13-pre2/hwclock/rtc.c	2005-08-30 11:06:38.000000000 +0200
+\ No newline at end of file
+diff -urN util-linux-2.13-pre5.orig/hwclock/rtc.c util-linux-2.13-pre5/hwclock/rtc.c
+--- util-linux-2.13-pre5.orig/hwclock/rtc.c	2005-10-25 17:08:26.000000000 -0400
++++ util-linux-2.13-pre5/hwclock/rtc.c	2005-10-25 17:09:40.000000000 -0400
 @@ -8,6 +8,7 @@
  
  #include "clock.h"
