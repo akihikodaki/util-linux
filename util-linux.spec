@@ -29,10 +29,6 @@ Release: 0.8.pre5
 License: distributable
 Group: System Environment/Base
 
-### TEMPORARY WORKAROUND ONLY [26-Oct-2005, kzak]
-ExcludeArch: s390
-###
-
 ### Dependences
 BuildRequires: sed
 BuildRequires: pam-devel
