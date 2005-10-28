@@ -25,7 +25,7 @@ BuildRoot: %{_tmppath}/%{name}-root
 Summary: A collection of basic system utilities.
 Name: util-linux
 Version: 2.13
-Release: 0.8.pre5
+Release: 0.9.pre5
 License: distributable
 Group: System Environment/Base
 
@@ -610,7 +610,10 @@ fi
 /sbin/losetup
 
 %changelog
-* Wed Oct 26  2005 Karel Zak <kzak@redhat.com> 2.13-0.8.pre5
+* Fri Oct 28 2005 Karel Zak <kzak@redhat.com> 2.13-0.9.pre5
+- rebuild
+
+* Wed Oct 26 2005 Karel Zak <kzak@redhat.com> 2.13-0.8.pre5
 - updated version of the patch for hwclock audit
 
 * Thu Oct 20 2005 Karel Zak <kzak@redhat.com> 2.13-0.7.pre5
