@@ -25,7 +25,7 @@ BuildRoot: %{_tmppath}/%{name}-root
 Summary: A collection of basic system utilities.
 Name: util-linux
 Version: 2.13
-Release: 0.9.pre5
+Release: 0.10.pre5
 License: distributable
 Group: System Environment/Base
 
@@ -157,6 +157,8 @@ Patch215: util-linux-2.13-audit-login.patch
 Patch216: util-linux-2.13-ipcs-shmax.patch
 # 171337 - mkfs.cramfs dies creating installer image
 Patch217: util-linux-2.13-cramfs-maxentries.patch
+# [171337 too] - mkfs.cramfs doesn't work correctly with empty files
+Patch218: util-linux-2.13-cramfs-zerofiles.patch
 
 # When adding patches, please make sure that it is easy to find out what bug # the 
 # patch fixes.
@@ -227,6 +229,7 @@ cp %{SOURCE8} %{SOURCE9} .
 %patch215 -p1
 %patch216 -p1
 %patch217 -p1
+%patch218 -p1
 
 %build
 unset LINGUAS || :
@@ -610,6 +613,9 @@ fi
 /sbin/losetup
 
 %changelog
+* Mon Nov  7 2005 Karel Zak <kzak@redhat.com> 2.13-0.10.pre5
+- fix #171337 - mkfs.cramfs doesn't work correctly with empty files
+
 * Fri Oct 28 2005 Karel Zak <kzak@redhat.com> 2.13-0.9.pre5
 - rebuild
 

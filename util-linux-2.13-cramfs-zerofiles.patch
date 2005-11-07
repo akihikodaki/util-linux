@@ -1,0 +1,11 @@
+--- util-linux-2.13-pre5/disk-utils/mkfs.cramfs.c.zerofiles	2005-11-07 13:05:27.000000000 +0100
++++ util-linux-2.13-pre5/disk-utils/mkfs.cramfs.c	2005-11-07 13:06:38.000000000 +0100
+@@ -661,7 +661,7 @@
+                         if (e->same) {
+                                 set_data_offset(e, base, e->same->offset);
+                                 e->offset = e->same->offset;
+-                        } else {
++                        } else if (e->size) {
+                                 set_data_offset(e, base, offset);
+                                 e->offset = offset;
+                                 offset = do_compress(base, offset, e->name,
