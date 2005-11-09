@@ -37,7 +37,7 @@ BuildRequires: libtermcap-devel
 BuildRequires: zlib-devel
 BuildRequires: slang-devel
 BuildRequires: texinfo
-BuildRequires: gettext
+BuildRequires: gettext-devel
 BuildRequires: libselinux-devel
 BuildRequires: e2fsprogs-devel >= 1.36
 BuildRequires: audit-libs-devel >= 1.0.6
