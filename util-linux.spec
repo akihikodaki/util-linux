@@ -25,7 +25,7 @@ BuildRoot: %{_tmppath}/%{name}-root
 Summary: A collection of basic system utilities.
 Name: util-linux
 Version: 2.13
-Release: 0.10.pre5
+Release: 0.11.pre6
 License: distributable
 Group: System Environment/Base
 
@@ -43,8 +43,8 @@ BuildRequires: e2fsprogs-devel >= 1.36
 BuildRequires: audit-libs-devel >= 1.0.6
 
 ### Sources
-# TODO [stable]: s/2.13-pre5/%{version}/
-Source0: ftp://ftp.win.tue.nl/pub/linux-local/utils/util-linux/util-linux-2.13-pre5.tar.bz2
+# TODO [stable]: s/2.13-pre6/%{version}/
+Source0: ftp://ftp.win.tue.nl/pub/linux-local/utils/util-linux/util-linux-2.13-pre6.tar.bz2
 Source1: util-linux-selinux.pamd
 Source2: util-linux-chsh-chfn.pamd
 Source8: nologin.c
@@ -157,8 +157,11 @@ Patch215: util-linux-2.13-audit-login.patch
 Patch216: util-linux-2.13-ipcs-shmax.patch
 # 171337 - mkfs.cramfs dies creating installer image
 Patch217: util-linux-2.13-cramfs-maxentries.patch
-# [171337 too] - mkfs.cramfs doesn't work correctly with empty files
+# [also 171337] - mkfs.cramfs doesn't work correctly with empty files
 Patch218: util-linux-2.13-cramfs-zerofiles.patch
+# 172203 - mount man page in RHEL4 lacks any info on cifs mount options
+Patch219: util-linux-2.12a-mount-man-cifs.patch
+
 
 # When adding patches, please make sure that it is easy to find out what bug # the 
 # patch fixes.
@@ -172,9 +175,9 @@ program.
 
 %prep
 # TODO [stable]: remove -n
-%setup -q -a 11 -n util-linux-2.13-pre5
+%setup -q -a 11 -n util-linux-2.13-pre6
 
-%patch1 -p1 -b .moretc
+%patch1 -p1
 %patch70 -p1
 # nologin
 cp %{SOURCE8} %{SOURCE9} .
@@ -184,7 +187,7 @@ cp %{SOURCE8} %{SOURCE9} .
 %if %{include_raw}
 %patch109 -p1
 %endif
-%patch113 -p1 -b .ctty3
+%patch113 -p1
 %patch120 -p1
 %patch126 -p1
 %patch128 -p1
@@ -194,20 +197,20 @@ cp %{SOURCE8} %{SOURCE9} .
 %patch150 -p0
 %patch151 -p1
 %patch153 -p1
-%patch157 -p1 -b .pamstart
-%patch159 -p1 -b .console
+%patch157 -p1
+%patch159 -p1
 %if %{include_raw}
 %patch160 -p1
 %endif
 %patch164 -p1
-%patch170 -p1 -b .nfsv4
+%patch170 -p1
 %patch171 -p1
 %patch172 -p1
 %patch173 -p1
 %patch174 -p1
-%patch180 -p1 -b .lastlog
+%patch180 -p1
 %patch181 -p1
-%patch182 -p1 -b .typo
+%patch182 -p1
 %patch183 -p1
 %patch184 -p1
 %patch185 -p1
@@ -215,21 +218,21 @@ cp %{SOURCE8} %{SOURCE9} .
 %patch187 -p1
 %patch188 -p1
 %patch189 -p1
-%patch202 -p1 -b .audit
-%patch203 -p1 -b .gpt
+%patch202 -p1
+%patch203 -p1
 %patch204 -p1
 %patch205 -p1
-%patch206 -p1 -b .arch
-%patch210 -p1 -b .swsuspend
+%patch206 -p1
+%patch210 -p1
 %patch211 -p1
 %patch212 -p1
 %patch213 -p1
 %patch214 -p1
-# audit
 %patch215 -p1
 %patch216 -p1
 %patch217 -p1
 %patch218 -p1
+%patch219 -p1
 
 %build
 unset LINGUAS || :
@@ -613,6 +616,10 @@ fi
 /sbin/losetup
 
 %changelog
+* Fri Nov 25 2005 Karel Zak <kzak@redhat.com> 2.13-0.11.pre6
+- update to upstream version 2.13-pre6
+- fix #172203 - mount man page in RHEL4 lacks any info on cifs mount options
+
 * Mon Nov  7 2005 Karel Zak <kzak@redhat.com> 2.13-0.10.pre5
 - fix #171337 - mkfs.cramfs doesn't work correctly with empty files
 

@@ -1,5 +1,5 @@
---- util-linux-2.13-pre4/fdisk/fdisk.c.gpt	2005-10-07 18:40:26.000000000 +0200
-+++ util-linux-2.13-pre4/fdisk/fdisk.c	2005-10-07 18:40:26.000000000 +0200
+--- util-linux-2.13-pre6/fdisk/fdisk.c.gpt	2005-11-24 15:30:36.000000000 +0100
++++ util-linux-2.13-pre6/fdisk/fdisk.c	2005-11-24 15:30:36.000000000 +0100
 @@ -34,6 +34,8 @@
  #include <linux/blkpg.h>
  #endif
@@ -57,8 +57,8 @@
  	get_boot(fdisk);
  
  	if (osf_label) {
---- /dev/null	2005-10-07 17:17:17.781101976 +0200
-+++ util-linux-2.13-pre4/fdisk/gpt.h	2005-10-07 18:40:26.000000000 +0200
+--- /dev/null	2005-11-14 15:52:26.044616250 +0100
++++ util-linux-2.13-pre6/fdisk/gpt.h	2005-11-24 15:30:36.000000000 +0100
 @@ -0,0 +1,9 @@
 +
 +#ifndef __GPT_H__
@@ -69,12 +69,12 @@
 +
 +#endif /* __GPT_H__ */
 +
---- util-linux-2.13-pre4/fdisk/Makefile.am.gpt	2005-09-12 20:55:27.000000000 +0200
-+++ util-linux-2.13-pre4/fdisk/Makefile.am	2005-10-07 18:46:57.000000000 +0200
+--- util-linux-2.13-pre6/fdisk/Makefile.am.gpt	2005-10-16 14:12:52.000000000 +0200
++++ util-linux-2.13-pre6/fdisk/Makefile.am	2005-11-24 15:31:42.000000000 +0100
 @@ -5,13 +5,13 @@
  sbin_PROGRAMS = fdisk
  man_MANS = fdisk.8
- fdisk_SOURCES = fdisk.c llseek.c disksize.c fdiskbsdlabel.c fdisksgilabel.c \
+ fdisk_SOURCES = fdisk.c disksize.c fdiskbsdlabel.c fdisksgilabel.c \
 -	fdisksunlabel.c fdiskaixlabel.c i386_sys_types.c partname.c
 +	fdisksunlabel.c fdiskaixlabel.c i386_sys_types.c partname.c gpt.c
  
@@ -87,8 +87,8 @@
  
  if USE_SLANG
  sbin_PROGRAMS += cfdisk
---- util-linux-2.13-pre4/fdisk/fdisk.8.gpt	2005-10-07 18:40:26.000000000 +0200
-+++ util-linux-2.13-pre4/fdisk/fdisk.8	2005-10-07 18:40:26.000000000 +0200
+--- util-linux-2.13-pre6/fdisk/fdisk.8.gpt	2005-11-24 15:30:36.000000000 +0100
++++ util-linux-2.13-pre6/fdisk/fdisk.8	2005-11-24 15:30:36.000000000 +0100
 @@ -42,6 +42,11 @@
  partition tables.
  It understands DOS type partition tables and BSD or SUN type disklabels.
@@ -101,8 +101,8 @@
  The
  .I device
  is usually one of the following:
---- util-linux-2.13-pre4/fdisk/sfdisk.8.gpt	2004-12-31 17:28:30.000000000 +0100
-+++ util-linux-2.13-pre4/fdisk/sfdisk.8	2005-10-07 18:40:26.000000000 +0200
+--- util-linux-2.13-pre6/fdisk/sfdisk.8.gpt	2004-12-31 17:28:30.000000000 +0100
++++ util-linux-2.13-pre6/fdisk/sfdisk.8	2005-11-24 15:30:36.000000000 +0100
 @@ -18,6 +18,11 @@
  on a device, check the partitions on a device, and - very dangerous -
  repartition a device.
@@ -115,8 +115,8 @@
  .SS "List Sizes"
  .BI "sfdisk \-s " partition
  gives the size of
---- /dev/null	2005-10-07 17:17:17.781101976 +0200
-+++ util-linux-2.13-pre4/fdisk/gpt.c	2005-10-07 18:40:26.000000000 +0200
+--- /dev/null	2005-11-14 15:52:26.044616250 +0100
++++ util-linux-2.13-pre6/fdisk/gpt.c	2005-11-24 15:30:36.000000000 +0100
 @@ -0,0 +1,287 @@
 +/*
 +    GPT (GUID Partition Table) signature detection. Based on libparted and 
@@ -405,8 +405,8 @@
 +	exit(EXIT_SUCCESS);
 +}
 +#endif
---- util-linux-2.13-pre4/fdisk/sfdisk.c.gpt	2005-08-14 17:14:18.000000000 +0200
-+++ util-linux-2.13-pre4/fdisk/sfdisk.c	2005-10-07 18:40:26.000000000 +0200
+--- util-linux-2.13-pre6/fdisk/sfdisk.c.gpt	2005-10-16 14:18:32.000000000 +0200
++++ util-linux-2.13-pre6/fdisk/sfdisk.c	2005-11-24 15:30:36.000000000 +0100
 @@ -50,6 +50,8 @@
  #include "nls.h"
  #include "common.h"
@@ -416,7 +416,7 @@
  #define SIZE(a)	(sizeof(a)/sizeof(a[0]))
  
  /*
-@@ -2476,6 +2478,23 @@
+@@ -2457,6 +2459,23 @@
  	return NULL;
  }	
  
@@ -440,7 +440,7 @@
  static void do_list(char *dev, int silent);
  static void do_size(char *dev, int silent);
  static void do_geom(char *dev, int silent);
-@@ -2621,6 +2640,7 @@
+@@ -2602,6 +2621,7 @@
  	while ((dev = nextproc()) != NULL) {
  	    if (is_ide_cdrom_or_tape(dev))
  		continue;
@@ -448,7 +448,7 @@
  	    if (opt_out_geom)
  		do_geom(dev, 1);
  	    if (opt_out_pt_geom)
-@@ -2648,6 +2668,7 @@
+@@ -2629,6 +2649,7 @@
  
      if (opt_list || opt_out_geom || opt_out_pt_geom || opt_size || verify) {
  	while (optind < argc) {
@@ -456,7 +456,7 @@
  	    if (opt_out_geom)
  	      do_geom(argv[optind], 0);
  	    if (opt_out_pt_geom)
-@@ -2676,6 +2697,7 @@
+@@ -2657,6 +2678,7 @@
  	  fatal(_("usage: sfdisk --change-id device partition-number Id\n"));
  	else if (optind != argc-3 && optind != argc-2)
  	  fatal(_("usage: sfdisk --id device partition-number [Id]\n"));
@@ -464,7 +464,7 @@
  	do_change_id(argv[optind], argv[optind+1],
  		     (optind == argc-2) ? 0 : argv[optind+2]);
  	exit(exit_status);
-@@ -2685,6 +2707,8 @@
+@@ -2666,6 +2688,8 @@
        fatal(_("can specify only one device (except with -l or -s)\n"));
      dev = argv[optind];
  
@@ -473,7 +473,7 @@
      if (opt_reread)
        do_reread(dev);
      else if (restore_sector_file)
-@@ -2861,6 +2885,8 @@
+@@ -2842,6 +2866,8 @@
  
      z = &oldp;
  
@@ -482,7 +482,7 @@
      rw = (!no_write && (arg || ac > 1));
      fd = my_open(dev, rw, 0);
  
-@@ -2934,6 +2960,8 @@
+@@ -2943,6 +2969,8 @@
  
      z = &oldp;
  
