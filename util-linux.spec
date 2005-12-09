@@ -25,7 +25,7 @@ BuildRoot: %{_tmppath}/%{name}-root
 Summary: A collection of basic system utilities.
 Name: util-linux
 Version: 2.13
-Release: 0.11.pre6
+Release: 0.11.pre6.1
 License: distributable
 Group: System Environment/Base
 
@@ -616,6 +616,9 @@ fi
 /sbin/losetup
 
 %changelog
+* Fri Dec 09 2005 Jesse Keating <jkeating@redhat.com>
+- rebuilt
+
 * Fri Nov 25 2005 Karel Zak <kzak@redhat.com> 2.13-0.11.pre6
 - update to upstream version 2.13-pre6
 - fix #172203 - mount man page in RHEL4 lacks any info on cifs mount options
