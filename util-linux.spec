@@ -25,7 +25,7 @@ BuildRoot: %{_tmppath}/%{name}-root
 Summary: A collection of basic system utilities.
 Name: util-linux
 Version: 2.13
-Release: 0.11.pre6.1
+Release: 0.12
 License: distributable
 Group: System Environment/Base
 
@@ -616,6 +616,9 @@ fi
 /sbin/losetup
 
 %changelog
+* Mon Dec 12 2005 Karel Zak <kzak@redhat.com> 2.13-0.12
+- rebuilt
+
 * Fri Dec 09 2005 Jesse Keating <jkeating@redhat.com>
 - rebuilt
 
