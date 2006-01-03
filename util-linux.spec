@@ -25,7 +25,7 @@ BuildRoot: %{_tmppath}/%{name}-root
 Summary: A collection of basic system utilities.
 Name: util-linux
 Version: 2.13
-Release: 0.12
+Release: 0.13
 License: distributable
 Group: System Environment/Base
 
@@ -161,7 +161,12 @@ Patch217: util-linux-2.13-cramfs-maxentries.patch
 Patch218: util-linux-2.13-cramfs-zerofiles.patch
 # 172203 - mount man page in RHEL4 lacks any info on cifs mount options
 Patch219: util-linux-2.12a-mount-man-cifs.patch
-
+# better wide chars usage in the cal command (based on the old 'moremisc' patch)
+Patch220: util-linux-2.12p-cal-wide.patch
+# 176441: col truncates data
+Patch221: util-linux-2.12p-col-EILSEQ.patch
+# 174111 - mount allows loopback devices to be mounted more than once to the same mount point
+Patch222: util-linux-2.13-mount-twiceloop.patch
 
 # When adding patches, please make sure that it is easy to find out what bug # the 
 # patch fixes.
@@ -233,6 +238,9 @@ cp %{SOURCE8} %{SOURCE9} .
 %patch217 -p1
 %patch218 -p1
 %patch219 -p1
+%patch220 -p1
+%patch221 -p1
+%patch222 -p1
 
 %build
 unset LINGUAS || :
@@ -616,6 +624,12 @@ fi
 /sbin/losetup
 
 %changelog
+* Tue Jan  3 2006 Karel Zak <kzak@redhat.com> 2.13-0.13
+- fix #174676 - hwclock audit return code mismatch
+- fix #176441: col truncates data
+- fix #174111 - mount allows loopback devices to be mounted more than once to the same mount point
+- better wide chars usage in the cal command (based on the old 'moremisc' patch)
+
 * Mon Dec 12 2005 Karel Zak <kzak@redhat.com> 2.13-0.12
 - rebuilt
 

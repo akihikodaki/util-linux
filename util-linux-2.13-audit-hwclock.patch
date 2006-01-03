@@ -46,7 +46,7 @@ diff -urN util-linux-2.13-pre5.orig/hwclock/audit.c util-linux-2.13-pre5/hwclock
 +{
 +	if (audit_this) {
 +		audit_log_user_message(audit_fd, AUDIT_USYS_CONFIG, 
-+			"changing system time", NULL, NULL, NULL, status);
++			"changing system time", NULL, NULL, NULL, status ? 0 : 1);
 +		close(audit_fd);
 +	}
 +	exit(status);
