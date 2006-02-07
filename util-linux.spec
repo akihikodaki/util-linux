@@ -25,7 +25,7 @@ BuildRoot: %{_tmppath}/%{name}-root
 Summary: A collection of basic system utilities.
 Name: util-linux
 Version: 2.13
-Release: 0.14
+Release: 0.14.1
 License: distributable
 Group: System Environment/Base
 
@@ -624,6 +624,9 @@ fi
 /sbin/losetup
 
 %changelog
+* Tue Feb 07 2006 Jesse Keating <jkeating@redhat.com> - 2.13-0.14.1
+- rebuilt for new gcc4.1 snapshot and glibc changes
+
 * Thu Jan 19 2006 Steve Dickson <steved@redhat.com> 2.13-0.14
 - Updated the gssd_check() and idmapd_check(), used with
   nfsv4 mounts, to looked for the correct file in /var/lock/subsys
