@@ -25,7 +25,7 @@ BuildRoot: %{_tmppath}/%{name}-root
 Summary: A collection of basic system utilities.
 Name: util-linux
 Version: 2.13
-Release: 0.14.1
+Release: 0.15
 License: distributable
 Group: System Environment/Base
 
@@ -167,6 +167,8 @@ Patch220: util-linux-2.12p-cal-wide.patch
 Patch221: util-linux-2.12p-col-EILSEQ.patch
 # 174111 - mount allows loopback devices to be mounted more than once to the same mount point
 Patch222: util-linux-2.13-mount-twiceloop.patch
+# nobug - add --rmpart N and --rmparts
+Patch223: util-linux-2.13-rmparts.patch
 
 # When adding patches, please make sure that it is easy to find out what bug # the 
 # patch fixes.
@@ -241,6 +243,7 @@ cp %{SOURCE8} %{SOURCE9} .
 %patch220 -p1
 %patch221 -p1
 %patch222 -p1
+%patch223 -p1
 
 %build
 unset LINGUAS || :
@@ -624,6 +627,9 @@ fi
 /sbin/losetup
 
 %changelog
+* Wed Feb  8 2006 Peter Jones <pjones@redhat.com> 2.13-0.15
+- add "blockdev --rmpart N <device>" and "blockdev --rmparts <device>"
+
 * Tue Feb 07 2006 Jesse Keating <jkeating@redhat.com> - 2.13-0.14.1
 - rebuilt for new gcc4.1 snapshot and glibc changes
 
