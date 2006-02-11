@@ -25,7 +25,7 @@ BuildRoot: %{_tmppath}/%{name}-root
 Summary: A collection of basic system utilities.
 Name: util-linux
 Version: 2.13
-Release: 0.15
+Release: 0.15.1
 License: distributable
 Group: System Environment/Base
 
@@ -627,6 +627,9 @@ fi
 /sbin/losetup
 
 %changelog
+* Fri Feb 10 2006 Jesse Keating <jkeating@redhat.com> - 2.13-0.15.1
+- bump again for double-long bug on ppc(64)
+
 * Wed Feb  8 2006 Peter Jones <pjones@redhat.com> 2.13-0.15
 - add "blockdev --rmpart N <device>" and "blockdev --rmparts <device>"
 
