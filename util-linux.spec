@@ -25,7 +25,7 @@ BuildRoot: %{_tmppath}/%{name}-root
 Summary: A collection of basic system utilities.
 Name: util-linux
 Version: 2.13
-Release: 0.15.1
+Release: 0.16
 License: distributable
 Group: System Environment/Base
 
@@ -627,6 +627,9 @@ fi
 /sbin/losetup
 
 %changelog
+* Tue Feb 21 2006 Karel Zak <kzak@redhat.com> 2.13-0.16
+- fix #180730 - col is exiting with 1 (fix util-linux-2.12p-col-EILSEQ.patch)
+
 * Fri Feb 10 2006 Jesse Keating <jkeating@redhat.com> - 2.13-0.15.1
 - bump again for double-long bug on ppc(64)
 
