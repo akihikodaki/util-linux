@@ -169,6 +169,16 @@ Patch221: util-linux-2.12p-col-EILSEQ.patch
 Patch222: util-linux-2.13-mount-twiceloop.patch
 # nobug - add --rmpart N and --rmparts
 Patch223: util-linux-2.13-rmparts.patch
+# 181782 - mkswap should automatically add selinux label to swapfile
+Patch224: util-linux-2.13-mkswap-selinux.patch
+# 181896 - broken example in man pages
+Patch225: util-linux-2.13-schedutils-man.patch
+# 177331 - login omits pam_acct_mgmt & pam_chauthtok when authentication is skipped.
+Patch226: util-linux-2.13-login-pam-acct.patch
+# 177523 - umount -a should not unmount sysfs
+Patch227: util-linux-2.13-umount-sysfs.patch
+# 182553 - fdisk -l inside xen guest shows no disks
+Patch228: util-linux-2.13-fdisk-xvd.patch
 
 # When adding patches, please make sure that it is easy to find out what bug # the 
 # patch fixes.
@@ -244,6 +254,11 @@ cp %{SOURCE8} %{SOURCE9} .
 %patch221 -p1
 %patch222 -p1
 %patch223 -p1
+%patch224 -p1
+%patch225 -p1
+%patch226 -p1
+%patch227 -p1
+%patch228 -p1
 
 %build
 unset LINGUAS || :
@@ -627,8 +642,13 @@ fi
 /sbin/losetup
 
 %changelog
-* Tue Feb 21 2006 Karel Zak <kzak@redhat.com> 2.13-0.16
+* Wed Feb 22 2006 Karel Zak <kzak@redhat.com> 2.13-0.16
+- fix #181782 - mkswap should automatically add selinux label to swapfile
 - fix #180730 - col is exiting with 1 (fix util-linux-2.12p-col-EILSEQ.patch)
+- fix #181896 - broken example in schedutils man pages
+- fix #177331 - login omits pam_acct_mgmt & pam_chauthtok when authentication is skipped.
+- fix #177523 - umount -a should not unmount sysfs
+- fix #182553 - fdisk -l inside xen guest shows no disks
 
 * Fri Feb 10 2006 Jesse Keating <jkeating@redhat.com> - 2.13-0.15.1
 - bump again for double-long bug on ppc(64)

@@ -1,0 +1,60 @@
+--- util-linux-2.13-pre6/disk-utils/mkswap.c.selinux	2006-02-22 14:07:47.000000000 +0100
++++ util-linux-2.13-pre6/disk-utils/mkswap.c	2006-02-22 15:16:05.000000000 +0100
+@@ -39,6 +39,8 @@
+ #include <sys/ioctl.h>		/* for _IO */
+ #include <sys/utsname.h>
+ #include <sys/stat.h>
++#include <errno.h>
++#include <selinux/selinux.h>
+ #include "swapheader.h"
+ #include "xstrncpy.h"
+ #include "nls.h"
+@@ -76,6 +78,8 @@
+ 
+ #define MAKE_VERSION(p,q,r)	(65536*(p) + 256*(q) + (r))
+ 
++#define SELINUX_SWAPFILE_LABEL	"swapfile_t"
++
+ static int
+ linux_version_code(void) {
+ 	struct utsname my_utsname;
+@@ -718,5 +722,30 @@
+ 	if (fsync(DEV))
+ 		 die(_("fsync failed"));
+ #endif
++
++	if (S_ISREG(statbuf.st_mode)) {
++		char *context = NULL;
++
++		if (fgetfilecon(DEV, &context) < 0) {
++			if (errno == ENODATA) {
++				context = NULL;
++			} else {
++				perror(device_name);
++				die(_("unable to obtain selinux file label"));
++				return 0;
++			}
++		}
++	    	if (context==NULL || strcmp(context, SELINUX_SWAPFILE_LABEL)) {
++			if (fsetfilecon(DEV, SELINUX_SWAPFILE_LABEL)) {
++				fprintf(stderr, "%s: unable to relabel %s to %s: %s\n",
++						program_name, device_name, 
++						SELINUX_SWAPFILE_LABEL,
++						strerror(errno));
++				exit(1);
++			}
++		}
++		if (context)
++			freecon(context);
++	}
+ 	return 0;
+ }
+--- util-linux-2.13-pre6/disk-utils/Makefile.am.selinux	2006-02-22 15:23:00.000000000 +0100
++++ util-linux-2.13-pre6/disk-utils/Makefile.am	2006-02-22 15:23:09.000000000 +0100
+@@ -31,5 +31,5 @@
+ endif
+ 
+ if HAVE_UUID
+-mkswap_LDADD = -luuid
++mkswap_LDADD = -luuid -lselinux
+ endif

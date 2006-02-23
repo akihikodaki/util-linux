@@ -1,0 +1,22 @@
+--- util-linux-2.13-pre6/schedutils/taskset.1.kzak	2006-02-22 16:10:26.000000000 +0100
++++ util-linux-2.13-pre6/schedutils/taskset.1	2006-02-22 16:10:38.000000000 +0100
+@@ -82,7 +82,7 @@
+ .SH USAGE
+ .TP
+ The default behavior is to run a new command with a given affinity mask:
+-taskset [mask] -- [command] [arguments]
++taskset [mask] [command] [arguments]
+ .TP
+ You can also retrieve the CPU affinity of an existing task:
+ taskset -p [pid]
+--- util-linux-2.13-pre6/schedutils/chrt.1.kzak	2006-02-22 16:09:02.000000000 +0100
++++ util-linux-2.13-pre6/schedutils/chrt.1	2006-02-22 16:09:22.000000000 +0100
+@@ -72,7 +72,7 @@
+ .SH USAGE
+ .TP
+ The default behavior is to run a new command::
+-chrt [prio] -- [command] [arguments]
++chrt [prio] [command] [arguments]
+ .TP
+ You can also retrieve the real-time attributes of an existing task:
+ chrt -p [pid]
