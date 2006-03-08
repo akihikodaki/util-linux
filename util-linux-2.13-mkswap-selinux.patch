@@ -1,60 +1,81 @@
---- util-linux-2.13-pre6/disk-utils/mkswap.c.selinux	2006-02-22 14:07:47.000000000 +0100
-+++ util-linux-2.13-pre6/disk-utils/mkswap.c	2006-02-22 15:16:05.000000000 +0100
-@@ -39,6 +39,8 @@
+--- util-linux-2.13-pre6/disk-utils/mkswap.c.selinux	2005-08-14 17:34:49.000000000 +0200
++++ util-linux-2.13-pre6/disk-utils/mkswap.c	2006-03-08 16:35:08.000000000 +0100
+@@ -39,6 +39,12 @@
  #include <sys/ioctl.h>		/* for _IO */
  #include <sys/utsname.h>
  #include <sys/stat.h>
 +#include <errno.h>
++#ifdef HAVE_LIBSELINUX
 +#include <selinux/selinux.h>
++#include <selinux/context.h>
++#endif
++
  #include "swapheader.h"
  #include "xstrncpy.h"
  #include "nls.h"
-@@ -76,6 +78,8 @@
+@@ -76,6 +82,8 @@
  
  #define MAKE_VERSION(p,q,r)	(65536*(p) + 256*(q) + (r))
  
-+#define SELINUX_SWAPFILE_LABEL	"swapfile_t"
++#define SELINUX_SWAPFILE_TYPE	"swapfile_t"
 +
  static int
  linux_version_code(void) {
  	struct utsname my_utsname;
-@@ -718,5 +722,30 @@
+@@ -718,5 +726,39 @@
  	if (fsync(DEV))
  		 die(_("fsync failed"));
  #endif
 +
-+	if (S_ISREG(statbuf.st_mode)) {
-+		char *context = NULL;
++#ifdef HAVE_LIBSELINUX
++	if (S_ISREG(statbuf.st_mode) && is_selinux_enabled()) {
++		security_context_t context_string;
++		security_context_t oldcontext;
++		context_t newcontext;
 +
-+		if (fgetfilecon(DEV, &context) < 0) {
-+			if (errno == ENODATA) {
-+				context = NULL;
-+			} else {
-+				perror(device_name);
-+				die(_("unable to obtain selinux file label"));
-+				return 0;
-+			}
++		if ((fgetfilecon(DEV, &oldcontext) < 0) && 
++		    (errno != ENODATA)) {
++			fprintf(stderr, "%s: %s: unable to obtain selinux file label: %s\n",
++					program_name, device_name, 
++					strerror(errno));
++			exit(1);
 +		}
-+	    	if (context==NULL || strcmp(context, SELINUX_SWAPFILE_LABEL)) {
-+			if (fsetfilecon(DEV, SELINUX_SWAPFILE_LABEL)) {
++		if (!(newcontext = context_new(oldcontext)))
++			die(_("unable to create new selinux context"));
++		if (context_type_set(newcontext, SELINUX_SWAPFILE_TYPE))
++			die(_("couldn't compute selinux context"));
++		
++		context_string = context_str(newcontext);
++		
++		if (strcmp(context_string, oldcontext)!=0) {
++			if (fsetfilecon(DEV, context_string)) {
 +				fprintf(stderr, "%s: unable to relabel %s to %s: %s\n",
 +						program_name, device_name, 
-+						SELINUX_SWAPFILE_LABEL,
++						context_string,
 +						strerror(errno));
 +				exit(1);
 +			}
 +		}
-+		if (context)
-+			freecon(context);
++		context_free(newcontext);
++		freecon(oldcontext);
 +	}
++#endif
  	return 0;
  }
---- util-linux-2.13-pre6/disk-utils/Makefile.am.selinux	2006-02-22 15:23:00.000000000 +0100
-+++ util-linux-2.13-pre6/disk-utils/Makefile.am	2006-02-22 15:23:09.000000000 +0100
-@@ -31,5 +31,5 @@
+--- util-linux-2.13-pre6/disk-utils/Makefile.am.selinux	2005-09-10 19:46:10.000000000 +0200
++++ util-linux-2.13-pre6/disk-utils/Makefile.am	2006-03-08 16:27:03.000000000 +0100
+@@ -30,6 +30,13 @@
+ mkfs_cramfs_LDADD = -lz $(top_srcdir)/lib/libmd5.a
  endif
  
++mkswap_LDADD =
++
  if HAVE_UUID
 -mkswap_LDADD = -luuid
-+mkswap_LDADD = -luuid -lselinux
++mkswap_LDADD += -luuid
++endif
++
++if HAVE_SELINUX
++mkswap_LDADD += -lselinux
  endif
++

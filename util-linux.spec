@@ -25,7 +25,7 @@ BuildRoot: %{_tmppath}/%{name}-root
 Summary: A collection of basic system utilities.
 Name: util-linux
 Version: 2.13
-Release: 0.16
+Release: 0.17
 License: distributable
 Group: System Environment/Base
 
@@ -254,7 +254,7 @@ cp %{SOURCE8} %{SOURCE9} .
 %patch221 -p1
 %patch222 -p1
 %patch223 -p1
-%patch224 -p1
+%patch224 -p1 -b .selinux
 %patch225 -p1
 %patch226 -p1
 %patch227 -p1
@@ -642,6 +642,9 @@ fi
 /sbin/losetup
 
 %changelog
+* Wed Mar  8 2006 Karel Zak <kzak@redhat.com> 2.13-0.17
+- fix #181782 - mkswap selinux relabeling (fix util-linux-2.13-mkswap-selinux.patch)
+
 * Wed Feb 22 2006 Karel Zak <kzak@redhat.com> 2.13-0.16
 - fix #181782 - mkswap should automatically add selinux label to swapfile
 - fix #180730 - col is exiting with 1 (fix util-linux-2.12p-col-EILSEQ.patch)
