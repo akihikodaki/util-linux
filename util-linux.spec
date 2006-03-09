@@ -25,7 +25,7 @@ BuildRoot: %{_tmppath}/%{name}-root
 Summary: A collection of basic system utilities.
 Name: util-linux
 Version: 2.13
-Release: 0.17
+Release: 0.18
 License: distributable
 Group: System Environment/Base
 
@@ -449,6 +449,7 @@ rm -f ${RPM_BUILD_ROOT}%{_infodir}/dir
 touch /var/log/lastlog
 chown root:root /var/log/lastlog
 chmod 0644 /var/log/lastlog
+[ -x /sbin/restorecon ] && /sbin/restorecon /var/log/lastlog
 
 %postun
 if [ "$1" = 0 ]; then
@@ -642,6 +643,9 @@ fi
 /sbin/losetup
 
 %changelog
+* Wed Mar 10 2006 Jesse Keating <jkeating@redhat.com> 2.13-0.18
+- restorecon /var/log/lastlog
+
 * Wed Mar  8 2006 Karel Zak <kzak@redhat.com> 2.13-0.17
 - fix #181782 - mkswap selinux relabeling (fix util-linux-2.13-mkswap-selinux.patch)
 
