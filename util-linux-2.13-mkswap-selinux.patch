@@ -35,7 +35,7 @@
 +
 +		if ((fgetfilecon(DEV, &oldcontext) < 0) && 
 +		    (errno != ENODATA)) {
-+			fprintf(stderr, "%s: %s: unable to obtain selinux file label: %s\n",
++			fprintf(stderr, _("%s: %s: unable to obtain selinux file label: %s\n"),
 +					program_name, device_name, 
 +					strerror(errno));
 +			exit(1);
@@ -49,7 +49,7 @@
 +		
 +		if (strcmp(context_string, oldcontext)!=0) {
 +			if (fsetfilecon(DEV, context_string)) {
-+				fprintf(stderr, "%s: unable to relabel %s to %s: %s\n",
++				fprintf(stderr, _("%s: unable to relabel %s to %s: %s\n"),
 +						program_name, device_name, 
 +						context_string,
 +						strerror(errno));
