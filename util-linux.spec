@@ -25,7 +25,7 @@ BuildRoot: %{_tmppath}/%{name}-root
 Summary: A collection of basic system utilities.
 Name: util-linux
 Version: 2.13
-Release: 0.19
+Release: 0.20
 License: distributable
 Group: System Environment/Base
 
@@ -63,6 +63,7 @@ Requires: pam >= 0.66-4, /etc/pam.d/system-auth
 Requires: audit-libs >= 1.0.6
 Conflicts: kernel < 2.2.12-7, 
 Prereq: /sbin/install-info
+Prereq: /sbin/restorecon
 Provides: mount = %{version}
 Provides: losetup = %{version}
 Provides: schedutils
@@ -449,7 +450,7 @@ rm -f ${RPM_BUILD_ROOT}%{_infodir}/dir
 touch /var/log/lastlog
 chown root:root /var/log/lastlog
 chmod 0644 /var/log/lastlog
-[ -x /sbin/restorecon ] && /sbin/restorecon /var/log/lastlog
+/sbin/restorecon /var/log/lastlog >/dev/null 2>&1
 
 %postun
 if [ "$1" = 0 ]; then
@@ -643,6 +644,10 @@ fi
 /sbin/losetup
 
 %changelog
+* Wed Mar  9 2006 Jesse Keating <jkeating@redhat.com> 2.13-0.20
+- Better calling of restorecon as suggested by Bill Nottingham
+- prereq restorecon to avoid ordering issues
+
 * Wed Mar  9 2006 Jesse Keating <jkeating@redhat.com> 2.13-0.19
 - restorecon /var/log/lastlog
 
