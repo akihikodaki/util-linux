@@ -180,6 +180,12 @@ Patch226: util-linux-2.13-login-pam-acct.patch
 Patch227: util-linux-2.13-umount-sysfs.patch
 # 182553 - fdisk -l inside xen guest shows no disks
 Patch228: util-linux-2.13-fdisk-xvd.patch
+# 169042 - Changed nfsmount to try udp before using tcp when rpc-ing
+#          the remote rpc.mountd (iff -o tcp is not specified).
+Patch229: util-linux-2.13-nfsmount-mountd-udp.patch
+# 151549 - Added 'noacl' mount flag
+Patch230: util-linux-2.13-nfs-noacl.patch
+
 
 # When adding patches, please make sure that it is easy to find out what bug # the 
 # patch fixes.
@@ -260,6 +266,8 @@ cp %{SOURCE8} %{SOURCE9} .
 %patch226 -p1
 %patch227 -p1
 %patch228 -p1
+%patch229 -p1
+%patch230 -p1
 
 %build
 unset LINGUAS || :
@@ -644,6 +652,13 @@ fi
 /sbin/losetup
 
 %changelog
+* Mon May  1 2006 Steve Dickson <steved@redhat.com> 2.13-0.21
+- fix #151549 - Added 'noacl' mount flag
+- fix #169042 - Changed nfsmount to try udp before using tcp when rpc-ing
+                the remote rpc.mountd (iff -o tcp is not specified).
+                This drastically increases the total number of tcp mounts
+                that can happen at once (ala autofs).
+
 * Wed Mar  9 2006 Jesse Keating <jkeating@redhat.com> 2.13-0.20
 - Better calling of restorecon as suggested by Bill Nottingham
 - prereq restorecon to avoid ordering issues
