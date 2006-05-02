@@ -25,7 +25,7 @@ BuildRoot: %{_tmppath}/%{name}-root
 Summary: A collection of basic system utilities.
 Name: util-linux
 Version: 2.13
-Release: 0.21
+Release: 0.22
 License: distributable
 Group: System Environment/Base
 
@@ -187,6 +187,8 @@ Patch229: util-linux-2.13-nfsmount-mountd-udp.patch
 Patch230: util-linux-2.13-nfs-noacl.patch
 # 183713 - foreground nfs mount timeout options to get hard mount semantic
 Patch231: util-linux-2.13-nfsmount-retry.patch
+# Adds syslog logging to background mounts
+Patch232: util-linux-2.13-nfsmount-syslog.patch
 
 
 # When adding patches, please make sure that it is easy to find out what bug # the 
@@ -271,6 +273,7 @@ cp %{SOURCE8} %{SOURCE9} .
 %patch229 -p1
 %patch230 -p1
 %patch231 -p1
+%patch232 -p1
 
 %build
 unset LINGUAS || :
@@ -655,6 +658,10 @@ fi
 /sbin/losetup
 
 %changelog
+* Tue May  2 2006 Steve Dickson <steved@redhat.com> 2.13-0.22
+- Added syslog logging to background mounts as suggested
+  by a customer.
+
 * Mon May  1 2006 Steve Dickson <steved@redhat.com> 2.13-0.21
 - fix #183713 - foreground mounts are not retrying as advertised
 - fix #151549 - Added 'noacl' mount flag
