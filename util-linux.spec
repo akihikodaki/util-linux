@@ -25,7 +25,7 @@ BuildRoot: %{_tmppath}/%{name}-root
 Summary: A collection of basic system utilities.
 Name: util-linux
 Version: 2.13
-Release: 0.22
+Release: 0.23
 License: distributable
 Group: System Environment/Base
 
@@ -658,6 +658,9 @@ fi
 /sbin/losetup
 
 %changelog
+* Wed May 24 2006 Steve Dickson <steved@redhat.com> 2.13-0.23
+- Fixed bug in patch for bz183713 which cause nfs4 mounts to fail.
+
 * Tue May  2 2006 Steve Dickson <steved@redhat.com> 2.13-0.22
 - Added syslog logging to background mounts as suggested
   by a customer.
