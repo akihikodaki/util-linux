@@ -25,7 +25,7 @@ BuildRoot: %{_tmppath}/%{name}-root
 Summary: A collection of basic system utilities.
 Name: util-linux
 Version: 2.13
-Release: 0.23
+Release: 0.24
 License: distributable
 Group: System Environment/Base
 
@@ -63,7 +63,6 @@ Requires: pam >= 0.66-4, /etc/pam.d/system-auth
 Requires: audit-libs >= 1.0.6
 Conflicts: kernel < 2.2.12-7, 
 Prereq: /sbin/install-info
-Prereq: /sbin/restorecon
 Provides: mount = %{version}
 Provides: losetup = %{version}
 Provides: schedutils
@@ -464,7 +463,8 @@ rm -f ${RPM_BUILD_ROOT}%{_infodir}/dir
 touch /var/log/lastlog
 chown root:root /var/log/lastlog
 chmod 0644 /var/log/lastlog
-/sbin/restorecon /var/log/lastlog >/dev/null 2>&1
+# Fix the file context, do not use restorecon
+chcon `matchpathcon -n /var/log/lastlog` /var/log/lastlog >/dev/null 2>&1
 
 %postun
 if [ "$1" = 0 ]; then
@@ -658,6 +658,10 @@ fi
 /sbin/losetup
 
 %changelog
+* Wed May 24 2006 Dan Walsh <dwalsh@RedHat.com> 2.13-0.24
+- Remove requirement on restorecon, since we can do the same thing
+- with chcon/matchpathcon, and not add requirement on policycoreutils
+
 * Wed May 24 2006 Steve Dickson <steved@redhat.com> 2.13-0.23
 - Fixed bug in patch for bz183713 which cause nfs4 mounts to fail.
 
