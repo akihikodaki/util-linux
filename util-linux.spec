@@ -211,8 +211,8 @@ Patch240: util-linux-2.13-fdisk-sectors.patch
 Patch241: util-linux-2.13-fdisk-isfull.patch
 # 181549 - raw(8) manpage has old information about dd
 Patch242: util-linux-2.12a-raw-man-dd.patch
-
-Patch243: util-linux-2.13-swapon-debug.patch
+# Don't use asm/page.h
+Patch243: util-linux-2.13-swap-page.patch
 
 # When adding patches, please make sure that it is easy to find out what bug # the 
 # patch fixes.
@@ -304,9 +304,8 @@ cp %{SOURCE8} %{SOURCE9} .
 %patch238 -p1
 %patch239 -p1
 %patch240 -p1
-%patch241 -p1 -b .isfull
+%patch241 -p1
 %patch242 -p1
-
 %patch243 -p1
 
 %build
@@ -705,6 +704,7 @@ fi
 - fdisk: wrong number of sectors for large disks (suse#160822)
 - merge fdisk-xvd (#182553) with new fdisk-isfull (#188981) patch 
 - fix #181549 - raw(8) manpage has old information about dd
+- remove asm/page.h usage
 
 * Wed May 24 2006 Dan Walsh <dwalsh@RedHat.com> 2.13-0.24
 - Remove requirement on restorecon, since we can do the same thing
