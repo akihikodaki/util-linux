@@ -1,0 +1,28 @@
+--- util-linux-2.12a/disk-utils/raw.8.dd	2006-04-24 15:27:39.000000000 +0200
++++ util-linux-2.12a/disk-utils/raw.8	2006-04-24 15:53:46.000000000 +0200
+@@ -15,6 +15,12 @@
+ .PP
+ .B raw
+ .B \-qa
++.SH WARNING
++Although Linux includes support for rawio, it is now a deprecated interface. If
++your application performs device access using this interface, Red Hat
++encourages you to modify your application to open the block device with the
++O_DIRECT flag. The rawio interface will exist for the life of Red Hat
++Enterprise Linux 4, but is a candidate for removal from future releases.
+ .SH DESCRIPTION
+ .B raw
+ is used to bind a Linux raw character device to a block device.  Any
+@@ -82,8 +88,10 @@
+ .SH BUGS
+ The Linux 
+ .B dd
+-(1) command does not currently align its buffers correctly, and so
+-cannot be used on raw devices.
++(1) command should be used without bs= option or the blocksize needs to be a
++multiple of the sector size of the device (512 bytes usually) otherwise it
++will fail with "Invalid Argument" messages (EINVAL).
++
+ .PP
+ Raw I/O devices do not maintain cache coherency with the Linux block
+ device buffer cache.  If you use raw I/O to overwrite data already in

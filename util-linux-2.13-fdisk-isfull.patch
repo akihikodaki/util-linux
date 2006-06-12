@@ -1,0 +1,103 @@
+--- util-linux-2.13-pre6/fdisk/sfdisk.c.isfull	2006-06-12 13:31:46.000000000 +0200
++++ util-linux-2.13-pre6/fdisk/sfdisk.c	2006-06-12 13:31:47.000000000 +0200
+@@ -2413,19 +2413,6 @@
+ 	return is_ide;
+ }
+ 
+-static int
+-is_probably_full_disk(char *name) {
+-	struct hd_geometry geometry;
+-	int fd, i = 0;
+-
+-	fd = open(name, O_RDONLY);
+-	if (fd >= 0) {
+-		i = ioctl(fd, HDIO_GETGEO, &geometry);
+-		close(fd);
+-	}
+-	return (fd >= 0 && i == 0 && geometry.start == 0);
+-}
+-
+ #define PROC_PARTITIONS	"/proc/partitions"
+ static FILE *procf = NULL;
+ 
+--- util-linux-2.13-pre6/fdisk/common.h.isfull	2004-09-06 20:07:11.000000000 +0200
++++ util-linux-2.13-pre6/fdisk/common.h	2006-06-12 13:31:47.000000000 +0200
+@@ -28,5 +28,6 @@
+ extern struct systypes i386_sys_types[];
+ 
+ extern char *partname(char *dev, int pno, int lth);
++extern int is_probably_full_disk(char *name);
+ 
+ int disksize(int fd, unsigned long long *sectors);
+--- util-linux-2.13-pre6/fdisk/partname.c.isfull	2002-07-07 14:16:43.000000000 +0200
++++ util-linux-2.13-pre6/fdisk/partname.c	2006-06-12 13:32:54.000000000 +0200
+@@ -1,6 +1,9 @@
+ #include <ctype.h>
+ #include <stdio.h>
+ #include <string.h>
++#include <sys/types.h>
++#include <sys/stat.h>
++#include <fcntl.h>
+ #include "common.h"
+ 
+ /*
+@@ -45,3 +48,30 @@
+ partname(char *dev, int pno, int lth) {
+ 	return partnamebf(dev, pno, lth, 0, NULL);
+ }
++
++int
++is_probably_full_disk(char *name) {
++#ifdef HDIO_GETGEO
++	struct hd_geometry geometry;
++	int fd, i = 0;
++
++	fd = open(name, O_RDONLY);
++	if (fd >= 0) {
++		i = ioctl(fd, HDIO_GETGEO, &geometry);
++		close(fd);
++	}
++	if (i==0)
++		return (fd >= 0 && geometry.start == 0);
++	/*
++	 * "silly heuristic" is still so sexy for us, because
++	 * for example Xen doesn't implement HDIO_GETGEO for virtual
++	 * block devices (/dev/xvda).
++	 * -- kzak@redhat.com (23-Feb-2006)
++	 */
++#endif
++	/* silly heuristic */
++	while (*name)
++		name++;
++	return !isdigit(name[-1]);
++}
++
+--- util-linux-2.13-pre6/fdisk/fdisk.c.isfull	2006-06-12 13:31:47.000000000 +0200
++++ util-linux-2.13-pre6/fdisk/fdisk.c	2006-06-12 13:31:47.000000000 +0200
+@@ -788,26 +788,6 @@
+ #endif
+ }
+ 
+-static int
+-is_probably_full_disk(char *name) {
+-#ifdef HDIO_GETGEO
+-	struct hd_geometry geometry;
+-	int fd, i = 0;
+-
+-	fd = open(name, O_RDONLY);
+-	if (fd >= 0) {
+-		i = ioctl(fd, HDIO_GETGEO, &geometry);
+-		close(fd);
+-	}
+-	return (fd >= 0 && i == 0 && geometry.start == 0);
+-#else
+-	/* silly heuristic */
+-	while (*name)
+-		name++;
+-	return !isdigit(name[-1]);
+-#endif
+-}
+-
+ static void
+ get_partition_table_geometry(void) {
+ 	unsigned char *bufp = MBRbuffer;

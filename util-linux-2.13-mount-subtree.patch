@@ -1,0 +1,187 @@
+--- util-linux-2.13-pre6/mount/mount.8.subtree	2006-06-12 09:18:26.000000000 +0200
++++ util-linux-2.13-pre6/mount/mount.8	2006-06-12 09:19:43.000000000 +0200
+@@ -131,6 +131,41 @@
+ .B "mount --move olddir newdir"
+ .RE
+ 
++Since Linux 2.6.15 it is possible to mark a mount and its submounts as shared,
++private, slave or unbindable. A shared mount provides ability to create mirrors
++of that mount such that mounts and umounts within any of the mirrors propagate
++to the other mirror. A slave mount receives propagation from its master, but
++any not vice-versa.  A private mount carries no propagation abilities.  A
++unbindable mount is a private mount which cannot cloned through a bind
++operation. Detailed semantics is documented in Documentation/sharedsubtree.txt
++file in the kernel source tree.
++.RS
++.br
++.B "mount --make-shared mountpoint"
++.br
++.B "mount --make-slave mountpoint"
++.br
++.B "mount --make-private mountpoint"
++.br
++.B "mount --make-unbindable mountpoint"
++.br
++.RE
++
++The following commands allows one to recursively change the type of all the
++mounts under a given mountpoint.
++.RS
++.br
++.B "mount --make-rshared mountpoint"
++.br
++.B "mount --make-rslave mountpoint"
++.br
++.B "mount --make-rprivate mountpoint"
++.br
++.B
++"mount --make-runbindable mountpoint"
++.br
++.RE
++
+ The
+ .I proc
+ file system is not associated with a special device, and when
+--- util-linux-2.13-pre6/mount/mount_constants.h.subtree	2002-11-01 01:24:36.000000000 +0100
++++ util-linux-2.13-pre6/mount/mount_constants.h	2006-06-12 09:19:43.000000000 +0200
+@@ -57,6 +57,18 @@
+ #ifndef MS_VERBOSE
+ #define MS_VERBOSE	0x8000	/* 32768 */
+ #endif
++#ifndef MS_UNBINDABLE
++#define MS_UNBINDABLE	(1<<17)	/* 131072 unbindable*/
++#endif
++#ifndef MS_PRIVATE
++#define MS_PRIVATE	(1<<18)	/* 262144 Private*/
++#endif
++#ifndef MS_SLAVE
++#define MS_SLAVE	(1<<19)	/* 524288 Slave*/
++#endif
++#ifndef MS_SHARED
++#define MS_SHARED	(1<<20)	/* 1048576 Shared*/
++#endif
+ /*
+  * Magic mount flag number. Had to be or-ed to the flag values.
+  */
+--- util-linux-2.13-pre6/mount/mount.c.subtree	2006-06-12 09:18:26.000000000 +0200
++++ util-linux-2.13-pre6/mount/mount.c	2006-06-12 09:19:43.000000000 +0200
+@@ -74,7 +74,9 @@
+ /* Add volumelabel in a listing of mounted devices (-l). */
+ static int list_with_volumelabel = 0;
+ 
+-/* Nonzero for mount {--bind|--replace|--before|--after|--over|--move} */
++/* Nonzero for mount {--bind|--replace|--before|--after|--over|--move|
++ * 		       make-shared|make-private|make-unbindable|make-slave}
++ */
+ static int mounttype = 0;
+ 
+ /* True if ruid != euid.  */
+@@ -109,6 +111,8 @@
+ /* Options that we keep from appearing in the options field in the mtab.  */
+ #define MS_NOMTAB	(MS_REMOUNT|MS_NOAUTO|MS_USERS|MS_USER|MS_PAMCONSOLE)
+ 
++#define MS_PROPAGATION  (MS_SHARED|MS_SLAVE|MS_UNBINDABLE|MS_PRIVATE)
++
+ /* Options that we make ordinary users have by default.  */
+ #define MS_SECURE	(MS_NOEXEC|MS_NOSUID|MS_NODEV)
+ 
+@@ -346,6 +350,9 @@
+ 		*flags |= MS_RDONLY;
+ 	if (readwrite)
+ 		*flags &= ~MS_RDONLY;
++
++	if (mounttype & MS_PROPAGATION)
++		*flags &= ~MS_BIND;
+ 	*flags |= mounttype;
+ }
+ 
+@@ -916,13 +923,15 @@
+       if (loop)
+ 	  opt_loopdev = loopdev;
+ 
+-      update_mtab_entry(loop ? loopfile : spec,
++      if (!(mounttype & MS_PROPAGATION)) {
++	      update_mtab_entry(loop ? loopfile : spec,
+ 			node,
+ 			types ? types : "unknown",
+ 			fix_opts_string (flags & ~MS_NOMTAB, extra_opts, user),
+ 			flags,
+ 			freq,
+ 			pass);
++      }
+ 
+       block_signals (SIG_UNBLOCK);
+       res = 0;
+@@ -1461,6 +1470,14 @@
+ 	{ "move", 0, 0, 133 },
+ 	{ "guess-fstype", 1, 0, 134 },
+ 	{ "rbind", 0, 0, 135 },
++	{ "make-shared", 0, 0, 136 },
++	{ "make-slave", 0, 0, 137 },
++	{ "make-private", 0, 0, 138 },
++	{ "make-unbindable", 0, 0, 139 },
++	{ "make-rshared", 0, 0, 140 },
++	{ "make-rslave", 0, 0, 141 },
++	{ "make-rprivate", 0, 0, 142 },
++	{ "make-runbindable", 0, 0, 143 },
+ 	{ "internal-only", 0, 0, 'i' },
+ 	{ NULL, 0, 0, 0 }
+ };
+@@ -1487,6 +1504,17 @@
+ 	  "       mount --bind olddir newdir\n"
+ 	  "or move a subtree:\n"
+ 	  "       mount --move olddir newdir\n"
++	  "One can change the type of mount containing the directory dir:\n"
++	  "       mount --make-shared dir\n"
++	  "       mount --make-slave dir\n"
++	  "       mount --make-private dir\n"
++	  "       mount --make-unbindable dir\n"
++	  "One can change the type of all the mounts in a mount subtree\n"
++	  "containing the directory dir:\n"
++	  "       mount --make-rshared dir\n"
++	  "       mount --make-rslave dir\n"
++	  "       mount --make-rprivate dir\n"
++	  "       mount --make-runbindable dir\n"
+ 	  "A device can be given by name, say /dev/hda1 or /dev/cdrom,\n"
+ 	  "or by label, using  -L label  or by uuid, using  -U uuid .\n"
+ 	  "Other options: [-nfFrsvw] [-o options] [-p passwdfd].\n"
+@@ -1638,6 +1666,39 @@
+ 		case 135:
+ 			mounttype = (MS_BIND | MS_REC);
+ 			break;
++
++		case 136:
++			mounttype = MS_SHARED;
++			break;
++
++		case 137:
++			mounttype = MS_SLAVE;
++			break;
++
++		case 138:
++			mounttype = MS_PRIVATE;
++			break;
++
++		case 139:
++			mounttype = MS_UNBINDABLE;
++			break;
++
++		case 140:
++			mounttype = (MS_SHARED | MS_REC);
++			break;
++
++		case 141:
++			mounttype = (MS_SLAVE | MS_REC);
++			break;
++
++		case 142:
++			mounttype = (MS_PRIVATE | MS_REC);
++			break;
++
++		case 143:
++			mounttype = (MS_UNBINDABLE | MS_REC);
++			break;
++
+ 		case '?':
+ 		default:
+ 			usage (stderr, EX_USAGE);

@@ -1,0 +1,39 @@
+--- util-linux-2.13-pre7/mount/nfs.5.bugs	2006-03-30 21:37:53.000000000 +0200
++++ util-linux-2.13-pre7/mount/nfs.5	2006-03-30 21:38:13.000000000 +0200
+@@ -443,3 +443,10 @@
+ .P
+ The umount command should notify the server
+ when an NFS filesystem is unmounted.
++.P
++Checking files on NFS filesystem referenced by file descriptors (i.e. the 
++.BR fcntl 
++and 
++.BR ioctl
++families of functions) may lead to inconsistent result due to the lack of
++consistency check in kernel even if noac is used.
+--- util-linux-2.13-pre7/mount/mount.8.bugs	2006-03-30 21:36:56.000000000 +0200
++++ util-linux-2.13-pre7/mount/mount.8	2006-03-30 21:37:35.000000000 +0200
+@@ -2047,6 +2047,23 @@
+ .IR /proc/partitions .
+ In particular, it may well fail if the kernel was compiled with devfs
+ but devfs is not mounted.
++.PP
++It is possible that files 
++.IR /etc/mtab
++and 
++.IR /proc/mounts
++don't match. The first file is based only on the mount command options, but the
++content of the second file also depends on the kernel and others settings (e.g.
++remote NFS server. In particular case the mount command may reports unreliable
++information about a NFS mount point and the /proc/mounts file usually contains
++more reliable information.)
++.PP
++Checking files on NFS filesystem referenced by file descriptors (i.e. the 
++.BR fcntl 
++and 
++.BR ioctl
++families of functions) may lead to inconsistent result due to the lack of
++consistency check in kernel even if noac is used.
+ .SH HISTORY
+ A
+ .B mount

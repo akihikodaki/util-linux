@@ -1,0 +1,28 @@
+--- util-linux-2.13-pre6/mount/mount.c.move	2006-06-12 09:19:43.000000000 +0200
++++ util-linux-2.13-pre6/mount/mount.c	2006-06-12 09:45:05.000000000 +0200
+@@ -768,6 +768,25 @@
+ 		else {
+ 			mntFILE *mfp;
+ 
++			/* when moving a mount point, we have to make sure the mtab
++			 * gets updated properly.  We get info about the old mount
++			 * point, copy it to the new mount point, and then delete
++			 * the old mount point. */
++			if (flags & MS_MOVE) {
++				const char *olddir = mnt.mnt_fsname;
++				struct mntentchn *oldmc = oldmc = getmntfile(olddir);
++				if (oldmc != NULL) {
++					mnt.mnt_fsname = strdup(oldmc->m.mnt_fsname);
++					mnt.mnt_type = oldmc->m.mnt_type;
++					mnt.mnt_opts = oldmc->m.mnt_opts;
++					mnt.mnt_freq = oldmc->m.mnt_freq;
++					mnt.mnt_passno = oldmc->m.mnt_passno;
++				}
++				update_mtab(olddir, NULL);
++				if (oldmc != NULL)
++					my_free(olddir);
++			}
++
+ 			lock_mtab();
+ 			mfp = my_setmntent(MOUNTED, "a+");
+ 			if (mfp == NULL || mfp->mntent_fp == NULL) {

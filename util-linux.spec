@@ -25,7 +25,7 @@ BuildRoot: %{_tmppath}/%{name}-root
 Summary: A collection of basic system utilities.
 Name: util-linux
 Version: 2.13
-Release: 0.24
+Release: 0.25
 License: distributable
 Group: System Environment/Base
 
@@ -177,8 +177,6 @@ Patch225: util-linux-2.13-schedutils-man.patch
 Patch226: util-linux-2.13-login-pam-acct.patch
 # 177523 - umount -a should not unmount sysfs
 Patch227: util-linux-2.13-umount-sysfs.patch
-# 182553 - fdisk -l inside xen guest shows no disks
-Patch228: util-linux-2.13-fdisk-xvd.patch
 # 169042 - Changed nfsmount to try udp before using tcp when rpc-ing
 #          the remote rpc.mountd (iff -o tcp is not specified).
 Patch229: util-linux-2.13-nfsmount-mountd-udp.patch
@@ -188,7 +186,29 @@ Patch230: util-linux-2.13-nfs-noacl.patch
 Patch231: util-linux-2.13-nfsmount-retry.patch
 # Adds syslog logging to background mounts
 Patch232: util-linux-2.13-nfsmount-syslog.patch
-
+# 187014 - umount segfaults for normal user
+Patch233: util-linux-2.13-mount-uuid.patch
+# 183446 - cal not UTF-8-aware
+Patch234: util-linux-2.13-cal-wide.patch
+# 186915 - mount does not translate SELIinux context options though libselinux
+# 185500 - Need man page entry for -o context= mount option
+Patch235: util-linux-2.13-mount-context.patch
+# 152579 - missing info about /etc/mtab and /proc/mounts mismatch
+# 183890 - missing info about possible ioctl() and fcntl() problems on NFS filesystem
+Patch236: util-linux-2.13-mount-man-bugs.patch
+# Keep gcc happy
+Patch237: util-linux-2.13-hexdump-gcc.patch
+# 191230 - using mount --move results in wrong data in /etc/mtab
+Patch238: util-linux-2.13-mount-move.patch
+# Subtrees support
+Patch239: util-linux-2.13-mount-subtree.patch
+# wrong number of sectors for large disks (suse#160822)
+Patch240: util-linux-2.13-fdisk-sectors.patch
+# 182553 - fdisk -l inside xen guest shows no disks
+# 188981 - "sfdisk -l" tries to open partitions
+Patch241: util-linux-2.13-fdisk-isfull.patch
+# 181549 - raw(8) manpage has old information about dd
+Patch242: util-linux-2.12a-raw-man-dd.patch
 
 # When adding patches, please make sure that it is easy to find out what bug # the 
 # patch fixes.
@@ -268,11 +288,21 @@ cp %{SOURCE8} %{SOURCE9} .
 %patch225 -p1
 %patch226 -p1
 %patch227 -p1
-%patch228 -p1
 %patch229 -p1
 %patch230 -p1
 %patch231 -p1
 %patch232 -p1
+%patch233 -p1
+%patch234 -p1
+%patch235 -p1
+%patch236 -p1
+%patch237 -p1
+%patch238 -p1
+%patch239 -p1
+%patch240 -p1
+%patch241 -p1 -b .isfull
+%patch242 -p1
+
 
 %build
 unset LINGUAS || :
@@ -658,6 +688,19 @@ fi
 /sbin/losetup
 
 %changelog
+* Mon Jun 12 2006 Karel Zak <kzak@redhat.com> 2.13-0.25
+- fix #187014 - umount segfaults for normal user
+- fix #183446 - cal not UTF-8-aware
+- fix #186915 - mount does not translate SELIinux context options though libselinux
+- fix #185500 - Need man page entry for -o context= mount option
+- fix #152579 - missing info about /etc/mtab and /proc/mounts mismatch
+- fix #183890 - missing info about possible ioctl() and fcntl() problems on NFS filesystem
+- fix #191230 - using mount --move results in wrong data in /etc/mtab
+- added mount subtrees support
+- fdisk: wrong number of sectors for large disks (suse#160822)
+- merge fdisk-xvd (#182553) with new fdisk-isfull (#188981) patch 
+- fix #181549 - raw(8) manpage has old information about dd
+
 * Wed May 24 2006 Dan Walsh <dwalsh@RedHat.com> 2.13-0.24
 - Remove requirement on restorecon, since we can do the same thing
 - with chcon/matchpathcon, and not add requirement on policycoreutils

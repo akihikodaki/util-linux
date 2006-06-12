@@ -1,0 +1,153 @@
+
+ This patch adds to the mount man page docs about context, fscontext and
+defcontext mount options and translate context options from human to raw
+selinux context format.  -- 03/30/2006 Karel Zak <kzak@redhat.com> 
+
+--- util-linux-2.13-pre7/mount/mount.8.cxt	2006-03-30 17:15:06.000000000 +0200
++++ util-linux-2.13-pre7/mount/mount.8	2006-03-30 17:15:06.000000000 +0200
+@@ -661,6 +661,50 @@
+ .BR noexec ", " nosuid ", and " nodev
+ (unless overridden by subsequent options, as in the option line
+ .BR users,exec,dev,suid ).
++.TP
++\fBcontext=\fP\fIcontext\fP, \fBfscontext=\fP\fIcontext\fP and \fBdefcontext=\fP\fIcontext\fP
++The 
++.BR context= 
++option is useful when mounting filesystems that do not support
++extended attributes, such as a floppy or hard disk formatted with VFAT, or
++systems that are not normally running under SELinux, such as an ext3 formatted
++disk from a non-SELinux workstation. You can also use
++.BR context= 
++on filesystems you do not trust, such as a floppy. It also helps in compatibility with
++xattr-supporting filesystems on earlier 2.4.<x> kernel versions. Even where
++xattrs are supported, you can save time not having to label every file by
++assigning the entire disk one security context.
++
++A commonly used option for removable media is 
++.BR context=system_u:object_r:removable_t .
++
++Two other options are 
++.BR fscontext= 
++and 
++.BR defcontext= ,
++both of which are mutually exclusive of the context option. This means you
++can use fscontext and defcontext with each other, but neither can be used with
++context.
++
++The 
++.BR fscontext= 
++option works for all filesystems, regardless of their xattr
++support. The fscontext option sets the overarching filesystem label to a
++specific security context. This filesystem label is separate from the
++individual labels on the files. It represents the entire filesystem for
++certain kinds of permission checks, such as during mount or file creation.
++Individual file labels are still obtained from the xattrs on the files
++themselves. The context option actually sets the aggregate context that
++fscontext provides, in addition to supplying the same label for individual
++files.
++
++You can set the default security context for unlabeled files using 
++.BR defcontext=
++option. This overrides the value set for unlabeled files in the policy and requires a
++file system that supports xattr labeling. 
++
++For more details see 
++.BR selinux (8)
+ .RE
+ .TP
+ .B \-\-bind
+--- util-linux-2.13-pre7/mount/mount.c.cxt	2006-03-30 17:15:06.000000000 +0200
++++ util-linux-2.13-pre7/mount/mount.c	2006-03-30 20:16:57.000000000 +0200
+@@ -21,6 +21,11 @@
+ #include <sys/wait.h>
+ #include <sys/mount.h>
+ 
++#ifdef HAVE_LIBSELINUX
++#include <selinux/selinux.h>
++#include <selinux/context.h>
++#endif
++
+ #include "mount_blkid.h"
+ #include "mount_constants.h"
+ #include "sundries.h"
+@@ -255,6 +260,49 @@
+ 		free((void *) s);
+ }
+ 
++#ifdef HAVE_LIBSELINUX
++/* translates SELinux context from human to raw format and 
++ * appends it to the mount extra options.
++ *
++ * returns -1 on error and 0 on success 
++ */
++static int
++append_context(const char *optname, const char *optdata, char *extra_opts, int *len)
++{
++	security_context_t raw = NULL;
++	char *buf = NULL;
++	int bufsz;
++	
++	if (!is_selinux_enabled())
++		/* ignore the option if we running without selinux */
++		return 0;
++
++	if (optdata==NULL || *optdata=='\0' || optname==NULL)
++		return -1;
++	
++	if (selinux_trans_to_raw_context(
++			(security_context_t) optdata, &raw)==-1 ||
++			raw==NULL)
++		return -1;
++	
++	if (verbose)
++		printf(_("mount: translated %s '%s' to '%s'\n"), 
++				optname, optdata, (char *) raw);
++
++	bufsz = strlen(optname) + strlen(raw) + 2;	/* 2 is \0 and '=' */ 
++	buf = xmalloc(bufsz);
++
++	snprintf(buf, bufsz, "%s=%s", optname, (char *) raw);
++	freecon(raw);
++	
++	if ((*len -= bufsz-1) > 0)
++		strcat(extra_opts, buf);
++	
++	my_free(buf);
++	return 0;
++}
++#endif
++
+ /*
+  * Look for OPT in opt_map table and return mask value.
+  * If OPT isn't found, tack it onto extra_opts (which is non-NULL).
+@@ -313,7 +361,20 @@
+ 			return;
+ 		}
+ 	}
+-
++#ifdef HAVE_LIBSELINUX
++	if (strncmp(opt, "context=", 8)==0 && *(opt+8)) {
++		if (append_context("context", opt+8, extra_opts, &len)==0)
++			return;
++	}
++	if (strncmp(opt, "fscontext=", 10)==0 && *(opt+10)) {
++		if (append_context("fscontext", opt+10, extra_opts, &len)==0)
++			return;
++	}
++	if (strncmp(opt, "defcontext=", 11)==0 && *(opt+11)) {
++		if (append_context("defcontext", opt+11, extra_opts, &len)==0)
++			return;
++	}
++#endif
+ 	if ((len -= strlen(opt)) > 0)
+ 		strcat(extra_opts, opt);
+ }
+@@ -330,7 +391,7 @@
+ 	if (options != NULL) {
+ 		char *opts = xstrdup(options);
+ 		char *opt;
+-		int len = strlen(opts) + 20;
++		int len = strlen(opts) + 256;
+ 
+ 		*extra_opts = xmalloc(len); 
+ 		**extra_opts = '\0';

@@ -1,0 +1,17 @@
+
+ gcc 4.1.0: "warning: memset used with constant zero length parameter; this
+ could be due to transposed parameters". So, fix it!
+ -- 03/30/2006 Karel Zak <kzak@redhat.com> 
+
+--- util-linux-2.13-pre7/text-utils/display.c.gcc	2006-03-31 10:44:50.000000000 +0200
++++ util-linux-2.13-pre7/text-utils/display.c	2006-03-31 10:45:22.000000000 +0200
+@@ -255,7 +255,8 @@
+ 					(void)printf("*\n");
+ 				return(NULL);
+ 			}
+-			memset((char *)curp + nread, 0, need);
++			if (need > 0)
++				memset((char *)curp + nread, 0, need);
+ 			eaddress = address + nread;
+ 			return(curp);
+ 		}
