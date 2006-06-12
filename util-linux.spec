@@ -30,19 +30,19 @@ License: distributable
 Group: System Environment/Base
 
 ### Dependences
-BuildRequires: sed
-BuildRequires: pam-devel
-BuildRequires: ncurses-devel
-BuildRequires: libtermcap-devel
-BuildRequires: zlib-devel
-BuildRequires: slang-devel
-BuildRequires: texinfo
-BuildRequires: gettext-devel
-BuildRequires: libselinux-devel
-BuildRequires: e2fsprogs-devel >= 1.36
 BuildRequires: audit-libs-devel >= 1.0.6
 BuildRequires: autoconf
 BuildRequires: automake
+BuildRequires: e2fsprogs-devel >= 1.36
+BuildRequires: gettext-devel
+BuildRequires: libselinux-devel
+BuildRequires: libtermcap-devel
+BuildRequires: ncurses-devel
+BuildRequires: pam-devel
+BuildRequires: sed
+BuildRequires: slang-devel
+BuildRequires: texinfo
+BuildRequires: zlib-devel
 
 ### Sources
 # TODO [stable]: s/2.13-pre6/%{version}/
@@ -212,6 +212,8 @@ Patch241: util-linux-2.13-fdisk-isfull.patch
 # 181549 - raw(8) manpage has old information about dd
 Patch242: util-linux-2.12a-raw-man-dd.patch
 
+Patch243: util-linux-2.13-swapon-debug.patch
+
 # When adding patches, please make sure that it is easy to find out what bug # the 
 # patch fixes.
 ########### END upstreamable
@@ -305,6 +307,7 @@ cp %{SOURCE8} %{SOURCE9} .
 %patch241 -p1 -b .isfull
 %patch242 -p1
 
+%patch243 -p1
 
 %build
 unset LINGUAS || :
