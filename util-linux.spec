@@ -41,6 +41,8 @@ BuildRequires: gettext-devel
 BuildRequires: libselinux-devel
 BuildRequires: e2fsprogs-devel >= 1.36
 BuildRequires: audit-libs-devel >= 1.0.6
+BuildRequires: autoconf
+BuildRequires: automake
 
 ### Sources
 # TODO [stable]: s/2.13-pre6/%{version}/
