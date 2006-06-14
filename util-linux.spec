@@ -25,7 +25,7 @@ BuildRoot: %{_tmppath}/%{name}-root
 Summary: A collection of basic system utilities.
 Name: util-linux
 Version: 2.13
-Release: 0.25
+Release: 0.26
 License: distributable
 Group: System Environment/Base
 
@@ -213,6 +213,8 @@ Patch241: util-linux-2.13-fdisk-isfull.patch
 Patch242: util-linux-2.12a-raw-man-dd.patch
 # Don't use asm/page.h
 Patch243: util-linux-2.13-swap-page.patch
+# Don't use linux/posix_types.h or asm/posix_types.h
+Patch244: util-linux-2.13-nfs4-posix_types.patch
 
 # When adding patches, please make sure that it is easy to find out what bug # the 
 # patch fixes.
@@ -307,6 +309,7 @@ cp %{SOURCE8} %{SOURCE9} .
 %patch241 -p1
 %patch242 -p1
 %patch243 -p1
+%patch244 -p1
 
 %build
 unset LINGUAS || :
@@ -692,6 +695,9 @@ fi
 /sbin/losetup
 
 %changelog
+* Wed Jun 14 2006 Steve Dickson <steved@redhat.com> 2.13-0.26
+- Remove unneeded header files from nfsmount.c
+
 * Mon Jun 12 2006 Karel Zak <kzak@redhat.com> 2.13-0.25
 - fix #187014 - umount segfaults for normal user
 - fix #183446 - cal not UTF-8-aware
