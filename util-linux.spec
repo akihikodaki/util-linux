@@ -25,7 +25,7 @@ BuildRoot: %{_tmppath}/%{name}-root
 Summary: A collection of basic system utilities.
 Name: util-linux
 Version: 2.13
-Release: 0.26
+Release: 0.27
 License: distributable
 Group: System Environment/Base
 
@@ -501,7 +501,9 @@ touch /var/log/lastlog
 chown root:root /var/log/lastlog
 chmod 0644 /var/log/lastlog
 # Fix the file context, do not use restorecon
-chcon `matchpathcon -n /var/log/lastlog` /var/log/lastlog >/dev/null 2>&1
+if [ -x /usr/sbin/selinuxenabled ] && /usr/sbin/selinuxenabled; then
+	chcon `matchpathcon -n /var/log/lastlog` /var/log/lastlog >/dev/null 2>&1
+fi
 
 %postun
 if [ "$1" = 0 ]; then
@@ -695,6 +697,9 @@ fi
 /sbin/losetup
 
 %changelog
+* Wed Jun 21 2006 Dan Walsh <dwalsh@RedHat.com> 2.13-0.27
+- Only execute chcon on machines with selinux enabled
+
 * Wed Jun 14 2006 Steve Dickson <steved@redhat.com> 2.13-0.26
 - Remove unneeded header files from nfsmount.c
 
