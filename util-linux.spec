@@ -25,7 +25,7 @@ BuildRoot: %{_tmppath}/%{name}-root
 Summary: A collection of basic system utilities.
 Name: util-linux
 Version: 2.13
-Release: 0.27
+Release: 0.28
 License: distributable
 Group: System Environment/Base
 
@@ -505,10 +505,11 @@ if [ -x /usr/sbin/selinuxenabled ] && /usr/sbin/selinuxenabled; then
 	chcon `matchpathcon -n /var/log/lastlog` /var/log/lastlog >/dev/null 2>&1
 fi
 
-%postun
+%preun
 if [ "$1" = 0 ]; then
     /sbin/install-info --del %{_infodir}/ipc.info* %{_infodir}/dir
 fi
+exit 0
 
 %files -f %{name}.lang
 %defattr(-,root,root)
@@ -697,6 +698,9 @@ fi
 /sbin/losetup
 
 %changelog
+* Mon Jun 26 2006 Florian La Roche <laroche@redhat.com>
+- move install-info parts from postun to preun
+
 * Wed Jun 21 2006 Dan Walsh <dwalsh@RedHat.com> 2.13-0.27
 - Only execute chcon on machines with selinux enabled
 
