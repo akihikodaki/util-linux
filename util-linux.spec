@@ -4,13 +4,21 @@
 #
 # Notes:
 # 	- upstream maintainer Adrian Bunk <bunk@kernel.org>
-#
-# TODO:
-#	- remove deprecated the arch command (since release 2.13)
-#
+
+### Header 
+Summary: A collection of basic system utilities.
+Name: util-linux
+Version: 2.13
+Release: 0.29
+License: distributable
+Group: System Environment/Base
 
 ### Features
+%if 0%{?rhel}
+%define include_raw 1
+%else
 %define include_raw 0
+%endif
 
 ### Macros
 %define floppyver 0.12
@@ -20,14 +28,6 @@
 ### Paths
 BuildRoot: %{_tmppath}/%{name}-root
 # see build section for _prefix
-
-### Header 
-Summary: A collection of basic system utilities.
-Name: util-linux
-Version: 2.13
-Release: 0.28
-License: distributable
-Group: System Environment/Base
 
 ### Dependences
 BuildRequires: audit-libs-devel >= 1.0.6
@@ -290,7 +290,7 @@ cp %{SOURCE8} %{SOURCE9} .
 %patch221 -p1
 %patch222 -p1
 %patch223 -p1
-%patch224 -p1 -b .selinux
+%patch224 -p1
 %patch225 -p1
 %patch226 -p1
 %patch227 -p1
@@ -698,7 +698,10 @@ exit 0
 /sbin/losetup
 
 %changelog
-* Mon Jun 26 2006 Florian La Roche <laroche@redhat.com>
+* Fri Jul  7 2006 Karel Zak <kzak@redhat.com> 2.13-0.29 
+- include the raw command for RHELs
+
+* Mon Jun 26 2006 Florian La Roche <laroche@redhat.com> 2.13-0.28
 - move install-info parts from postun to preun
 
 * Wed Jun 21 2006 Dan Walsh <dwalsh@RedHat.com> 2.13-0.27
