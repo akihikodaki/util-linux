@@ -9,7 +9,7 @@
 Summary: A collection of basic system utilities.
 Name: util-linux
 Version: 2.13
-Release: 0.29
+Release: 0.30
 License: distributable
 Group: System Environment/Base
 
@@ -497,6 +497,8 @@ rm -f ${RPM_BUILD_ROOT}%{_infodir}/dir
 
 %post
 /sbin/install-info %{_infodir}/ipc.info* %{_infodir}/dir
+# only for minimal buildroots without /var/log
+[ -d /var/log ] || mkdir -p /var/log
 touch /var/log/lastlog
 chown root:root /var/log/lastlog
 chmod 0644 /var/log/lastlog
@@ -698,6 +700,9 @@ exit 0
 /sbin/losetup
 
 %changelog
+* Mon Jul 10 2006 Karsten Hopp <karsten@redhat.de> 2.13-0.30
+- silence install in minimal buildroot without /var/log
+
 * Fri Jul  7 2006 Karel Zak <kzak@redhat.com> 2.13-0.29 
 - include the raw command for RHELs
 
