@@ -9,7 +9,7 @@
 Summary: A collection of basic system utilities.
 Name: util-linux
 Version: 2.13
-Release: 0.30
+Release: 0.31
 License: distributable
 Group: System Environment/Base
 
@@ -64,7 +64,9 @@ Conflicts: initscripts <= 4.58, timeconfig <= 3.0.1
 Requires: pam >= 0.66-4, /etc/pam.d/system-auth
 Requires: audit-libs >= 1.0.6
 Conflicts: kernel < 2.2.12-7, 
-Prereq: /sbin/install-info
+Requires(preun): /sbin/install-info
+Requires(post): /sbin/install-info
+Requires(post): coreutils
 Provides: mount = %{version}
 Provides: losetup = %{version}
 Provides: schedutils
@@ -498,10 +500,10 @@ rm -f ${RPM_BUILD_ROOT}%{_infodir}/dir
 %post
 /sbin/install-info %{_infodir}/ipc.info* %{_infodir}/dir
 # only for minimal buildroots without /var/log
-[ -d /var/log ] || mkdir -p /var/log
-touch /var/log/lastlog
-chown root:root /var/log/lastlog
-chmod 0644 /var/log/lastlog
+[ -d /var/log ] || /bin/mkdir -p /var/log
+/bin/touch /var/log/lastlog
+/bin/chown root:root /var/log/lastlog
+/bin/chmod 0644 /var/log/lastlog
 # Fix the file context, do not use restorecon
 if [ -x /usr/sbin/selinuxenabled ] && /usr/sbin/selinuxenabled; then
 	chcon `matchpathcon -n /var/log/lastlog` /var/log/lastlog >/dev/null 2>&1
@@ -700,6 +702,9 @@ exit 0
 /sbin/losetup
 
 %changelog
+* Tue Jul 11 2006 Karel Zak <kzak@redhat.com> 2.13-0.31
+- cleanup dependences for post and preun scriptlets
+
 * Mon Jul 10 2006 Karsten Hopp <karsten@redhat.de> 2.13-0.30
 - silence install in minimal buildroot without /var/log
 
