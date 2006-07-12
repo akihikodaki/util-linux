@@ -9,7 +9,7 @@
 Summary: A collection of basic system utilities.
 Name: util-linux
 Version: 2.13
-Release: 0.31
+Release: 0.31.1
 License: distributable
 Group: System Environment/Base
 
@@ -702,6 +702,9 @@ exit 0
 /sbin/losetup
 
 %changelog
+* Wed Jul 12 2006 Jesse Keating <jkeating@redhat.com> - 2.13-0.31.1
+- rebuild
+
 * Tue Jul 11 2006 Karel Zak <kzak@redhat.com> 2.13-0.31
 - cleanup dependences for post and preun scriptlets
 
