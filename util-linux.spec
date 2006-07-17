@@ -9,7 +9,7 @@
 Summary: A collection of basic system utilities.
 Name: util-linux
 Version: 2.13
-Release: 0.31.1
+Release: 0.32
 License: distributable
 Group: System Environment/Base
 
@@ -217,6 +217,8 @@ Patch242: util-linux-2.12a-raw-man-dd.patch
 Patch243: util-linux-2.13-swap-page.patch
 # Don't use linux/posix_types.h or asm/posix_types.h
 Patch244: util-linux-2.13-nfs4-posix_types.patch
+# IPv6 support to login command
+Patch245: util-linux-2.13-login-ipv6.patch
 
 # When adding patches, please make sure that it is easy to find out what bug # the 
 # patch fixes.
@@ -312,6 +314,7 @@ cp %{SOURCE8} %{SOURCE9} .
 %patch242 -p1
 %patch243 -p1
 %patch244 -p1
+%patch245 -p1
 
 %build
 unset LINGUAS || :
@@ -702,6 +705,12 @@ exit 0
 /sbin/losetup
 
 %changelog
+* Mon Jul 17 2006 Karel Zak <kzak@redhat.com> 2.13-0.32
+- add IPv6 support to the login command (patch by Milan Zazrivec)
+
+* Thu Jul 13 2006 David Howells <dhowells@redhat.com>
+- fix #198626 - add keyinit instructions to the login PAM script
+
 * Wed Jul 12 2006 Jesse Keating <jkeating@redhat.com> - 2.13-0.31.1
 - rebuild
 
