@@ -9,7 +9,7 @@
 Summary: A collection of basic system utilities.
 Name: util-linux
 Version: 2.13
-Release: 0.32
+Release: 0.33
 License: distributable
 Group: System Environment/Base
 
@@ -67,6 +67,7 @@ Conflicts: kernel < 2.2.12-7,
 Requires(preun): /sbin/install-info
 Requires(post): /sbin/install-info
 Requires(post): coreutils
+Requires(post): libselinux
 Provides: mount = %{version}
 Provides: losetup = %{version}
 Provides: schedutils
@@ -705,6 +706,9 @@ exit 0
 /sbin/losetup
 
 %changelog
+* Tue Jul 18 2006 Karel Zak <kzak@redhat.com> 2.13-0.33
+- add Requires(post): libselinux
+
 * Mon Jul 17 2006 Karel Zak <kzak@redhat.com> 2.13-0.32
 - add IPv6 support to the login command (patch by Milan Zazrivec)
 - fix #198626 - add keyinit instructions to the login PAM script 
