@@ -510,7 +510,7 @@ rm -f ${RPM_BUILD_ROOT}%{_infodir}/dir
 /bin/chmod 0644 /var/log/lastlog
 # Fix the file context, do not use restorecon
 if [ -x /usr/sbin/selinuxenabled ] && /usr/sbin/selinuxenabled; then
-	chcon `matchpathcon -n /var/log/lastlog` /var/log/lastlog >/dev/null 2>&1
+	/usr/bin/chcon `/usr/sbin/matchpathcon -n /var/log/lastlog` /var/log/lastlog >/dev/null 2>&1
 fi
 
 %preun
