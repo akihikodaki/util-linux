@@ -9,7 +9,7 @@
 Summary: A collection of basic system utilities.
 Name: util-linux
 Version: 2.13
-Release: 0.33
+Release: 0.34
 License: distributable
 Group: System Environment/Base
 
@@ -706,6 +706,9 @@ exit 0
 /sbin/losetup
 
 %changelog
+* Wed Jul 26 2006 Karel Zak <kzak@redhat.com> 2.13-0.34
+- rebuild
+
 * Tue Jul 18 2006 Karel Zak <kzak@redhat.com> 2.13-0.33
 - add Requires(post): libselinux
 
