@@ -9,7 +9,7 @@
 Summary: A collection of basic system utilities.
 Name: util-linux
 Version: 2.13
-Release: 0.35
+Release: 0.36
 License: distributable
 Group: System Environment/Base
 
@@ -67,7 +67,7 @@ Conflicts: kernel < 2.2.12-7,
 Requires(preun): /sbin/install-info
 Requires(post): /sbin/install-info
 Requires(post): coreutils
-Requires(post): libselinux
+
 Provides: mount = %{version}
 Provides: losetup = %{version}
 Provides: schedutils
@@ -513,7 +513,14 @@ rm -f ${RPM_BUILD_ROOT}%{_infodir}/dir
 /bin/chmod 0644 /var/log/lastlog
 # Fix the file context, do not use restorecon
 if [ -x /usr/sbin/selinuxenabled ] && /usr/sbin/selinuxenabled; then
-	/usr/bin/chcon `/usr/sbin/matchpathcon -n /var/log/lastlog` /var/log/lastlog >/dev/null 2>&1
+	SECXT=$( /usr/sbin/matchpathcon -n /var/log/lastlog 2> /dev/null )
+	if [ -n "$SECXT" ]; then
+		# Selinux enabled, but without policy? It's true for buildroots
+		# without selinux stuff on host machine with enabled selinux.
+		# We don't want to use any RPM dependence on selinux policy for
+		# matchpathcon(2). SELinux policy should be optional.
+		/usr/bin/chcon "$SECXT"  /var/log/lastlog >/dev/null 2>&1
+	fi
 fi
 
 %preun
@@ -709,7 +716,10 @@ exit 0
 /sbin/losetup
 
 %changelog
-* Thu Jul 27 2006 Steve Dickson <steved@redhat.com> 2.13-0.34
+* Thu Jul 27 2006 Karel Zak <kzak@redhat.com> 2.13-0.36
+- fix #198300, #199557 - util-linux "post" scriptlet failure
+
+* Thu Jul 27 2006 Steve Dickson <steved@redhat.com> 2.13-0.35
 - Added the -o fsc flag to nfsmount.
 
 * Wed Jul 26 2006 Karel Zak <kzak@redhat.com> 2.13-0.34
