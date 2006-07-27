@@ -9,7 +9,7 @@
 Summary: A collection of basic system utilities.
 Name: util-linux
 Version: 2.13
-Release: 0.34
+Release: 0.35
 License: distributable
 Group: System Environment/Base
 
@@ -220,6 +220,8 @@ Patch243: util-linux-2.13-swap-page.patch
 Patch244: util-linux-2.13-nfs4-posix_types.patch
 # IPv6 support to login command
 Patch245: util-linux-2.13-login-ipv6.patch
+# fscache bits for NFS mounts
+Patch246: util-linux-2.13-nfsmount-fsc.patch
 
 # When adding patches, please make sure that it is easy to find out what bug # the 
 # patch fixes.
@@ -316,6 +318,7 @@ cp %{SOURCE8} %{SOURCE9} .
 %patch243 -p1
 %patch244 -p1
 %patch245 -p1
+%patch246 -p1
 
 %build
 unset LINGUAS || :
@@ -706,6 +709,9 @@ exit 0
 /sbin/losetup
 
 %changelog
+* Thu Jul 27 2006 Steve Dickson <steved@redhat.com> 2.13-0.34
+- Added the -o fsc flag to nfsmount.
+
 * Wed Jul 26 2006 Karel Zak <kzak@redhat.com> 2.13-0.34
 - rebuild
 
