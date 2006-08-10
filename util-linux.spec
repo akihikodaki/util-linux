@@ -9,7 +9,7 @@
 Summary: A collection of basic system utilities.
 Name: util-linux
 Version: 2.13
-Release: 0.37
+Release: 0.38
 License: distributable
 Group: System Environment/Base
 
@@ -719,6 +719,9 @@ exit 0
 /sbin/losetup
 
 %changelog
+* Thu Aug 10 2006 Dan Walsh <dwalsh@redhat.com> 2.13-0.38
+- Change keycreate line to happen after pam_selinux open call so it gets correct context
+
 * Thu Aug 10 2006 Karel Zak <kzak@redhat.com> 2.13-0.37
 - fix #176494 - last -i returns strange IP addresses (patch by Bill Nottingham)
 
