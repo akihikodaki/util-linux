@@ -9,7 +9,7 @@
 Summary: A collection of basic system utilities.
 Name: util-linux
 Version: 2.13
-Release: 0.36
+Release: 0.37
 License: distributable
 Group: System Environment/Base
 
@@ -222,6 +222,8 @@ Patch244: util-linux-2.13-nfs4-posix_types.patch
 Patch245: util-linux-2.13-login-ipv6.patch
 # fscache bits for NFS mounts
 Patch246: util-linux-2.13-nfsmount-fsc.patch
+# 176494 - last -i returns strange IP addresses
+Patch247: util-linux-2.13-login-timeval.patch
 
 # When adding patches, please make sure that it is easy to find out what bug # the 
 # patch fixes.
@@ -319,6 +321,7 @@ cp %{SOURCE8} %{SOURCE9} .
 %patch244 -p1
 %patch245 -p1
 %patch246 -p1
+%patch247 -p1
 
 %build
 unset LINGUAS || :
@@ -716,6 +719,9 @@ exit 0
 /sbin/losetup
 
 %changelog
+* Thu Aug 10 2006 Karel Zak <kzak@redhat.com> 2.13-0.37
+- fix #176494 - last -i returns strange IP addresses (patch by Bill Nottingham)
+
 * Thu Jul 27 2006 Karel Zak <kzak@redhat.com> 2.13-0.36
 - fix #198300, #199557 - util-linux "post" scriptlet failure
 
