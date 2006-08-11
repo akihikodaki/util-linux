@@ -9,7 +9,7 @@
 Summary: A collection of basic system utilities.
 Name: util-linux
 Version: 2.13
-Release: 0.38
+Release: 0.39
 License: distributable
 Group: System Environment/Base
 
@@ -224,6 +224,8 @@ Patch245: util-linux-2.13-login-ipv6.patch
 Patch246: util-linux-2.13-nfsmount-fsc.patch
 # 176494 - last -i returns strange IP addresses
 Patch247: util-linux-2.13-login-timeval.patch
+# 199745 - Non-existant simpleinit(8) mentioned in ctrlaltdel(8)
+Patch248: util-linux-2.13-ctrlaltdel-man.patch
 
 # When adding patches, please make sure that it is easy to find out what bug # the 
 # patch fixes.
@@ -322,6 +324,7 @@ cp %{SOURCE8} %{SOURCE9} .
 %patch245 -p1
 %patch246 -p1
 %patch247 -p1
+%patch248 -p1
 
 %build
 unset LINGUAS || :
@@ -719,6 +722,9 @@ exit 0
 /sbin/losetup
 
 %changelog
+* Fri Aug 11 2006 Karel Zak <kzak@redhat.com> 2.13-0.39
+- fix #199745 - non-existant simpleinit(8) mentioned in ctrlaltdel(8)
+
 * Thu Aug 10 2006 Dan Walsh <dwalsh@redhat.com> 2.13-0.38
 - Change keycreate line to happen after pam_selinux open call so it gets correct context
 
