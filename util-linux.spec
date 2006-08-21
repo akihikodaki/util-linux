@@ -9,7 +9,7 @@
 Summary: A collection of basic system utilities.
 Name: util-linux
 Version: 2.13
-Release: 0.39
+Release: 0.40
 License: distributable
 Group: System Environment/Base
 
@@ -47,8 +47,9 @@ BuildRequires: zlib-devel
 ### Sources
 # TODO [stable]: s/2.13-pre6/%{version}/
 Source0: ftp://ftp.win.tue.nl/pub/linux-local/utils/util-linux/util-linux-2.13-pre6.tar.bz2
-Source1: util-linux-selinux.pamd
-Source2: util-linux-chsh-chfn.pamd
+Source1: util-linux-login.pamd
+Source2: util-linux-remote.pamd
+Source3: util-linux-chsh-chfn.pamd
 Source8: nologin.c
 Source9: nologin.8
 Source11: http://download.sourceforge.net/floppyutil/floppy-%{floppyver}.tar.gz
@@ -441,9 +442,9 @@ gzip -9nf ${RPM_BUILD_ROOT}%{_infodir}/ipc.info
 { 
   pushd ${RPM_BUILD_ROOT}%{_sysconfdir}/pam.d
   install -m 644 %{SOURCE1} ./login
-  install -m 644 %{SOURCE1} ./remote
-  install -m 644 %{SOURCE2} ./chsh
-  install -m 644 %{SOURCE2} ./chfn
+  install -m 644 %{SOURCE2} ./remote
+  install -m 644 %{SOURCE3} ./chsh
+  install -m 644 %{SOURCE3} ./chfn
   popd
 }
 
@@ -502,6 +503,13 @@ for I in addpart delpart partx; do
 	fi
 done
 
+# /usr/bin -> /bin
+for I in taskset; do
+	if [ -e $RPM_BUILD_ROOT/usr/bin/$I ]; then
+		mv $RPM_BUILD_ROOT/usr/bin/$I $RPM_BUILD_ROOT/bin/$I
+	fi
+done
+
 # omit info/dir file
 rm -f ${RPM_BUILD_ROOT}%{_infodir}/dir
 
@@ -545,6 +553,7 @@ exit 0
 %attr(755,root,root)	/bin/login
 /bin/more
 /bin/kill
+/bin/taskset
 
 %config %{_sysconfdir}/pam.d/chfn
 %config %{_sysconfdir}/pam.d/chsh
@@ -580,7 +589,6 @@ exit 0
 
 %{_bindir}/chrt
 %{_bindir}/ionice
-%{_bindir}/taskset
 
 %{_bindir}/cal
 %attr(4711,root,root)	%{_bindir}/chfn
@@ -722,6 +730,12 @@ exit 0
 /sbin/losetup
 
 %changelog
+* Mon Aug 21 2006 Karel Zak <kzak@redhat.com> 2.13-0.40
+- fix Makefile.am in util-linux-2.13-mount-context.patch
+- fix #201343 - pam_securetty requires known user to work
+                (split PAM login configuration to two files)
+- fix #203358 - change location of taskset binary to allow for early affinity work
+
 * Fri Aug 11 2006 Karel Zak <kzak@redhat.com> 2.13-0.39
 - fix #199745 - non-existant simpleinit(8) mentioned in ctrlaltdel(8)
 
