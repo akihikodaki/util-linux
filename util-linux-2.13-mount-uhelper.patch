@@ -1,5 +1,24 @@
---- util-linux-2.13-pre6/mount/umount.8.uhelper	2006-09-15 09:44:43.000000000 +0200
-+++ util-linux-2.13-pre6/mount/umount.8	2006-09-15 10:07:11.000000000 +0200
+--- util-linux-2.13-pre6/mount/mount.c.uhelper	2006-09-15 13:23:23.000000000 +0200
++++ util-linux-2.13-pre6/mount/mount.c	2006-09-15 13:23:23.000000000 +0200
+@@ -183,7 +183,7 @@
+ };
+ 
+ static const char *opt_loopdev, *opt_vfstype, *opt_offset, *opt_encryption,
+-	*opt_speed, *opt_comment;
++	*opt_speed, *opt_comment, *opt_uhelper;
+ 
+ static struct string_opt_map {
+   char *tag;
+@@ -196,6 +196,7 @@
+   { "encryption=", 0, &opt_encryption },
+   { "speed=", 0, &opt_speed },
+   { "comment=", 1, &opt_comment },
++  { "uhelper=", 0, &opt_uhelper },
+   { NULL, 0, NULL }
+ };
+ 
+--- util-linux-2.13-pre6/mount/umount.8.uhelper	2004-11-10 20:49:37.000000000 +0100
++++ util-linux-2.13-pre6/mount/umount.8	2006-09-15 14:02:25.000000000 +0200
 @@ -122,6 +122,19 @@
  Any pending loop devices can be freed using `losetup -d', see
  .BR losetup (8).
@@ -14,14 +33,14 @@
 +where the <suffix> is filesystem type or a value from "uhelper=" mtab option. 
 +
 +The uhelper (unprivileged umount request helper) is possible used when non-root
-+user wants to umount device which has been mounted by an external process (e.g.
-+HAL) and there is not entry in fstab for this mountpoint. 
++user wants to umount a mountpoint which is not defined in the /etc/fstab file 
++(e.g devices mounted by HAL).
 +
  .SH FILES
  .I /etc/mtab
  table of mounted file systems
---- util-linux-2.13-pre6/mount/umount.c.uhelper	2006-09-15 09:11:38.000000000 +0200
-+++ util-linux-2.13-pre6/mount/umount.c	2006-09-15 09:44:10.000000000 +0200
+--- util-linux-2.13-pre6/mount/umount.c.uhelper	2006-09-15 13:23:23.000000000 +0200
++++ util-linux-2.13-pre6/mount/umount.c	2006-09-15 13:23:23.000000000 +0200
 @@ -565,11 +565,24 @@
  
  	if (suid) {

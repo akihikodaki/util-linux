@@ -331,7 +331,7 @@ cp %{SOURCE8} %{SOURCE9} .
 %patch247 -p1
 %patch248 -p1
 %patch249 -p1
-%patch250 -p1
+%patch250 -p1 -b .uhelper
 
 %build
 unset LINGUAS || :
