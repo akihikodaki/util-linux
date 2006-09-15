@@ -1,0 +1,49 @@
+--- util-linux-2.13-pre6/mount/umount.8.uhelper	2006-09-15 09:44:43.000000000 +0200
++++ util-linux-2.13-pre6/mount/umount.8	2006-09-15 10:07:11.000000000 +0200
+@@ -122,6 +122,19 @@
+ Any pending loop devices can be freed using `losetup -d', see
+ .BR losetup (8).
+ 
++.SH NOTES
++The syntax of external umount helpers is:
++
++.br
++.BI "/sbin/umount.<suffix> [\-nlfvr] " "dir " | " device "
++.br
++
++where the <suffix> is filesystem type or a value from "uhelper=" mtab option. 
++
++The uhelper (unprivileged umount request helper) is possible used when non-root
++user wants to umount device which has been mounted by an external process (e.g.
++HAL) and there is not entry in fstab for this mountpoint. 
++
+ .SH FILES
+ .I /etc/mtab
+ table of mounted file systems
+--- util-linux-2.13-pre6/mount/umount.c.uhelper	2006-09-15 09:11:38.000000000 +0200
++++ util-linux-2.13-pre6/mount/umount.c	2006-09-15 09:44:10.000000000 +0200
+@@ -565,11 +565,24 @@
+ 
+ 	if (suid) {
+ 		char *mtab_user = NULL;
++		char *uhelper = NULL;
+ 
+ 		if (!mc)
+ 			die(2,
+ 			    _("umount: %s is not mounted (according to mtab)"),
+ 			    file);
++		/*
++		 * uhelper - unprivileged umount helper
++		 * -- external umount (for example HAL mounts)
++		 */
++		if (mc->m.mnt_opts) 
++			uhelper = get_value(mc->m.mnt_opts, "uhelper=");
++		if (uhelper) {
++			int status = 0; 
++			if (check_special_umountprog(arg, arg, uhelper, &status))
++				return status;
++		}
++
+ 		/* The 2.4 kernel will generally refuse to mount the same
+ 		   filesystem on the same mount point, but will accept NFS.
+ 		   So, unmounting must be possible. */

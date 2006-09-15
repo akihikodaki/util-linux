@@ -9,7 +9,7 @@
 Summary: A collection of basic system utilities.
 Name: util-linux
 Version: 2.13
-Release: 0.40
+Release: 0.41
 License: distributable
 Group: System Environment/Base
 
@@ -227,6 +227,10 @@ Patch246: util-linux-2.13-nfsmount-fsc.patch
 Patch247: util-linux-2.13-login-timeval.patch
 # 199745 - Non-existant simpleinit(8) mentioned in ctrlaltdel(8)
 Patch248: util-linux-2.13-ctrlaltdel-man.patch
+# 205038 - mount not allowing sloppy option
+Patch249: util-linux-2.13-mount-sloppy.patch
+# 188193 - util-linux should provide plugin infrastructure for HAL
+Patch250: util-linux-2.13-mount-uhelper.patch
 
 # When adding patches, please make sure that it is easy to find out what bug # the 
 # patch fixes.
@@ -326,6 +330,8 @@ cp %{SOURCE8} %{SOURCE9} .
 %patch246 -p1
 %patch247 -p1
 %patch248 -p1
+%patch249 -p1
+%patch250 -p1
 
 %build
 unset LINGUAS || :
@@ -730,6 +736,12 @@ exit 0
 /sbin/losetup
 
 %changelog
+* Fri Sep 15 2006 Karel Zak <kzak@redhat.com> 2.13-0.41
+- fix #205038 - mount not allowing sloppy option (exports "-s"
+  to external /sbin/mount.nfs(4) calls) 
+- fix minor bug in util-linux-2.13-mount-twiceloop.patch
+- fix #188193- util-linux should provide plugin infrastructure for HAL
+
 * Mon Aug 21 2006 Karel Zak <kzak@redhat.com> 2.13-0.40
 - fix Makefile.am in util-linux-2.13-mount-context.patch
 - fix #201343 - pam_securetty requires known user to work
