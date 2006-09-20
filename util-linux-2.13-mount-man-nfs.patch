@@ -1,0 +1,84 @@
+--- util-linux-2.12p/mount/mount.8.nfsdoc	2005-05-10 11:46:25.119592000 -0400
++++ util-linux-2.12p/mount/mount.8	2005-10-07 09:46:13.374277000 -0400
+@@ -1339,29 +1339,17 @@ For details, see
+ 
+ Especially useful options include
+ .TP
+-.B rsize=8192,wsize=8192
+-This will make your nfs connection faster than with the default
+-buffer size of 4096. (NFSv2 does not work with larger values of
+-.B rsize
+-and
+-.BR wsize .)
+-.TP
+-.B hard
+-The program accessing a file on a NFS mounted file system will hang
+-when the server crashes. The process cannot be interrupted or
+-killed unless you also specify
+-.BR intr .
+-When the NFS server is back online the program will continue undisturbed
+-from where it was. This is probably what you want.
+-.TP
+-.B soft
+-This option allows the kernel to time out if the nfs server is not
+-responding for some time. The time can be
+-specified with
+-.BR timeo=time .
+-This option might be useful if your nfs server sometimes doesn't respond
+-or will be rebooted while some process tries to get a file from the server.
+-Usually it just causes lots of trouble.
++.B rsize=32768,wsize=32768
++This causes the NFS client to try to negotiate a buffer size
++up to the size specified.
++A large buffer size does improve performance, but both the 
++server and client have to support it.
++In the case where one of these does not support the size specified, 
++the size negotiated will be the largest that both support.
++.TP
++.B intr
++This will allow NFS operations (on hard mounts) to be 
++interrupted while waiting for a response from the server. 
+ .TP
+ .B nolock
+ Do not use locking. Do not start lockd.
+@@ -1408,30 +1396,16 @@ For details, see
+ Especially useful options include
+ .TP
+ .B rsize=32768,wsize=32768
+-This will make your NFS connection faster than with the default
+-buffer size of 4096.
+-.TP
+-.B hard
+-The program accessing a file on a NFS mounted file system will hang
+-when the server crashes. The process cannot be interrupted or
+-killed unless you also specify
+-.BR intr .
+-When the NFS server is back online the program will continue undisturbed
+-from where it was. This is probably what you want.
+-.TP
+-.B soft
+-This option allows the kernel to time out if the NFS server is not
+-responding for some time. The time can be
+-specified with
+-.BR timeo=time .
+-This timeout value is expressed in tenths of a second.
+-The
+-.BR soft
+-option might be useful if your NFS server sometimes doesn't respond
+-or will be rebooted while some process tries to get a file from the server.
+-Avoid using this option with
+-.BR proto=udp
+-or with a short timeout.
++This causes the NFS4 client to try to negotiate a buffer size
++up to the size specified.
++A large buffer size does improve performance, but both the 
++server and client have to support it.
++In the case where one of these does not support the size specified, 
++the size negotiated will be the largest that both support.
++.TP
++.B intr
++This will allow NFS4 operations (on hard mounts) to be 
++interrupted while waiting for a response from the server. 
+ 
+ .SH "Mount options for ntfs"
+ .TP

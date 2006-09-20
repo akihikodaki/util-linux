@@ -1,0 +1,106 @@
+--- util-linux-2.13-pre2/mount/mount.8.nfsv4	2005-08-02 19:34:16.000000000 +0200
++++ util-linux-2.13-pre2/mount/mount.8	2005-08-17 10:44:06.000000000 +0200
+@@ -384,6 +384,7 @@
+ .IR msdos ,
+ .IR ncpfs ,
+ .IR nfs ,
++.IR nfs4 ,
+ .IR ntfs ,
+ .IR proc ,
+ .IR qnx4 ,
+@@ -421,7 +422,7 @@
+ program has to do is issue a simple
+ .IR mount (2)
+ system call, and no detailed knowledge of the filesystem type is required.
+-For a few types however (like nfs, smbfs, ncpfs) ad hoc code is
++For a few types however (like nfs, nfs4, smbfs, ncpfs) ad hoc code is
+ necessary. The nfs ad hoc code is built in, but smbfs and ncpfs
+ have a separate mount program. In order to make it possible to
+ treat all types in a uniform way, mount will execute the program
+@@ -449,9 +450,10 @@
+ All of the filesystem types listed there will be tried,
+ except for those that are labeled "nodev" (e.g.,
+ .IR devpts ,
+-.I proc
++.IR proc ,
++.IR nfs ,
+ and
+-.IR nfs ).
++.IR nfs4 ).
+ If
+ .I /etc/filesystems
+ ends in a line with a single * only, mount will read
+@@ -1373,6 +1375,73 @@
+ .B nolock
+ Do not use locking. Do not start lockd.
+ 
++.SH "Mount options for nfs4"
++Instead of a textual option string, parsed by the kernel, the
++.I nfs4
++file system expects a binary argument of type
++.IR "struct nfs4_mount_data" .
++The program
++.B mount
++itself parses the following options of the form `tag=value',
++and puts them in the structure mentioned:
++.BI rsize= n,
++.BI wsize= n,
++.BI timeo= n,
++.BI retrans= n,
++.BI acregmin= n,
++.BI acregmax= n,
++.BI acdirmin= n,
++.BI acdirmax= n,
++.BI actimeo= n,
++.BI retry= n,
++.BI port= n,
++.BI proto= n,
++.BI clientaddr= n,
++.BI sec= n.
++The option
++.BI addr= n
++is accepted but ignored.
++Also the following Boolean options, possibly preceded by
++.B no
++are recognized:
++.BR bg ,
++.BR fg ,
++.BR soft ,
++.BR hard ,
++.BR intr ,
++.BR cto ,
++.BR ac ,
++For details, see
++.BR nfs (5).
++
++Especially useful options include
++.TP
++.B rsize=32768,wsize=32768
++This will make your NFS connection faster than with the default
++buffer size of 4096.
++.TP
++.B hard
++The program accessing a file on a NFS mounted file system will hang
++when the server crashes. The process cannot be interrupted or
++killed unless you also specify
++.BR intr .
++When the NFS server is back online the program will continue undisturbed
++from where it was. This is probably what you want.
++.TP
++.B soft
++This option allows the kernel to time out if the NFS server is not
++responding for some time. The time can be
++specified with
++.BR timeo=time .
++This timeout value is expressed in tenths of a second.
++The
++.BR soft
++option might be useful if your NFS server sometimes doesn't respond
++or will be rebooted while some process tries to get a file from the server.
++Avoid using this option with
++.BR proto=udp
++or with a short timeout.
++
+ .SH "Mount options for ntfs"
+ .TP
+ .BI iocharset= name

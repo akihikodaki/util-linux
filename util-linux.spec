@@ -9,7 +9,7 @@
 Summary: A collection of basic system utilities.
 Name: util-linux
 Version: 2.13
-Release: 0.41
+Release: 0.42
 License: distributable
 Group: System Environment/Base
 
@@ -109,13 +109,8 @@ Patch160: raw-handle-nonpresent-devs.patch
 
 Patch164: util-linux-2.12j-113790-hotkeys.patch
 
-# patches required for NFSv4 support
-Patch170: util-linux-2.13-nfsv4.patch
-Patch171: util-linux-2.12a-mount-proto.patch
-Patch172: util-linux-2.12a-nfsmount-overflow.patch
-Patch173: util-linux-2.12a-nfsmount-reservp.patch
-Patch174: util-linux-2.12p-nfsmount-rollback.patch
-
+# Info about NFS4
+Patch170: util-linux-2.13-mount-man-nfs4.patch
 # Makeing /var/log/lastlog (#151635)
 Patch180: util-linux-2.12p-login-lastlog.patch
 # Improved /etc/mtab lock (#143118)
@@ -124,8 +119,6 @@ Patch181: util-linux-2.12p-mtab-lock.patch
 Patch182: util-linux-2.12p-ipcs-typo.patch
 # 154498 - util-linux login & pam session
 Patch183: util-linux-2.12a-pamsession.patch
-# 155293 - man 5 nfs should include vers as a mount option
-Patch184: util-linux-2.12p-nfsman.patch
 # 76467 - At boot time, fsck chokes on LVs listed by label in fstab
 Patch185: util-linux-2.12p-lvm2dupes-76467.patch
 # add note about ATAPI IDE floppy to fdformat.8
@@ -149,7 +142,7 @@ Patch206: util-linux-2.13-arch.patch
 # 165863 - swsusp swaps should be reinitialized
 Patch210: util-linux-2.13-swapon-suspend.patch
 # 170110 - Documentation for 'rsize' and 'wsize' NFS mount options is misleading
-Patch211: util-linux-2.12p-nfs-manupdate.patch
+Patch211: util-linux-2.13-mount-man-nfs.patch
 # 169628 - /usr/bin/floppy doesn't work with /dev/fd0
 Patch212: util-linux-2.12p-floppy-generic.patch
 # 168436 - login will attempt to run if it has no read/write access to its terminal
@@ -183,15 +176,6 @@ Patch225: util-linux-2.13-schedutils-man.patch
 Patch226: util-linux-2.13-login-pam-acct.patch
 # 177523 - umount -a should not unmount sysfs
 Patch227: util-linux-2.13-umount-sysfs.patch
-# 169042 - Changed nfsmount to try udp before using tcp when rpc-ing
-#          the remote rpc.mountd (iff -o tcp is not specified).
-Patch229: util-linux-2.13-nfsmount-mountd-udp.patch
-# 151549 - Added 'noacl' mount flag
-Patch230: util-linux-2.13-nfs-noacl.patch
-# 183713 - foreground nfs mount timeout options to get hard mount semantic
-Patch231: util-linux-2.13-nfsmount-retry.patch
-# Adds syslog logging to background mounts
-Patch232: util-linux-2.13-nfsmount-syslog.patch
 # 187014 - umount segfaults for normal user
 Patch233: util-linux-2.13-mount-uuid.patch
 # 183446 - cal not UTF-8-aware
@@ -217,12 +201,8 @@ Patch241: util-linux-2.13-fdisk-isfull.patch
 Patch242: util-linux-2.12a-raw-man-dd.patch
 # Don't use asm/page.h
 Patch243: util-linux-2.13-swap-page.patch
-# Don't use linux/posix_types.h or asm/posix_types.h
-Patch244: util-linux-2.13-nfs4-posix_types.patch
 # IPv6 support to login command
 Patch245: util-linux-2.13-login-ipv6.patch
-# fscache bits for NFS mounts
-Patch246: util-linux-2.13-nfsmount-fsc.patch
 # 176494 - last -i returns strange IP addresses
 Patch247: util-linux-2.13-login-timeval.patch
 # 199745 - Non-existant simpleinit(8) mentioned in ctrlaltdel(8)
@@ -231,6 +211,8 @@ Patch248: util-linux-2.13-ctrlaltdel-man.patch
 Patch249: util-linux-2.13-mount-sloppy.patch
 # 188193 - util-linux should provide plugin infrastructure for HAL
 Patch250: util-linux-2.13-mount-uhelper.patch
+# Removes obsolete NFS code (we use /sbin/[u]mount.nfs[4] from nfs-utils)
+Patch251: util-linux-2.13-mount-nonfs.patch
 
 # When adding patches, please make sure that it is easy to find out what bug # the 
 # patch fixes.
@@ -272,16 +254,12 @@ cp %{SOURCE8} %{SOURCE9} .
 %patch160 -p1
 %endif
 %patch164 -p1
+
 %patch170 -p1
-%patch171 -p1
-%patch172 -p1
-%patch173 -p1
-%patch174 -p1
 %patch180 -p1
 %patch181 -p1
 %patch182 -p1
 %patch183 -p1
-%patch184 -p1
 %patch185 -p1
 %patch186 -p1
 %patch187 -p1
@@ -310,10 +288,6 @@ cp %{SOURCE8} %{SOURCE9} .
 %patch225 -p1
 %patch226 -p1
 %patch227 -p1
-%patch229 -p1
-%patch230 -p1
-%patch231 -p1
-%patch232 -p1
 %patch233 -p1
 %patch234 -p1
 %patch235 -p1
@@ -325,13 +299,12 @@ cp %{SOURCE8} %{SOURCE9} .
 %patch241 -p1
 %patch242 -p1
 %patch243 -p1
-%patch244 -p1
 %patch245 -p1
-%patch246 -p1
 %patch247 -p1
 %patch248 -p1
 %patch249 -p1
-%patch250 -p1 -b .uhelper
+%patch250 -p1
+%patch251 -p1
 
 %build
 unset LINGUAS || :
@@ -727,7 +700,6 @@ exit 0
 /sbin/swapon
 /sbin/swapoff
 %{_mandir}/man5/fstab.5*
-%{_mandir}/man5/nfs.5*
 %{_mandir}/man8/mount.8*
 %{_mandir}/man8/swapoff.8*
 %{_mandir}/man8/swapon.8*
@@ -736,6 +708,11 @@ exit 0
 /sbin/losetup
 
 %changelog
+* Wed Sep 20 2006 Karel Zak <kzak@redhat.com> 2.13-0.42
+- remove obsolete NFS code and patches (we use /sbin/mount.nfs
+  and /sbin/umount.nfs from nfs-utils now)
+- move nfs.5 to nfs-utils
+
 * Fri Sep 15 2006 Karel Zak <kzak@redhat.com> 2.13-0.41
 - fix #205038 - mount not allowing sloppy option (exports "-s"
   to external /sbin/mount.nfs(4) calls) 
