@@ -9,7 +9,7 @@
 Summary: A collection of basic system utilities.
 Name: util-linux
 Version: 2.13
-Release: 0.42
+Release: 0.42%{?dist}
 License: distributable
 Group: System Environment/Base
 
