@@ -9,7 +9,7 @@
 Summary: A collection of basic system utilities.
 Name: util-linux
 Version: 2.13
-Release: 0.42%{?dist}
+Release: 0.43%{?dist}
 License: distributable
 Group: System Environment/Base
 
@@ -708,6 +708,9 @@ exit 0
 /sbin/losetup
 
 %changelog
+* Sun Oct 01 2006 Jesse Keating <jkeating@redhat.com> - 2.13-0.43
+- rebuilt for unwind info generation, broken in gcc-4.1.1-21
+
 * Wed Sep 20 2006 Karel Zak <kzak@redhat.com> 2.13-0.42
 - remove obsolete NFS code and patches (we use /sbin/mount.nfs
   and /sbin/umount.nfs from nfs-utils now)
