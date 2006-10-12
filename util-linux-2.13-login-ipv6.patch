@@ -1,5 +1,5 @@
---- util-linux-2.13-pre6/login-utils/login.c.ipv6	2006-07-17 11:05:48.000000000 +0200
-+++ util-linux-2.13-pre6/login-utils/login.c	2006-07-17 11:05:48.000000000 +0200
+--- util-linux-2.13-pre6/login-utils/login.c.ipv6	2006-10-12 10:10:34.000000000 +0200
++++ util-linux-2.13-pre6/login-utils/login.c	2006-10-12 10:17:16.000000000 +0200
 @@ -173,7 +173,7 @@
  #ifdef HAVE_SECURITY_PAM_MISC_H
  static struct passwd pwdcopy;
@@ -18,19 +18,15 @@
  	}
  #if HAVE_UPDWTMP		/* bad luck for ancient systems */
  	updwtmp(_PATH_BTMP, &ut);
-@@ -380,13 +380,32 @@
+@@ -380,13 +380,33 @@
  
  	  hostname = strdup(optarg); 	/* strdup: Ambrose C. Li */
  	  {
 -		  struct hostent *he = gethostbyname(hostname);
-+		struct addrinfo hints, *addr_info;
-+		int k=0;
++		struct addrinfo hints, *info = NULL;
 +		
 +		memset(&hints, '\0', sizeof(hints));
 +		hints.ai_flags = AI_ADDRCONFIG;
-+		
-+		if (getaddrinfo(hostname, NULL, &hints, &addr_info) != 0)
-+		    fprintf(stderr, "getaddrinfo: %s\n", strerror(errno));
 +
 +		hostaddress[0] = 0;
  
@@ -39,25 +35,30 @@
 -		  if (he && he->h_addr_list && he->h_addr_list[0])
 -			  memcpy(hostaddress, he->h_addr_list[0],
 -				 sizeof(hostaddress));
-+		if (addr_info && (addr_info->ai_family == AF_INET))
++		if (getaddrinfo(hostname, NULL, &hints, &info)==0 && info)
 +		{
-+		    struct sockaddr_in *sa4;
-+		    
-+		    sa4 = (struct sockaddr_in *)addr_info->ai_addr;
-+		    memcpy(hostaddress, &(sa4->sin_addr), sizeof(sa4->sin_addr));
++			if (info->ai_family == AF_INET)
++			{
++			    struct sockaddr_in *sa4;
++			    
++			    sa4 = (struct sockaddr_in *) info->ai_addr;
++			    memcpy(hostaddress, &(sa4->sin_addr), 
++					    sizeof(sa4->sin_addr));
++			}
++			if (info->ai_family == AF_INET6)
++			{
++			    struct sockaddr_in6 *sa6;
++			    
++			    sa6 = (struct sockaddr_in6 *) info->ai_addr;
++			    memcpy(hostaddress, &(sa6->sin6_addr), 
++					    sizeof(sa6->sin6_addr));
++			}
++			freeaddrinfo(info);
 +		}
-+		if (addr_info && (addr_info->ai_family == AF_INET6))
-+		{
-+		    struct sockaddr_in6 *sa6;
-+		    
-+		    sa6 = (struct sockaddr_in6 *)addr_info->ai_addr;
-+		    memcpy(hostaddress, &(sa6->sin6_addr), sizeof(sa6->sin6_addr));
-+		}
-+		freeaddrinfo(addr_info);
  	  }
  	  break;
  	  
-@@ -906,7 +925,7 @@
+@@ -906,7 +926,7 @@
  	if (hostname) {
  		xstrncpy(ut.ut_host, hostname, sizeof(ut.ut_host));
  		if (hostaddress[0])
@@ -67,7 +68,7 @@
  	
  	pututline(&ut);
 --- util-linux-2.13-pre6/login-utils/login.h.ipv6	2005-08-02 14:01:18.000000000 +0200
-+++ util-linux-2.13-pre6/login-utils/login.h	2006-07-17 11:05:48.000000000 +0200
++++ util-linux-2.13-pre6/login-utils/login.h	2006-10-12 10:10:34.000000000 +0200
 @@ -1,7 +1,7 @@
  /* defined in login.c */
  extern void badlogin(const char *s);

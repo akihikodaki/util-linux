@@ -9,7 +9,7 @@
 Summary: A collection of basic system utilities.
 Name: util-linux
 Version: 2.13
-Release: 0.43%{?dist}
+Release: 0.44%{?dist}
 License: distributable
 Group: System Environment/Base
 
@@ -213,6 +213,10 @@ Patch249: util-linux-2.13-mount-sloppy.patch
 Patch250: util-linux-2.13-mount-uhelper.patch
 # Removes obsolete NFS code (we use /sbin/[u]mount.nfs[4] from nfs-utils)
 Patch251: util-linux-2.13-mount-nonfs.patch
+# Losetup.8 update -- add info about dm-crypt
+Patch252: util-linux-2.13-losetup-deprecated.patch
+# 208634 - mkswap "works" without warning on a mounted device
+Patch253: util-linux-2.13-mkswap-mounted.patch
 
 # When adding patches, please make sure that it is easy to find out what bug # the 
 # patch fixes.
@@ -305,6 +309,8 @@ cp %{SOURCE8} %{SOURCE9} .
 %patch249 -p1
 %patch250 -p1
 %patch251 -p1
+%patch252 -p1
+%patch253 -p1 -b .kzak
 
 %build
 unset LINGUAS || :
@@ -708,6 +714,11 @@ exit 0
 /sbin/losetup
 
 %changelog
+* Thu Oct 12 2006 Karel Zak <kzak@redhat.com> 2.13-0.44
+- fix #209911 - losetup.8 updated (use dm-crypt rather than deprecated cryptoloop)
+- fix #210338 - spurious error from '/bin/login -h $PHONENUMBER' (bug in IPv6 patch)
+- fix #208634 - mkswap "works" without warning on a mounted device
+
 * Sun Oct 01 2006 Jesse Keating <jkeating@redhat.com> - 2.13-0.43
 - rebuilt for unwind info generation, broken in gcc-4.1.1-21
 
