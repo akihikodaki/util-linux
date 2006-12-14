@@ -9,7 +9,7 @@
 Summary: A collection of basic system utilities.
 Name: util-linux
 Version: 2.13
-Release: 0.45%{?dist}
+Release: 0.46%{?dist}
 License: distributable
 Group: System Environment/Base
 
@@ -746,8 +746,10 @@ exit 0
 /sbin/losetup
 
 %changelog
-* Wed Dec 13 2006 Karel Zak <kzak@redhat.com> 2.13-0.45
+* Wed Dec 14 2006 Karel Zak <kzak@redhat.com> 2.13-0.46
 - fix leaking file descriptor in the more command (patch by Steve Grubb)
+
+* Wed Dec 13 2006 Karel Zak <kzak@redhat.com> 2.13-0.45
 - use ncurses only
 - fix #218915 - fdisk -b 4K
 - upgrade to -pre7 release
