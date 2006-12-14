@@ -1,16 +1,5 @@
 --- util-linux-2.12a/mount/mount.8.cifs	2005-11-23 16:34:34.000000000 +0100
 +++ util-linux-2.12a/mount/mount.8	2005-11-23 16:38:37.000000000 +0100
-@@ -413,8 +413,8 @@
- program has to do is issue a simple
- .IR mount (2)
- system call, and no detailed knowledge of the filesystem type is required.
--For a few types however (like nfs, nfs4, smbfs, ncpfs) ad hoc code is
--necessary. The nfs ad hoc code is built in, but smbfs and ncpfs
-+For a few types however (like nfs, nfs4, smbfs, ncpfs, cifs) ad hoc code is
-+necessary. The nfs ad hoc code is built in, but smbfs, ncpfs and cifs
- have a separate mount program. In order to make it possible to
- treat all types in a uniform way, mount will execute the program
- .I /sbin/mount.TYPE
 @@ -720,6 +720,16 @@
  (However, quota utilities may react to such strings in
  .IR /etc/fstab .)

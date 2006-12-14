@@ -1,0 +1,102 @@
+--- util-linux-2.13-pre6/schedutils/chrt.1.batch	2006-11-10 13:23:37.000000000 -0500
++++ util-linux-2.13-pre6/schedutils/chrt.1	2006-11-10 13:27:23.000000000 -0500
+@@ -36,10 +36,11 @@
+ .BR chrt (1)
+ sets or retrieves the real-time scheduling attributes of an existing PID or
+ runs COMMAND with the given attributes.  Both policy (one of
++.BR SCHED_OTHER ,
+ .BR SCHED_FIFO ,
+ .BR SCHED_RR ,
+ or
+-.BR SCHED_OTHER )
++.BR SCHED_BATCH )
+ and priority can be set and retrieved.
+ .SH OPTIONS
+ .TP
+@@ -48,6 +49,10 @@
+ .TP
+ 
+ .TP
++.B -b, --batch
++set scheduling policy to
++.BR SCHED_BATCH
++.TP
+ .B -f, --fifo
+ set scheduling policy to
+ .BR SCHED_FIFO
+--- util-linux-2.13-pre6/schedutils/chrt.c.batch	2005-08-14 11:18:54.000000000 -0400
++++ util-linux-2.13-pre6/schedutils/chrt.c	2006-11-10 13:27:52.000000000 -0500
+@@ -36,6 +36,8 @@
+ 	fprintf(stderr, "usage: %s [options] [prio] [pid | cmd [args...]]\n",
+ 			cmd);
+ 	fprintf(stderr, "manipulate real-time attributes of a process\n");
++	fprintf(stderr, "  -b, --batch                        "
++			"set policy to SCHED_BATCH\n");
+ 	fprintf(stderr, "  -f, --fifo                         "
+ 			"set policy to SCHED_FF\n");
+ 	fprintf(stderr, "  -p, --pid                          "
+@@ -83,6 +85,9 @@
+ 	case SCHED_RR:
+ 		printf("SCHED_RR\n");
+ 		break;
++	case SCHED_BATCH:
++		printf("SCHED_BATCH\n");
++		break;
+ 	default:
+ 		printf("unknown\n");
+ 	}
+@@ -101,6 +106,13 @@
+ {
+ 	int max, min;
+ 
++	max = sched_get_priority_max(SCHED_OTHER);
++	min = sched_get_priority_min(SCHED_OTHER);
++	if (max >= 0 && min >= 0)
++		printf("SCHED_OTHER min/max priority\t: %d/%d\n", min, max);
++	else
++		printf("SCHED_OTHER not supported?\n");
++
+ 	max = sched_get_priority_max(SCHED_FIFO);
+ 	min = sched_get_priority_min(SCHED_FIFO);
+ 	if (max >= 0 && min >= 0)
+@@ -115,12 +127,12 @@
+ 	else
+ 		printf("SCHED_RR not supported?\n");
+ 
+-	max = sched_get_priority_max(SCHED_OTHER);
+-	min = sched_get_priority_min(SCHED_OTHER);
++	max = sched_get_priority_max(SCHED_BATCH);
++	min = sched_get_priority_min(SCHED_BATCH);
+ 	if (max >= 0 && min >= 0)
+-		printf("SCHED_OTHER min/max priority\t: %d/%d\n", min, max);
++		printf("SCHED_BATCH min/max priority\t: %d/%d\n", min, max);
+ 	else
+-		printf("SCHED_OTHER not supported?\n");
++		printf("SCHED_BATCH not supported?\n");
+ }
+ 
+ int main(int argc, char *argv[])
+@@ -130,6 +142,7 @@
+ 	pid_t pid = 0;
+ 
+ 	struct option longopts[] = {
++		{ "batch",	0, NULL, 'b' },
+ 		{ "fifo",	0, NULL, 'f' },
+ 		{ "pid",	0, NULL, 'p' },
+ 		{ "help",	0, NULL, 'h' },
+@@ -141,11 +154,14 @@
+ 		{ NULL,		0, NULL, 0 }
+ 	};
+ 
+-	while((i = getopt_long(argc, argv, "+fphmorvV", longopts, NULL)) != -1)
++	while((i = getopt_long(argc, argv, "+bfphmorvV", longopts, NULL)) != -1)
+ 	{
+ 		int ret = 1;
+ 
+ 		switch (i) {
++		case 'b':
++			policy = SCHED_BATCH;
++			break;
+ 		case 'f':
+ 			policy = SCHED_FIFO;
+ 			break;

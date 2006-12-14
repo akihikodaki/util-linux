@@ -1,0 +1,47 @@
+--- util-linux-2.13-pre6/mount/lomount.c.ronly	2006-11-01 14:14:14.000000000 +0100
++++ util-linux-2.13-pre6/mount/lomount.c	2006-11-01 15:01:52.000000000 +0100
+@@ -444,7 +444,8 @@
+   "  %1$s -d loop_device                                    # delete\n"
+   "  %1$s -f                                                # find unused\n"
+   "  %1$s -a                                                # list all used\n"
+-  "  %1$s [-e encryption] [-o offset] {-f|loop_device} file # setup\n"),
++  "  %1$s -r                                                # read-only loop\n"
++  "  %1$s [-e encryption] [-o offset] [-r] {-f|loop_device} file # setup\n"),
+ 		progname);
+ 	exit(1);
+ }
+@@ -497,11 +498,14 @@
+ 	if ((p = strrchr(progname, '/')) != NULL)
+ 		progname = p+1;
+ 
+-	while ((c = getopt(argc, argv, "ade:E:fo:p:v")) != -1) {
++	while ((c = getopt(argc, argv, "ade:E:fo:p:vr")) != -1) {
+ 		switch (c) {
+ 		case 'a':
+ 			all = 1;
+ 			break;
++		case 'r':
++			ro = 1;
++			break;
+ 		case 'd':
+ 			delete = 1;
+ 			break;
+--- util-linux-2.13-pre6/mount/losetup.8.ronly	2006-11-01 14:49:14.000000000 +0100
++++ util-linux-2.13-pre6/mount/losetup.8	2006-11-01 15:06:21.000000000 +0100
+@@ -35,6 +35,7 @@
+ .IR offset ]
+ .RB [ \-p
+ .IR pfd ]
++.RB [ \-r ]
+ .in +8
+ .RB { \-f | \fIloop_device\fP }
+ .I file
+@@ -87,6 +88,8 @@
+ Read the passphrase from file descriptor with number
+ .I num
+ instead of from the terminal.
++.IP \fB\-r\fP
++Setup read-only loop device.
+ .SH RETURN VALUE
+ .B losetup
+ returns 0 on success, nonzero on failure. When

@@ -1,0 +1,14 @@
+
+ The original MS_COMMENT is in conflict with MS_UNBINDABLE.
+
+--- util-linux-2.13-pre6/mount/mount.c.comment	2006-11-01 13:31:45.000000000 +0100
++++ util-linux-2.13-pre6/mount/mount.c	2006-11-01 13:31:38.000000000 +0100
+@@ -106,7 +106,7 @@
+ #define MS_OWNER	0x10000000
+ #define MS_GROUP	0x08000000
+ #define MS_PAMCONSOLE   0x04000000
+-#define MS_COMMENT	0x00020000
++#define MS_COMMENT	0x02000000
+ #define MS_LOOP		0x00010000
+ 
+ 

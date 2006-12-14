@@ -1,0 +1,45 @@
+--- util-linux-2.13-pre6/disk-utils/raw.c.kzak	2006-11-21 21:56:40.000000000 +0100
++++ util-linux-2.13-pre6/disk-utils/raw.c	2006-11-21 22:35:11.000000000 +0100
+@@ -66,6 +66,7 @@
+ 	int  err;
+ 	int  block_major, block_minor;	
+ 	int  i;
++	int  rc;
+ 
+ 	struct stat statbuf;
+ 	
+@@ -108,19 +109,23 @@
+ 		usage(1);
+ 	raw_name = argv[optind++];
+ 
++	rc = sscanf(raw_name, RAWDEVDIR "raw%d", &raw_minor);
++	if (rc != 1) {
++		fprintf (stderr, 
++			 "Unsupported raw device name '%s' (format is " RAWDEVDIR "rawN))\n",
++			 raw_name);
++		exit(2);
++	}
++	if (raw_minor == 0) {
++		fprintf (stderr,
++			"Unsupported raw device name '%s' (minor number cannot be zero)\n",
++			raw_name);
++		exit(2);
++	}
++
+ 	err = stat(raw_name, &statbuf);
+-	if (err) {
+-		int rc;
+-		
+-		rc = sscanf(raw_name, RAWDEVDIR "raw%d", &raw_minor);
+-		if (rc != 1) {
+-			fprintf (stderr, 
+-				 "Cannot locate raw device '%s' (%s)\n",
+-				 raw_name, strerror(errno));
+-			exit(2);
+-		}
++	if (err) 
+ 		goto skip_test_rawdev;
+-	}
+ 	
+ 	if (!S_ISCHR(statbuf.st_mode)) {
+ 		fprintf (stderr, "raw device '%s' is not a character dev\n",

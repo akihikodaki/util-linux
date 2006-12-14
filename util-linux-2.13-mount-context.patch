@@ -1,10 +1,17 @@
-
- This patch adds to the mount man page docs about context, fscontext and
- defcontext mount options and translate context options from human to raw
- selinux context format.  -- 03/30/2006 Karel Zak <kzak@redhat.com>
-
---- util-linux-2.13-pre6/mount/mount.c.kzak	2006-08-21 11:51:50.000000000 +0200
-+++ util-linux-2.13-pre6/mount/mount.c	2006-08-21 11:51:50.000000000 +0200
+--- util-linux-2.13-pre6/mount/Makefile.am.context	2005-09-12 22:41:11.000000000 +0200
++++ util-linux-2.13-pre6/mount/Makefile.am	2006-11-01 11:31:46.000000000 +0100
+@@ -37,6 +37,9 @@
+ man_MANS += pivot_root.8
+ endif
+ 
++if HAVE_SELINUX
++mount_LDADD += -lselinux
++endif
+ 
+ swapon.c: swapargs.h
+ 
+--- util-linux-2.13-pre6/mount/mount.c.context	2006-11-01 11:31:46.000000000 +0100
++++ util-linux-2.13-pre6/mount/mount.c	2006-11-01 11:36:17.000000000 +0100
 @@ -21,6 +21,11 @@
  #include <sys/wait.h>
  #include <sys/mount.h>
@@ -17,20 +24,40 @@
  #include "mount_blkid.h"
  #include "mount_constants.h"
  #include "sundries.h"
-@@ -255,6 +260,49 @@
+@@ -255,13 +260,79 @@
  		free((void *) s);
  }
  
 +#ifdef HAVE_LIBSELINUX
++/* strip quotes from a "string"
++ * Warning: This function modify the "str" argument.
++ */
++static char *
++strip_quotes(char *str)
++{
++	char *end = NULL;
++
++	if (*str != '"') 
++		return str;
++	
++	end = strrchr(str, '"');
++	if (end == NULL || end == str) 
++		die (EX_USAGE, _("mount: improperly quoted option string '%s'"), str);
++
++	*end = '\0';
++	return str+1;
++}
++
 +/* translates SELinux context from human to raw format and 
 + * appends it to the mount extra options.
 + *
 + * returns -1 on error and 0 on success 
 + */
 +static int
-+append_context(const char *optname, const char *optdata, char *extra_opts, int *len)
++append_context(const char *optname, char *optdata, char *extra_opts, int *len)
 +{
 +	security_context_t raw = NULL;
++	char *data = NULL;
 +	char *buf = NULL;
 +	int bufsz;
 +	
@@ -41,19 +68,22 @@
 +	if (optdata==NULL || *optdata=='\0' || optname==NULL)
 +		return -1;
 +	
++	/* TODO: use strip_quotes() for all mount options? */
++	data = *optdata =='"' ? strip_quotes(optdata) : optdata;
++	
 +	if (selinux_trans_to_raw_context(
-+			(security_context_t) optdata, &raw)==-1 ||
-+			raw==NULL)
++			(security_context_t) data, &raw)==-1 ||
++			raw==NULL) 
 +		return -1;
 +	
 +	if (verbose)
 +		printf(_("mount: translated %s '%s' to '%s'\n"), 
-+				optname, optdata, (char *) raw);
-+
-+	bufsz = strlen(optname) + strlen(raw) + 2;	/* 2 is \0 and '=' */ 
++				optname, data, (char *) raw);
++                                                               // TODO 2.6.19: context options with commans are unsupported by kernel now ;-( 
++	bufsz = strlen(optname) + strlen(raw) + 2;              // bufsz = strlen(optname) + strlen(raw) + 4;	/* 4 is \0, '=' and 2x '"' */ 
 +	buf = xmalloc(bufsz);
 +
-+	snprintf(buf, bufsz, "%s=%s", optname, (char *) raw);
++	snprintf(buf, bufsz, "%s=%s", optname, (char *) raw);   // snprintf(buf, bufsz, "%s=\"%s\"", optname, (char *) raw);
 +	freecon(raw);
 +	
 +	if ((*len -= bufsz-1) > 0)
@@ -67,7 +97,15 @@
  /*
   * Look for OPT in opt_map table and return mask value.
   * If OPT isn't found, tack it onto extra_opts (which is non-NULL).
-@@ -313,7 +361,20 @@
+  * For the options uid= and gid= replace user or group name by its value.
+  */
+ static inline void
+-parse_opt(const char *opt, int *mask, char *extra_opts, int len) {
++parse_opt(char *opt, int *mask, char *extra_opts, int len) {
+ 	const struct opt_map *om;
+ 
+ 	for (om = opt_map; om->opt != NULL; om++)
+@@ -313,7 +384,20 @@
  			return;
  		}
  	}
@@ -89,17 +127,44 @@
  	if ((len -= strlen(opt)) > 0)
  		strcat(extra_opts, opt);
  }
-@@ -330,7 +391,7 @@
+@@ -329,16 +413,29 @@
+ 
  	if (options != NULL) {
  		char *opts = xstrdup(options);
- 		char *opt;
+-		char *opt;
 -		int len = strlen(opts) + 20;
 +		int len = strlen(opts) + 256;
++		int open_quote = 0;
++		char *opt, *p;
  
  		*extra_opts = xmalloc(len); 
  		**extra_opts = '\0';
---- util-linux-2.13-pre6/mount/mount.8.kzak	2006-08-21 11:51:50.000000000 +0200
-+++ util-linux-2.13-pre6/mount/mount.8	2006-08-21 11:51:50.000000000 +0200
+ 
+-		for (opt = strtok(opts, ","); opt; opt = strtok(NULL, ","))
+-			if (!parse_string_opt(opt))
+-				parse_opt(opt, flags, *extra_opts, len);
+-
++		for (p=opts, opt=NULL; p && *p; p++) {
++			if (!opt)
++				opt = p;		/* begin of the option item */
++			if (*p == '"') 
++				open_quote ^= 1;	/* reverse the status */
++			if (open_quote)
++				continue;		/* still in quoted block */
++			if (*p == ',')
++				*p = '\0';		/* terminate the option item */
++			/* end of option item or last item */
++			if (*p == '\0' || *(p+1) == '\0') {
++				if (!parse_string_opt(opt))
++					parse_opt(opt, flags, *extra_opts, len);
++				opt = NULL;
++			}
++		} 
+ 		free(opts);
+ 	}
+ 
+--- util-linux-2.13-pre6/mount/mount.8.context	2006-11-01 11:31:46.000000000 +0100
++++ util-linux-2.13-pre6/mount/mount.8	2006-11-01 11:31:46.000000000 +0100
 @@ -660,6 +660,50 @@
  .BR noexec ", " nosuid ", and " nodev
  (unless overridden by subsequent options, as in the option line
@@ -151,15 +216,3 @@
  .RE
  .TP
  .B \-\-bind
---- util-linux-2.13-pre6/mount/Makefile.am.kzak	2006-08-21 12:13:10.000000000 +0200
-+++ util-linux-2.13-pre6/mount/Makefile.am	2006-08-21 12:13:03.000000000 +0200
-@@ -37,6 +37,9 @@
- man_MANS += pivot_root.8
- endif
- 
-+if HAVE_SELINUX
-+mount_LDADD += -lselinux
-+endif
- 
- swapon.c: swapargs.h
- 

@@ -9,7 +9,7 @@
 Summary: A collection of basic system utilities.
 Name: util-linux
 Version: 2.13
-Release: 0.44%{?dist}
+Release: 0.45%{?dist}
 License: distributable
 Group: System Environment/Base
 
@@ -36,7 +36,8 @@ BuildRequires: automake
 BuildRequires: e2fsprogs-devel >= 1.36
 BuildRequires: gettext-devel
 BuildRequires: libselinux-devel
-BuildRequires: libtermcap-devel
+# ncurses is the right way now [kzak, 12/14/2006] 
+#BuildRequires: libtermcap-devel
 BuildRequires: ncurses-devel
 BuildRequires: pam-devel
 BuildRequires: sed
@@ -45,11 +46,12 @@ BuildRequires: texinfo
 BuildRequires: zlib-devel
 
 ### Sources
-# TODO [stable]: s/2.13-pre6/%{version}/
-Source0: ftp://ftp.win.tue.nl/pub/linux-local/utils/util-linux/util-linux-2.13-pre6.tar.bz2
+# TODO [stable]: s/2.13-pre7/%{version}/
+Source0: ftp://ftp.win.tue.nl/pub/linux-local/utils/util-linux/util-linux-2.13-pre7.tar.bz2
 Source1: util-linux-login.pamd
 Source2: util-linux-remote.pamd
 Source3: util-linux-chsh-chfn.pamd
+Source4: util-linux-60-raw.rules
 Source8: nologin.c
 Source9: nologin.8
 Source11: http://download.sourceforge.net/floppyutil/floppy-%{floppyver}.tar.gz
@@ -68,6 +70,9 @@ Conflicts: kernel < 2.2.12-7,
 Requires(preun): /sbin/install-info
 Requires(post): /sbin/install-info
 Requires(post): coreutils
+%if %{include_raw}
+Requires: udev
+%endif
 
 Provides: mount = %{version}
 Provides: losetup = %{version}
@@ -182,6 +187,7 @@ Patch233: util-linux-2.13-mount-uuid.patch
 Patch234: util-linux-2.13-cal-wide.patch
 # 186915 - mount does not translate SELIinux context options though libselinux
 # 185500 - Need man page entry for -o context= mount option
+# 211827 - Can't mount with additional contexts
 Patch235: util-linux-2.13-mount-context.patch
 # 152579 - missing info about /etc/mtab and /proc/mounts mismatch
 # 183890 - missing info about possible ioctl() and fcntl() problems on NFS filesystem
@@ -217,6 +223,18 @@ Patch251: util-linux-2.13-mount-nonfs.patch
 Patch252: util-linux-2.13-losetup-deprecated.patch
 # 208634 - mkswap "works" without warning on a mounted device
 Patch253: util-linux-2.13-mkswap-mounted.patch
+# 213127 - mount --make-unbindable does not work
+Patch254: util-linux-2.13-mount-comment.patch
+# 211749 - add -r option to losetup to create a read-only loop
+Patch255: util-linux-2.13-losetup-rdonly.patch
+# 216489 - SCHED_BATCH option missing in chrt
+Patch256: util-linux-2.13-schedutils-SCHED_BATCH.patch
+# 216712 - issues with raw device support ("raw0" is wrong device name)
+Patch257: util-linux-2.13-raw-raw0.patch
+# 217186 - /bin/sh: @MKINSTALLDIRS@: No such file or directory
+Patch258: util-linux-2.13-mkdir_p.patch
+# 218915 - fdisk -b 4K
+Patch259: util-linux-2.13-fdisk-b-4096.patch
 
 # When adding patches, please make sure that it is easy to find out what bug # the 
 # patch fixes.
@@ -230,18 +248,19 @@ program.
 
 %prep
 # TODO [stable]: remove -n
-%setup -q -a 11 -n util-linux-2.13-pre6
+%setup -q -a 11 -n util-linux-2.13-pre7
 
-%patch1 -p1
+# ncurses vs. termcap for the more command
+#%patch1 -p1
+
+
 %patch70 -p1
 # nologin
 cp %{SOURCE8} %{SOURCE9} .
 %patch100 -p1
 %patch106 -p1
 %patch107 -p1
-%if %{include_raw}
 %patch109 -p1
-%endif
 %patch113 -p1
 %patch120 -p1
 %patch126 -p1
@@ -254,11 +273,8 @@ cp %{SOURCE8} %{SOURCE9} .
 %patch153 -p1
 %patch157 -p1
 %patch159 -p1
-%if %{include_raw}
 %patch160 -p1
-%endif
 %patch164 -p1
-
 %patch170 -p1
 %patch180 -p1
 %patch181 -p1
@@ -310,7 +326,13 @@ cp %{SOURCE8} %{SOURCE9} .
 %patch250 -p1
 %patch251 -p1
 %patch252 -p1
-%patch253 -p1 -b .kzak
+%patch253 -p1
+%patch254 -p1
+%patch255 -p1
+%patch256 -p1
+%patch257 -p1
+%patch258 -p1
+%patch259 -p1
 
 %build
 unset LINGUAS || :
@@ -392,6 +414,13 @@ install -m 644 nologin.8 ${RPM_BUILD_ROOT}%{_mandir}/man8
 
 %if %{include_raw}
 echo '.so man8/raw.8' > $RPM_BUILD_ROOT%{_mandir}/man8/rawdevices.8
+{ 
+  # see RH bugzilla #216664
+  mkdir -p ${RPM_BUILD_ROOT}%{_sysconfdir}/udev/rules.d
+  pushd ${RPM_BUILD_ROOT}%{_sysconfdir}/udev/rules.d
+  install -m 644 %{SOURCE4} ./60-raw.rules
+  popd
+}
 %endif
 
 # Correct mail spool path.
@@ -489,7 +518,7 @@ for I in addpart delpart partx; do
 done
 
 # /usr/bin -> /bin
-for I in taskset; do
+for I in taskset raw; do
 	if [ -e $RPM_BUILD_ROOT/usr/bin/$I ]; then
 		mv $RPM_BUILD_ROOT/usr/bin/$I $RPM_BUILD_ROOT/bin/$I
 	fi
@@ -539,6 +568,10 @@ exit 0
 /bin/more
 /bin/kill
 /bin/taskset
+%if %{include_raw}
+/bin/raw
+%config %{_sysconfdir}/udev/rules.d/60-raw.rules
+%endif
 
 %config %{_sysconfdir}/pam.d/chfn
 %config %{_sysconfdir}/pam.d/chsh
@@ -607,10 +640,6 @@ exit 0
 %{_mandir}/man8/floppy.8*
 %endif
 %{_bindir}/namei
-
-%if %{include_raw}
-%{_bindir}/raw
-%endif
 %{_bindir}/rename
 %{_bindir}/renice
 %{_bindir}/rev
@@ -714,6 +743,22 @@ exit 0
 /sbin/losetup
 
 %changelog
+* Wed Dec 13 2006 Karel Zak <kzak@redhat.com> 2.13-0.45
+- use ncurses only
+- fix #218915 - fdisk -b 4K
+- upgrade to -pre7 release
+- fix building problem with raw0 patch
+- fix #217186 - /bin/sh: @MKINSTALLDIRS@: No such file or directory 
+  (port po/Makefile.in.in from gettext-0.16)
+- sync with FC6 and RHEL5:
+- fix #216489 - SCHED_BATCH option missing in chrt
+- fix #216712 - issues with raw device support ("raw0" is wrong device name)
+- fix #216760 - mount with context or fscontext option fails
+  (temporarily disabled the support for additional contexts -- not supported by kernel yet)
+- fix #211827 - Can't mount with additional contexts
+- fix #213127 - mount --make-unbindable does not work
+- fix #211749 - add -r option to losetup to create a read-only loop
+
 * Thu Oct 12 2006 Karel Zak <kzak@redhat.com> 2.13-0.44
 - fix #209911 - losetup.8 updated (use dm-crypt rather than deprecated cryptoloop)
 - fix #210338 - spurious error from '/bin/login -h $PHONENUMBER' (bug in IPv6 patch)
