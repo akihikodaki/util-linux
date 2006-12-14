@@ -235,6 +235,8 @@ Patch257: util-linux-2.13-raw-raw0.patch
 Patch258: util-linux-2.13-mkdir_p.patch
 # 218915 - fdisk -b 4K
 Patch259: util-linux-2.13-fdisk-b-4096.patch
+# leaking file descriptor
+Patch260: util-linux-2.13-more-CLOEXEC.patch
 
 # When adding patches, please make sure that it is easy to find out what bug # the 
 # patch fixes.
@@ -333,6 +335,7 @@ cp %{SOURCE8} %{SOURCE9} .
 %patch257 -p1
 %patch258 -p1
 %patch259 -p1
+%patch260 -p1
 
 %build
 unset LINGUAS || :
@@ -744,6 +747,7 @@ exit 0
 
 %changelog
 * Wed Dec 13 2006 Karel Zak <kzak@redhat.com> 2.13-0.45
+- fix leaking file descriptor in the more command (patch by Steve Grubb)
 - use ncurses only
 - fix #218915 - fdisk -b 4K
 - upgrade to -pre7 release
