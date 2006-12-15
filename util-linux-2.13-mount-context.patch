@@ -79,11 +79,11 @@
 +	if (verbose)
 +		printf(_("mount: translated %s '%s' to '%s'\n"), 
 +				optname, data, (char *) raw);
-+                                                               // TODO 2.6.19: context options with commans are unsupported by kernel now ;-( 
-+	bufsz = strlen(optname) + strlen(raw) + 2;              // bufsz = strlen(optname) + strlen(raw) + 4;	/* 4 is \0, '=' and 2x '"' */ 
++        
++	bufsz = strlen(optname) + strlen(raw) + 4;	/* 4 is \0, '=' and 2x '"' */ 
 +	buf = xmalloc(bufsz);
 +
-+	snprintf(buf, bufsz, "%s=%s", optname, (char *) raw);   // snprintf(buf, bufsz, "%s=\"%s\"", optname, (char *) raw);
++	snprintf(buf, bufsz, "%s=\"%s\"", optname, (char *) raw);
 +	freecon(raw);
 +	
 +	if ((*len -= bufsz-1) > 0)

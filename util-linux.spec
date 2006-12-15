@@ -9,7 +9,7 @@
 Summary: A collection of basic system utilities.
 Name: util-linux
 Version: 2.13
-Release: 0.46%{?dist}
+Release: 0.47%{?dist}
 License: distributable
 Group: System Environment/Base
 
@@ -237,6 +237,9 @@ Patch258: util-linux-2.13-mkdir_p.patch
 Patch259: util-linux-2.13-fdisk-b-4096.patch
 # leaking file descriptor
 Patch260: util-linux-2.13-more-CLOEXEC.patch
+# 217240 - namei ignores non-directory components instead of saying "Not a directory"
+# 217241 - namei enforces symlink limits inconsistently
+Patch261: util-linux-2.13-namei-logic.patch
 
 # When adding patches, please make sure that it is easy to find out what bug # the 
 # patch fixes.
@@ -336,6 +339,7 @@ cp %{SOURCE8} %{SOURCE9} .
 %patch258 -p1
 %patch259 -p1
 %patch260 -p1
+%patch261 -p1
 
 %build
 unset LINGUAS || :
@@ -746,6 +750,10 @@ exit 0
 /sbin/losetup
 
 %changelog
+* Fri Dec 15 2006 Karel Zak <kzak@redhat.com> 2.13-0.47
+- fix #217240 - namei ignores non-directory components instead of saying "Not a directory"
+- fix #217241 - namei enforces symlink limits inconsistently
+
 * Wed Dec 14 2006 Karel Zak <kzak@redhat.com> 2.13-0.46
 - fix leaking file descriptor in the more command (patch by Steve Grubb)
 

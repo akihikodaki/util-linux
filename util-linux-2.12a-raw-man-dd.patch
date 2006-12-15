@@ -8,8 +8,8 @@
 +Although Linux includes support for rawio, it is now a deprecated interface. If
 +your application performs device access using this interface, Red Hat
 +encourages you to modify your application to open the block device with the
-+O_DIRECT flag. The rawio interface will exist for the life of Red Hat
-+Enterprise Linux 4, but is a candidate for removal from future releases.
++O_DIRECT flag. The rawio interface is a candidate for removal from future releases.
++ 
  .SH DESCRIPTION
  .B raw
  is used to bind a Linux raw character device to a block device.  Any
