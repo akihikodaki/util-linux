@@ -9,7 +9,7 @@
 Summary: A collection of basic system utilities.
 Name: util-linux
 Version: 2.13
-Release: 0.47%{?dist}
+Release: 0.48%{?dist}
 License: distributable
 Group: System Environment/Base
 
@@ -750,6 +750,9 @@ exit 0
 /sbin/losetup
 
 %changelog
+* Sun Dec 17 2006 Karel Zak <kzak@redhat.com> 2.13-0.48
+- fix paths in po/Makefile.in.in
+
 * Fri Dec 15 2006 Karel Zak <kzak@redhat.com> 2.13-0.47
 - fix #217240 - namei ignores non-directory components instead of saying "Not a directory"
 - fix #217241 - namei enforces symlink limits inconsistently
