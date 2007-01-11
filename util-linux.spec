@@ -9,7 +9,7 @@
 Summary: A collection of basic system utilities.
 Name: util-linux
 Version: 2.13
-Release: 0.48%{?dist}
+Release: 0.49%{?dist}
 License: distributable
 Group: System Environment/Base
 
@@ -240,6 +240,8 @@ Patch260: util-linux-2.13-more-CLOEXEC.patch
 # 217240 - namei ignores non-directory components instead of saying "Not a directory"
 # 217241 - namei enforces symlink limits inconsistently
 Patch261: util-linux-2.13-namei-logic.patch
+# 222293 - undocumented partx,addpart, delpart
+Patch262: util-linux-2.13-partx-man.patch
 
 # When adding patches, please make sure that it is easy to find out what bug # the 
 # patch fixes.
@@ -340,6 +342,7 @@ cp %{SOURCE8} %{SOURCE9} .
 %patch259 -p1
 %patch260 -p1
 %patch261 -p1
+%patch262 -p1
 
 %build
 unset LINGUAS || :
@@ -593,6 +596,9 @@ exit 0
 /sbin/addpart
 /sbin/delpart
 /sbin/partx
+%{_mandir}/man8/partx.8*
+%{_mandir}/man8/addpart.8*
+%{_mandir}/man8/delpart.8*
 
 /sbin/sfdisk
 %{_mandir}/man8/sfdisk.8*
@@ -750,6 +756,9 @@ exit 0
 /sbin/losetup
 
 %changelog
+* Thu Jan 11 2007 Karel Zak <kzak@redhat.com> 2.13-0.49
+- fix #222293 - undocumented partx,addpart, delpart
+
 * Sun Dec 17 2006 Karel Zak <kzak@redhat.com> 2.13-0.48
 - fix paths in po/Makefile.in.in
 
