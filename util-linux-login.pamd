@@ -12,3 +12,4 @@ session    optional     pam_console.so
 # pam_selinux.so open should only be followed by sessions to be executed in the user context
 session    required     pam_selinux.so open
 session    optional     pam_keyinit.so force revoke
+session    optional     pam_ck_connector.so

@@ -9,7 +9,7 @@
 Summary: A collection of basic system utilities.
 Name: util-linux
 Version: 2.13
-Release: 0.49%{?dist}
+Release: 0.50%{?dist}
 License: distributable
 Group: System Environment/Base
 
@@ -73,6 +73,7 @@ Requires(post): coreutils
 %if %{include_raw}
 Requires: udev
 %endif
+Requires: ConsoleKit-libs
 
 Provides: mount = %{version}
 Provides: losetup = %{version}
@@ -756,6 +757,9 @@ exit 0
 /sbin/losetup
 
 %changelog
+* Sat Mar  3 2007 David Zeuthen <davidz@redhat.com> 2.13-0.50
+- include ConsoleKit session module by default (#229172)
+
 * Thu Jan 11 2007 Karel Zak <kzak@redhat.com> 2.13-0.49
 - fix #222293 - undocumented partx,addpart, delpart
 
