@@ -1,0 +1,46 @@
+commit 99c392d8ba163e35b9d562dd4bcf7dd476ad3573
+Author: Karel Zak <kzak@redhat.com>
+Date:   Tue Mar 20 00:32:37 2007 +0100
+
+    hwclock: fix --systohc sets clock 0.5 seconds slow
+    
+    quote from rh150493:
+    
+    	The kernel code, when setting the BIOS clock notes that the clock time
+    	ticks to the next second 0.5 seconds after adjusting it  (see
+    	linux/arch/i386/kernel/time.c).
+    
+    	hwclock --systohc sets the CMOS clock at the 1 second boundry and thus
+    	causes the clock to be wrong by 500ms each time it is reset.  If the
+    	clock is set every shutdown then the clock will have a reboot-count
+    	related drift as well as the natural drift problems of the clock. Note
+    	that this also mucks up the drift calculations, of course.
+    
+    Signed-off-by: Karel Zak <kzak@redhat.com>
+
+diff --git a/hwclock/hwclock.c b/hwclock/hwclock.c
+index 9731dad..820c388 100644
+--- a/hwclock/hwclock.c
++++ b/hwclock/hwclock.c
+@@ -517,14 +517,19 @@ set_hardware_clock_exact(const time_t sethwtime,
+            "Delaying further to reach the next full second.\n"),
+            time_diff(beginsystime, refsystime));
+   
+-  /* Now delay some more until Hardware Clock time newhwtime arrives */
++  /*
++   * Now delay some more until Hardware Clock time newhwtime arrives.  The -500
++   * ms is because the Hardware Clock always sets to your set time plus 500 ms
++   * (because it is designed to update to the next second precisely 500 ms
++   * after you finish the setting).
++   */
+   do {
+ 	  float tdiff;
+ 	  gettimeofday(&nowsystime, NULL);
+ 	  tdiff = time_diff(nowsystime, beginsystime);
+ 	  if (tdiff < 0)
+ 		  goto time_resync;	/* probably time was reset */
+-  } while (time_diff(nowsystime, refsystime) < newhwtime - sethwtime);
++  } while (time_diff(nowsystime, refsystime) - 0.5 < newhwtime - sethwtime);
+   
+   set_hardware_clock(newhwtime, universal, testing);
+ }

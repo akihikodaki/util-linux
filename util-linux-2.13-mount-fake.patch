@@ -1,0 +1,11 @@
+--- util-linux-2.13-pre7/mount/mount.c.kzak	2007-02-09 12:54:20.000000000 +0100
++++ util-linux-2.13-pre7/mount/mount.c	2007-02-09 12:54:14.000000000 +0100
+@@ -602,6 +602,8 @@
+ 		 mountargs[i++] = node;
+ 		 if (sloppy && (strcmp(type, "nfs")==0 || strcmp(type, "nfs4")==0))
+ 		      mountargs[i++] = "-s";
++		 if (fake)
++		      mountargs[i++] = "-f";
+ 		 if (nomtab)
+ 		      mountargs[i++] = "-n";
+ 		 if (verbose)

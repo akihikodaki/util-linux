@@ -9,7 +9,7 @@
 Summary: A collection of basic system utilities.
 Name: util-linux
 Version: 2.13
-Release: 0.50%{?dist}
+Release: 0.51%{?dist}
 License: distributable
 Group: System Environment/Base
 
@@ -243,6 +243,11 @@ Patch260: util-linux-2.13-more-CLOEXEC.patch
 Patch261: util-linux-2.13-namei-logic.patch
 # 222293 - undocumented partx,addpart, delpart
 Patch262: util-linux-2.13-partx-man.patch
+# 150493 - hwclock --systohc sets clock 0.5 seconds slow
+Patch263: util-linux-2.13-hwclock-systohc.patch
+# 227903 - mount -f does not work with NFS-mounted
+Patch264: util-linux-2.13-mount-fake.patch
+
 
 # When adding patches, please make sure that it is easy to find out what bug # the 
 # patch fixes.
@@ -344,6 +349,8 @@ cp %{SOURCE8} %{SOURCE9} .
 %patch260 -p1
 %patch261 -p1
 %patch262 -p1
+%patch263 -p1
+%patch264 -p1
 
 %build
 unset LINGUAS || :
@@ -757,6 +764,12 @@ exit 0
 /sbin/losetup
 
 %changelog
+* Fri Apr  6 2007 Karel Zak <kzak@redhat.com> 2.13-0.51
+- fix #150493 - hwclock --systohc sets clock 0.5 seconds slow
+- fix #220873 - starting RPC idmapd: Error: RPC MTAB does not exist.
+                (added rpc_pipefs to util-linux-2.13-umount-sysfs.patch)
+- fix #227903 - mount -f does not work with NFS-mounted
+
 * Sat Mar  3 2007 David Zeuthen <davidz@redhat.com> 2.13-0.50
 - include ConsoleKit session module by default (#229172)
 
