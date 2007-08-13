@@ -1,0 +1,16 @@
+--- util-linux-2.13-pre7/config/include-Makefile.am.kzak	2007-06-25 11:15:40.000000000 +0200
++++ util-linux-2.13-pre7/config/include-Makefile.am	2007-06-25 11:16:39.000000000 +0200
+@@ -3,10 +3,10 @@
+ datadir = $(prefix)/usr/share
+ infodir = $(datadir)/info
+ mandir = $(datadir)/man
++localedir = $(datadir)/locale
+ 
+-AM_CPPFLAGS = -include $(top_builddir)/config.h -I$(top_srcdir)/include
++AM_CPPFLAGS = -include $(top_builddir)/config.h -I$(top_srcdir)/include \
++       -DLOCALEDIR=\"$(localedir)\"
+ 
+ DEFAULT_INCLUDES =
+ 
+-DEFS = -DLOCALEDIR=\"$(localedir)\" @DEFS@
+-

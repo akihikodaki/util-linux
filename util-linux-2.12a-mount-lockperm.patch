@@ -1,0 +1,21 @@
+
+From: Flávio Leitner <fleitner@redhat.com>
+Subject: mount should set proper permissions on locktime
+
+When creating the "/etc/mtab~" lockfile (specifically 'linktargetfile'  in the
+lock_mtab function), the file is created with incorrect permissions ('000')
+which necessitates root to leverage CAP_DAC_OVERRIDE. If proper file modes (it
+would appear 0600 would be sufficient) were used in the open this would
+function properly with CAP_DAC_OVERRIDE revoked.
+
+--- util-linux-2.12a/mount/fstab.c.kzak	2007-07-31 12:13:26.000000000 +0200
++++ util-linux-2.12a/mount/fstab.c	2007-07-31 12:13:11.000000000 +0200
+@@ -433,7 +433,7 @@
+ 	linktargetfile = xmalloc(strlen(MOUNTLOCK_LINKTARGET) + 20);
+ 	sprintf(linktargetfile, MOUNTLOCK_LINKTARGET, getpid ());
+ 
+-	i = open (linktargetfile, O_WRONLY|O_CREAT, 0);
++	i = open (linktargetfile, O_WRONLY|O_CREAT, S_IRUSR|S_IWUSR);
+ 	if (i < 0) {
+ 		int errsv = errno;
+ 		/* linktargetfile does not exist (as a file)

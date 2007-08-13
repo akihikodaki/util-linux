@@ -5,11 +5,11 @@
 # Notes:
 # 	- upstream maintainer Adrian Bunk <bunk@kernel.org>
 
-### Header 
+### Header
 Summary: A collection of basic system utilities.
 Name: util-linux
 Version: 2.13
-Release: 0.51%{?dist}
+Release: 0.55%{?dist}
 License: distributable
 Group: System Environment/Base
 
@@ -247,11 +247,23 @@ Patch262: util-linux-2.13-partx-man.patch
 Patch263: util-linux-2.13-hwclock-systohc.patch
 # 227903 - mount -f does not work with NFS-mounted
 Patch264: util-linux-2.13-mount-fake.patch
-
-
-# When adding patches, please make sure that it is easy to find out what bug # the 
-# patch fixes.
-########### END upstreamable
+# 243930 - Translation files exist, but are not being used
+Patch265: util-linux-2.13-localedir.patch
+# 228731 - sfdisk doesn't support DM-MP device (add default heads and sectors)
+Patch266: util-linux-2.13-sfdisk-geo.patch
+# 231192 - ipcs is not printing correct values on pLinux
+Patch267: util-linux-2.13-ipcs-32bit.patch
+# 245912 - mount doesn't write the 'loop=...' option in /etc/mtab when mounting a loop device
+Patch268: util-linux-2.13-mount-loop.patch
+# 213253 - "cal -3" generates improperly formatted output
+Patch269: util-linux-2.13-cal-3.patch
+# 236848 - mount/fstab.c:lock_mtab() should open with proper permissions
+Patch270: util-linux-2.12a-mount-lockperm.patch
+# 238918 - blockdev --getsize does not work properly on devices with more than 2^31 sectors
+Patch271: util-linux-2.13-blockdev-errno.patch
+Patch272: util-linux-2.13-blockdev-unsigned.patch
+# backport MS_RELATIME
+Patch273: util-linux-2.13-mount-relatime.patch
 
 %description
 The util-linux package contains a large variety of low-level system
@@ -351,6 +363,15 @@ cp %{SOURCE8} %{SOURCE9} .
 %patch262 -p1
 %patch263 -p1
 %patch264 -p1
+%patch265 -p1
+%patch266 -p1
+%patch267 -p1
+%patch268 -p1
+%patch269 -p1
+%patch270 -p1
+%patch271 -p1
+%patch272 -p1
+%patch273 -p1
 
 %build
 unset LINGUAS || :
@@ -764,6 +785,25 @@ exit 0
 /sbin/losetup
 
 %changelog
+* Wed Aug  8  2007 Karel Zak <kzak@redhat.com> 2.13-0.55
+- rebuild F7 package to F8
+
+* Wed Aug  8  2007 Karel Zak <kzak@redhat.com> 2.13-0.54
+- backport mount relatime patch
+
+* Thu Aug  2  2007 Karel Zak <kzak@redhat.com> 2.13-0.53
+- fix #236848 - mount/fstab.c:lock_mtab() should open with proper permissions
+- fix #238918 - blockdev --getsize does not work properly on devices with more than 2^31 sectors
+
+* Mon Jul  9  2007 Karel Zak <kzak@redhat.com> 2.13-0.52
+- fix #245578 - login's PAM configuration inits the keyring at an inconvenient time
+- fix #231532 - "pamconsole" not documented in mount(8)
+- fix #243930 - translation files exist, but are not being used
+- fix #228731 - sfdisk doesn't support DM-MP device (add default heads and sectors)
+- fix #231192 - ipcs is not printing correct values on pLinux
+- fix #245912 - mount doesn't write the 'loop=...' option in /etc/mtab when mounting a loop device
+- fix #213253 - "cal -3" generates improperly formatted output
+
 * Fri Apr  6 2007 Karel Zak <kzak@redhat.com> 2.13-0.51
 - fix #150493 - hwclock --systohc sets clock 0.5 seconds slow
 - fix #220873 - starting RPC idmapd: Error: RPC MTAB does not exist.

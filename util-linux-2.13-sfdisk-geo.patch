@@ -1,0 +1,13 @@
+--- util-linux-2.13-pre7/fdisk/sfdisk.c.kzak	2007-06-25 09:13:31.000000000 +0200
++++ util-linux-2.13-pre7/fdisk/sfdisk.c	2007-06-25 09:12:42.000000000 +0200
+@@ -469,8 +469,8 @@
+ 
+     R = get_geometry(dev, fd, silent);
+ 
+-    B.heads = (U.heads ? U.heads : R.heads);
+-    B.sectors = (U.sectors ? U.sectors : R.sectors);
++    B.heads = (U.heads ? U.heads : (R.heads ? R.heads : 255));
++    B.sectors = (U.sectors ? U.sectors : (R.sectors ? R.sectors : 63));
+     B.cylinders = (U.cylinders ? U.cylinders : R.cylinders);
+ 
+     B.cylindersize = B.heads * B.sectors;
