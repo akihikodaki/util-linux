@@ -2,7 +2,7 @@
 Summary: A collection of basic system utilities
 Name: util-linux
 Version: 2.19
-Release: 0.1%{?dist}
+Release: 0.2%{?dist}
 License: GPLv2 and GPLv2+ and GPLv3+ and LGPLv2+ and BSD with advertising and Public Domain
 Group: System Environment/Base
 URL: ftp://ftp.kernel.org/pub/linux/utils/util-linux
@@ -20,7 +20,7 @@ URL: ftp://ftp.kernel.org/pub/linux/utils/util-linux
 
 ### Macros
 %define floppyver 0.16
-%define cytune_archs %{ix86} alpha armv4l
+%define cytune_archs %{ix86} alpha %{arm}
 
 ### Dependences
 BuildRequires: audit-libs-devel >= 1.0.6
@@ -283,7 +283,7 @@ install -d ${RPM_BUILD_ROOT}/var/lib/libuuid
 # libtool junk
 rm -rf ${RPM_BUILD_ROOT}%{_libdir}/*.la
 
-%ifarch sparc sparc64 sparcv9
+%ifarch %{sparc}
 rm -rf ${RPM_BUILD_ROOT}%{_bindir}/sunhostid
 cat << E-O-F > ${RPM_BUILD_ROOT}%{_bindir}/sunhostid
 #!/bin/sh
@@ -337,7 +337,7 @@ done
 %endif
 
 # unsupported on SPARCs
-%ifarch sparc sparcv9 sparc64
+%ifarch %{sparc}
 for I in /sbin/sfdisk \
 	%{_mandir}/man8/sfdisk.8* \
 	%doc fdisk/sfdisk.examples \
@@ -440,12 +440,13 @@ if [ -x /usr/sbin/selinuxenabled ] && /usr/sbin/selinuxenabled; then
 	fi
 fi
 %if %{mtab_symlink}
-	ln -s /proc/mounts /etc/mtab
-	/bin/chown root:root /etc/mtab
+rm -f /etc/mtab
+ln -s /proc/mounts /etc/mtab
+/bin/chown root:root /etc/mtab
 %else
-	touch /etc/mtab
-	/bin/chown root:root /etc/mtab
-	/bin/chmod 0644 /etc/mtab
+touch /etc/mtab
+/bin/chown root:root /etc/mtab
+/bin/chmod 0644 /etc/mtab
 %endif
 
 
@@ -670,7 +671,7 @@ fi
 %{_mandir}/man8/tunelp.8*
 %endif
 
-%ifnarch sparc sparcv9 sparc64
+%ifnarch %{sparc}
 %doc fdisk/sfdisk.examples
 /sbin/cfdisk
 /sbin/sfdisk
@@ -678,7 +679,7 @@ fi
 %{_mandir}/man8/sfdisk.8*
 %endif
 
-%ifarch sparc sparc64 sparcv9
+%ifarch %{sparc}
 %{_bindir}/sunhostid
 %endif
 
@@ -751,6 +752,9 @@ fi
 
 
 %changelog
+* Wed Jan 19 2011 Karel Zak <kzak@redhat.com> 2.19-0.2
+- clean up specfile (review #667416)
+
 * Wed Jan  5 2011 Karel Zak <kzak@redhat.com> 2.19-0.1
 - upgrade to the release 2.19-rc1
   ftp://ftp.kernel.org/pub/linux/utils/util-linux/v2.19/v2.19-ReleaseNotes
@@ -2139,7 +2143,7 @@ acquisition of controlling terminal).
 * Thu Mar 25 1999 Jeff Johnson <jbj@redhat.com>
 - include sfdisk (#1164)
 - fix write (#1784)
-- use positive logic in spec file (%%ifarch rather than %ifnarch).
+- use positive logic in spec file (ifarch rather than ifnarch).
 - (re)-use 1st matching utmp slot if search by mypid not found.
 - update to 2.9o
 - lastb wants bad logins in wtmp clone /var/run/btmp (#884)
