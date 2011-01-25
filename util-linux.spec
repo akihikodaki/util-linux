@@ -2,12 +2,12 @@
 Summary: A collection of basic system utilities
 Name: util-linux
 Version: 2.19
-Release: 0.2%{?dist}
+Release: 0.3%{?dist}
 License: GPLv2 and GPLv2+ and GPLv3+ and LGPLv2+ and BSD with advertising and Public Domain
 Group: System Environment/Base
 URL: ftp://ftp.kernel.org/pub/linux/utils/util-linux
 
-%define upstream_version %{version}-rc1-32-gbded43d
+%define upstream_version %{version}-rc2
 
 ### Features
 %if 0%{?rhel}
@@ -33,9 +33,7 @@ BuildRequires: popt-devel
 BuildRequires: libutempter-devel
 
 ### Sources
-#Source0: ftp://ftp.kernel.org/pub/linux/utils/util-linux/v2.19/util-linux-%{upstream_version}.tar.bz2
-
-Source0: util-linux-%{upstream_version}.tar.bz2
+Source0: ftp://ftp.kernel.org/pub/linux/utils/util-linux/v2.19/util-linux-%{upstream_version}.tar.bz2
 Source1: util-linux-ng-login.pamd
 Source2: util-linux-ng-remote.pamd
 Source3: util-linux-ng-chsh-chfn.pamd
@@ -442,7 +440,6 @@ fi
 %if %{mtab_symlink}
 rm -f /etc/mtab
 ln -s /proc/mounts /etc/mtab
-/bin/chown root:root /etc/mtab
 %else
 touch /etc/mtab
 /bin/chown root:root /etc/mtab
@@ -708,7 +705,7 @@ fi
 %defattr(-,root,root)
 %doc shlibs/mount/COPYING.libmount
 %{_libdir}/libmount.so
-%{_includedir}/mount
+%{_includedir}/libmount
 %{_libdir}/pkgconfig/mount.pc
 
 
@@ -752,6 +749,12 @@ fi
 
 
 %changelog
+* Tue Jan 25 2011 Karel Zak <kzak@redhat.com> 2.19-0.3
+- upgrade to the release 2.19-rc2
+  ftp://ftp.kernel.org/pub/linux/utils/util-linux/v2.19/v2.19-rc2-ChangeLog
+- fix #671893 - SELinux is preventing /bin/chown from 'setattr' accesses
+  on the file mounts.
+
 * Wed Jan 19 2011 Karel Zak <kzak@redhat.com> 2.19-0.2
 - clean up specfile (review #667416)
 
