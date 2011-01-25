@@ -2,12 +2,12 @@
 Summary: A collection of basic system utilities
 Name: util-linux
 Version: 2.19
-Release: 0.3%{?dist}
+Release: 0.4%{?dist}
 License: GPLv2 and GPLv2+ and GPLv3+ and LGPLv2+ and BSD with advertising and Public Domain
 Group: System Environment/Base
 URL: ftp://ftp.kernel.org/pub/linux/utils/util-linux
 
-%define upstream_version %{version}-rc2
+%define upstream_version %{version}-rc3
 
 ### Features
 %if 0%{?rhel}
@@ -749,6 +749,10 @@ fi
 
 
 %changelog
+* Tue Jan 25 2011 Karel Zak <kzak@redhat.com> 2.19-0.4
+- upgrade to the release 2.19-rc3
+  ftp://ftp.kernel.org/pub/linux/utils/util-linux/v2.19/v2.19-rc3-ChangeLog
+
 * Tue Jan 25 2011 Karel Zak <kzak@redhat.com> 2.19-0.3
 - upgrade to the release 2.19-rc2
   ftp://ftp.kernel.org/pub/linux/utils/util-linux/v2.19/v2.19-rc2-ChangeLog
