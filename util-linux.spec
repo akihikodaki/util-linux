@@ -2,7 +2,7 @@
 Summary: A collection of basic system utilities
 Name: util-linux
 Version: 2.19
-Release: 0.5%{?dist}
+Release: 0.6%{?dist}
 License: GPLv2 and GPLv2+ and GPLv3+ and LGPLv2+ and BSD with advertising and Public Domain
 Group: System Environment/Base
 URL: ftp://ftp.kernel.org/pub/linux/utils/util-linux
@@ -34,10 +34,10 @@ BuildRequires: libutempter-devel
 
 ### Sources
 Source0: ftp://ftp.kernel.org/pub/linux/utils/util-linux/v2.19/util-linux-%{upstream_version}.tar.bz2
-Source1: util-linux-ng-login.pamd
-Source2: util-linux-ng-remote.pamd
-Source3: util-linux-ng-chsh-chfn.pamd
-Source4: util-linux-ng-60-raw.rules
+Source1: util-linux-login.pamd
+Source2: util-linux-remote.pamd
+Source3: util-linux-chsh-chfn.pamd
+Source4: util-linux-60-raw.rules
 Source5: mount.tmpfs
 Source8: nologin.c
 Source9: nologin.8
@@ -749,6 +749,9 @@ fi
 
 
 %changelog
+* Tue Feb  8 2011 Karel Zak <kzak@redhat.com> 2.19-0.6
+- fix #665062 - add support for the postlogin PAM stack to util-linux-ng
+
 * Mon Feb 07 2011 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 2.19-0.5
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_15_Mass_Rebuild
 
