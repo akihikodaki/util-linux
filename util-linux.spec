@@ -2,12 +2,12 @@
 Summary: A collection of basic system utilities
 Name: util-linux
 Version: 2.19
-Release: 0.6%{?dist}
+Release: 1%{?dist}
 License: GPLv2 and GPLv2+ and GPLv3+ and LGPLv2+ and BSD with advertising and Public Domain
 Group: System Environment/Base
 URL: ftp://ftp.kernel.org/pub/linux/utils/util-linux
 
-%define upstream_version %{version}-rc3
+%define upstream_version %{version}
 
 ### Features
 %if 0%{?rhel}
@@ -38,7 +38,6 @@ Source1: util-linux-login.pamd
 Source2: util-linux-remote.pamd
 Source3: util-linux-chsh-chfn.pamd
 Source4: util-linux-60-raw.rules
-Source5: mount.tmpfs
 Source8: nologin.c
 Source9: nologin.8
 Source10: uuidd.init
@@ -312,11 +311,6 @@ ln -sf ../../sbin/hwclock ${RPM_BUILD_ROOT}/usr/sbin/hwclock
 ln -sf hwclock ${RPM_BUILD_ROOT}/sbin/clock
 echo ".so man8/hwclock.8" > ${RPM_BUILD_ROOT}%{_mandir}/man8/clock.8
 
-# install tmpfs mount helper
-pushd ${RPM_BUILD_ROOT}/sbin
-install -m 755 %{SOURCE5} ./mount.tmpfs
-popd
-
 # unsupported on ix86 alpha armv4l
 %ifnarch %cytune_archs
 rm -f $RPM_BUILD_ROOT%{_bindir}/cytune $RPM_BUILD_ROOT%{_mandir}/man8/cytune.8*
@@ -489,7 +483,6 @@ fi
 
 %attr(4755,root,root)	/bin/mount
 %attr(4755,root,root)	/bin/umount
-%attr(755,root,root)	/sbin/mount.tmpfs
 %attr(755,root,root)	/bin/login
 %attr(4711,root,root)	%{_bindir}/chfn
 %attr(4711,root,root)	%{_bindir}/chsh
@@ -749,6 +742,12 @@ fi
 
 
 %changelog
+
+* Thu Feb 10 2011 Karel Zak <kzak@redhat.com> 2.19-1
+- upgrade to the release 2.19
+  ftp://ftp.kernel.org/pub/linux/utils/util-linux/v2.19/v2.19-ReleaseNotes
+- remove /sbin/mount.tmpfs -- integrated to mount(8)
+
 * Tue Feb  8 2011 Karel Zak <kzak@redhat.com> 2.19-0.6
 - fix #665062 - add support for the postlogin PAM stack to util-linux-ng
 
