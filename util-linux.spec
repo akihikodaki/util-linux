@@ -2,10 +2,10 @@
 Summary: A collection of basic system utilities
 Name: util-linux
 Version: 2.19
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: GPLv2 and GPLv2+ and GPLv3+ and LGPLv2+ and BSD with advertising and Public Domain
 Group: System Environment/Base
-URL: ftp://ftp.kernel.org/pub/linux/utils/util-linux
+URL: http://kernel.org/~kzak/util-linux/
 
 %define upstream_version %{version}
 
@@ -19,7 +19,7 @@ URL: ftp://ftp.kernel.org/pub/linux/utils/util-linux
 %define mtab_symlink 1
 
 ### Macros
-%define floppyver 0.16
+%define floppyver 0.18
 %define cytune_archs %{ix86} alpha %{arm}
 
 ### Dependences
@@ -41,7 +41,7 @@ Source4: util-linux-60-raw.rules
 Source8: nologin.c
 Source9: nologin.8
 Source10: uuidd.init
-Source11: http://dl.sourceforge.net/floppyutil/floppy-%{floppyver}.tar.bz2
+Source11: http://downloads.sourceforge.net/floppyutil/floppy-%{floppyver}.tar.bz2
 
 ### Obsoletes & Conflicts & Provides
 # old versions of e2fsprogs contain fsck, uuidgen
@@ -64,11 +64,11 @@ Requires: udev
 ### Floppy patches (Fedora/RHEL specific)
 ###
 # add a missing header
-Patch0: util-linux-ng-2.13-floppy-locale.patch
+Patch0: util-linux-2.19-floppy-locale.patch
 # add note about ATAPI IDE floppy to fdformat.8
 Patch1: util-linux-ng-2.13-fdformat-man-ide.patch
 # 169628 - /usr/bin/floppy doesn't work with /dev/fd0
-Patch2: util-linux-ng-2.13-floppy-generic.patch
+Patch2: util-linux-2.19-floppy-generic.patch
 
 ### Fedora/RHEL specific patches -- need to die!
 ###
@@ -742,6 +742,9 @@ fi
 
 
 %changelog
+* Mon Mar  7 2011 Karel Zak <kzak@redhat.com> 2.19-2
+- fix #682502 - Broken source URL to floppy tarball, new version available
+- upgrade to floppy-0.18
 
 * Thu Feb 10 2011 Karel Zak <kzak@redhat.com> 2.19-1
 - upgrade to the release 2.19

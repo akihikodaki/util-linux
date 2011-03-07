@@ -1,6 +1,7 @@
---- util-linux-2.12p/floppy-0.16/floppyfloppy.c.generic	2001-02-13 01:15:38.000000000 +0100
-+++ util-linux-2.12p/floppy-0.16/floppyfloppy.c	2005-09-30 15:38:08.000000000 +0200
-@@ -264,6 +264,33 @@
+diff -up util-linux-2.19/floppy-0.18/floppyfloppy.c.kzak util-linux-2.19/floppy-0.18/floppyfloppy.c
+--- util-linux-2.19/floppy-0.18/floppyfloppy.c.kzak	2009-09-24 03:36:33.000000000 +0200
++++ util-linux-2.19/floppy-0.18/floppyfloppy.c	2011-03-07 10:40:42.000000000 +0100
+@@ -271,6 +271,33 @@ static RETSIGTYPE sighandler(int signum)
  #endif
  }
  
@@ -34,7 +35,7 @@
  
  static int do_format(const char *dev, int fmtnum,
  		     int (*fmt_func)(const char *, int), int flags)
-@@ -275,6 +302,7 @@
+@@ -282,6 +309,7 @@ static int do_format(const char *dev, in
  	struct format_descr curtrack;
  	int pct;
  	struct stat stat_buf;
@@ -42,7 +43,7 @@
  
  	int i, j;
  	char *devname;
-@@ -297,23 +325,52 @@
+@@ -304,23 +332,52 @@ static int do_format(const char *dev, in
  
  	strcat(strcpy(devname, dev), floppy_type[fmtnum].dev);
  

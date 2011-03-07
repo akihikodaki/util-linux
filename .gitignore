@@ -4,3 +4,7 @@
 /util-linux-2.19-rc2.tar.bz2
 /util-linux-2.19-rc3.tar.bz2
 /util-linux-2.19.tar.bz2
+*~
+.*.log
+*.rpm
+/floppy-0.18.tar.bz2
