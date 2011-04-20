@@ -1,13 +1,13 @@
 ### Header
 Summary: A collection of basic system utilities
 Name: util-linux
-Version: 2.19
-Release: 2%{?dist}
+Version: 2.19.1
+Release: 0.1%{?dist}
 License: GPLv2 and GPLv2+ and GPLv3+ and LGPLv2+ and BSD with advertising and Public Domain
 Group: System Environment/Base
 URL: http://kernel.org/~kzak/util-linux/
 
-%define upstream_version %{version}
+%define upstream_version %{version}-rc1
 
 ### Features
 %if 0%{?rhel}
@@ -742,6 +742,10 @@ fi
 
 
 %changelog
+* Wed Apr 20 2011 Karel Zak <kzak@redhat.com> 2.19.1-0.1
+- upgrade to the release 2.19.1-rc1
+  ftp://ftp.kernel.org/pub/linux/utils/util-linux/v2.19/v2.19.1-rc1-ChangeLog
+
 * Mon Mar  7 2011 Karel Zak <kzak@redhat.com> 2.19-2
 - fix #682502 - Broken source URL to floppy tarball, new version available
 - upgrade to floppy-0.18
