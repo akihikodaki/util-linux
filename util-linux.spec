@@ -2,7 +2,7 @@
 Summary: A collection of basic system utilities
 Name: util-linux
 Version: 2.19.1
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: GPLv2 and GPLv2+ and GPLv3+ and LGPLv2+ and BSD with advertising and Public Domain
 Group: System Environment/Base
 URL: http://kernel.org/~kzak/util-linux/
@@ -83,6 +83,18 @@ Patch5: util-linux-ng-2.16-blkid-cachefile.patch
 Patch7: util-linux-ng-2.13-login-lastlog.patch
 # 231192 - ipcs is not printing correct values on pLinux
 Patch8: util-linux-ng-2.15-ipcs-32bit.patch
+
+### Upstream patches
+###
+# kernel "3.0"
+Patch9: util-linux-2.19-kernel-version.patch
+# 709319 - 'mount -a' mounts already mounted directories
+Patch10: util-linux-2.19-libmount-mounted.patch
+Patch11: util-linux-2.19-mount-a-bind.patch
+# 709681 - failure to mount if a mount point ends with a slash in /etc/fstab
+Patch12: util-linux-2.19-mount-fsname.patch
+# 716483 - /var/tmp --(BIND-mounted)--> /tmp disrupts/hangs bootup
+Patch13: util-linux-2.19-mount-mountpoint.patch
 
 %description
 The util-linux package contains a large variety of low-level system
@@ -197,6 +209,12 @@ cp %{SOURCE8} %{SOURCE9} .
 %patch5 -p1
 %patch7 -p1
 %patch8 -p1
+%patch9 -p1
+%patch10 -p1
+%patch11 -p1
+%patch12 -p1
+%patch13 -p1
+
 
 %build
 unset LINGUAS || :
@@ -742,6 +760,12 @@ fi
 
 
 %changelog
+* Mon Jul  4 2011 Karel Zak <kzak@redhat.com> 2.19.1-2
+- fix #716483 - /var/tmp --(BIND-mounted)--> /tmp disrupts/hangs bootup
+- fix #709681 - failure to mount if a mount point ends with a slash in /etc/fstab
+- fix #709319 - 'mount -a' mounts already mounted directories
+- fix kernel version parsing
+
 * Fri May  6 2011 Karel Zak <kzak@redhat.com> 2.19.1-1
 - upgrade to the release 2.19.1
   ftp://ftp.kernel.org/pub/linux/utils/util-linux/v2.19/v2.19.1-ReleaseNotes
