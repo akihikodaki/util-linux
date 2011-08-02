@@ -1,0 +1,64 @@
+diff -up util-linux-2.20-rc1/libblkid/libblkid.3.kzak util-linux-2.20-rc1/libblkid/libblkid.3
+--- util-linux-2.20-rc1/libblkid/libblkid.3.kzak	2011-07-26 16:43:07.000000000 +0200
++++ util-linux-2.20-rc1/libblkid/libblkid.3	2011-07-29 21:17:20.883777687 +0200
+@@ -28,7 +28,7 @@ partitions and block device topology.
+ .P
+ The high-level part of the library keeps information about block devices
+ in a cache file
+-.I /etc/blkid.tab
++.I /etc/blkid/blkid.tab
+ and is verified to still be valid before being returned to the user
+ (if the user has read permission on the raw block device, otherwise not).
+ The cache file also allows unprivileged users (normally anyone other
+@@ -69,7 +69,7 @@ symlink does not match with LABEL or UUI
+ .I CACHE_FILE=<path>
+ Overrides the standard location of the cache file. This setting can be
+ overridden by the environment variable BLKID_FILE. Default is
+-.I /etc/blkid.tab.
++.I /etc/blkid/blkid.tab.
+ .TP
+ .I EVALUATE=<methods>
+ Defines LABEL and UUID evaluation method(s). Currently, the libblkid library
+@@ -87,7 +87,7 @@ from Ted Ts'o.  The library was subseque
+ The low-level probing code was rewritten by Karel Zak.
+ .SH FILES
+ .TP 18
+-.I /etc/blkid.tab
++.I /etc/blkid/blkid.tab
+ caches data extracted from each recognized block device
+ .TP
+ .I /etc/blkid.conf
+diff -up util-linux-2.20-rc1/libblkid/src/blkidP.h.kzak util-linux-2.20-rc1/libblkid/src/blkidP.h
+--- util-linux-2.20-rc1/libblkid/src/blkidP.h.kzak	2011-07-20 21:55:23.000000000 +0200
++++ util-linux-2.20-rc1/libblkid/src/blkidP.h	2011-07-29 21:17:52.852169993 +0200
+@@ -286,7 +286,7 @@ extern char *blkid_strdup(const char *s)
+ extern char *blkid_strndup(const char *s, const int length);
+ extern char *blkid_strconcat(const char *a, const char *b, const char *c);
+ 
+-#define BLKID_CACHE_FILE	"/etc/blkid.tab"
++#define BLKID_CACHE_FILE	"/etc/blkid/blkid.tab"
+ #define BLKID_CONFIG_FILE	"/etc/blkid.conf"
+ 
+ #define BLKID_ERR_IO	 5
+diff -up util-linux-2.20-rc1/misc-utils/blkid.8.kzak util-linux-2.20-rc1/misc-utils/blkid.8
+--- util-linux-2.20-rc1/misc-utils/blkid.8.kzak	2011-07-20 21:55:23.000000000 +0200
++++ util-linux-2.20-rc1/misc-utils/blkid.8	2011-07-29 21:15:37.312506693 +0200
+@@ -79,7 +79,7 @@ same meaning as "KiB") or decimal (10^N)
+ Read from
+ .I cachefile
+ instead of reading from the default cache file
+-.IR /etc/blkid.tab .
++.IR /etc/blkid/blkid.tab .
+ If you want to start with a clean cache (i.e. don't report devices previously
+ scanned but not necessarily available at this time), specify
+ .IR /dev/null .
+@@ -242,7 +242,7 @@ Display version number and exit.
+ Write the device cache to
+ .I writecachefile
+ instead of writing it to the default cache file
+-.IR /etc/blkid.tab .
++.IR /etc/blkid/blkid.tab .
+ If you don't want to save the cache at all, specify
+ .IR /dev/null.
+ If not specified, it will be the same file as that given with the
+diff -up util-linux-2.20-rc1/misc-utils/blkid.c.kzak util-linux-2.20-rc1/misc-utils/blkid.c

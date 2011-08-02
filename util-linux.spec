@@ -1,13 +1,13 @@
 ### Header
 Summary: A collection of basic system utilities
 Name: util-linux
-Version: 2.19.1
-Release: 2%{?dist}
+Version: 2.20
+Release: 0.1%{?dist}
 License: GPLv2 and GPLv2+ and GPLv3+ and LGPLv2+ and BSD with advertising and Public Domain
 Group: System Environment/Base
 URL: http://kernel.org/~kzak/util-linux/
 
-%define upstream_version %{version}
+%define upstream_version %{version}-rc1
 
 ### Features
 %if 0%{?rhel}
@@ -66,7 +66,7 @@ Requires: udev
 # add a missing header
 Patch0: util-linux-2.19-floppy-locale.patch
 # add note about ATAPI IDE floppy to fdformat.8
-Patch1: util-linux-ng-2.13-fdformat-man-ide.patch
+Patch1: util-linux-2.20-fdformat-man-ide.patch
 # 169628 - /usr/bin/floppy doesn't work with /dev/fd0
 Patch2: util-linux-2.19-floppy-generic.patch
 
@@ -75,7 +75,7 @@ Patch2: util-linux-2.19-floppy-generic.patch
 # 199745 - Non-existant simpleinit(8) mentioned in ctrlaltdel(8)
 Patch4: util-linux-ng-2.13-ctrlaltdel-man.patch
 # /etc/blkid.tab --> /etc/blkid/blkid.tab
-Patch5: util-linux-ng-2.16-blkid-cachefile.patch
+Patch5: util-linux-2.20-blkid-cachefile.patch
 
 ### Ready for upstream?
 ###
@@ -83,18 +83,6 @@ Patch5: util-linux-ng-2.16-blkid-cachefile.patch
 Patch7: util-linux-ng-2.13-login-lastlog.patch
 # 231192 - ipcs is not printing correct values on pLinux
 Patch8: util-linux-ng-2.15-ipcs-32bit.patch
-
-### Upstream patches
-###
-# kernel "3.0"
-Patch9: util-linux-2.19-kernel-version.patch
-# 709319 - 'mount -a' mounts already mounted directories
-Patch10: util-linux-2.19-libmount-mounted.patch
-Patch11: util-linux-2.19-mount-a-bind.patch
-# 709681 - failure to mount if a mount point ends with a slash in /etc/fstab
-Patch12: util-linux-2.19-mount-fsname.patch
-# 716483 - /var/tmp --(BIND-mounted)--> /tmp disrupts/hangs bootup
-Patch13: util-linux-2.19-mount-mountpoint.patch
 
 %description
 The util-linux package contains a large variety of low-level system
@@ -209,12 +197,6 @@ cp %{SOURCE8} %{SOURCE9} .
 %patch5 -p1
 %patch7 -p1
 %patch8 -p1
-%patch9 -p1
-%patch10 -p1
-%patch11 -p1
-%patch12 -p1
-%patch13 -p1
-
 
 %build
 unset LINGUAS || :
@@ -514,6 +496,7 @@ fi
 /bin/kill
 /bin/lsblk
 /bin/more
+/bin/mountpoint
 /bin/taskset
 
 /sbin/addpart
@@ -606,6 +589,7 @@ fi
 %{_mandir}/man1/lscpu.1*
 %{_mandir}/man1/mcookie.1*
 %{_mandir}/man1/more.1*
+%{_mandir}/man1/mountpoint.1*
 %{_mandir}/man1/namei.1*
 %{_mandir}/man1/readprofile.1*
 %{_mandir}/man1/rename.1*
@@ -622,7 +606,6 @@ fi
 %{_mandir}/man1/uuidgen.1*
 %{_mandir}/man1/whereis.1*
 %{_mandir}/man1/write.1*
-
 %{_mandir}/ru/man1/ddate.1.gz
 
 %{_mandir}/man5/fstab.5*
@@ -709,12 +692,12 @@ fi
 
 %files -n libmount
 %defattr(-,root,root)
-%doc shlibs/mount/COPYING.libmount
+%doc libmount/COPYING.libmount
 /%{_lib}/libmount.so.*
 
 %files -n libmount-devel
 %defattr(-,root,root)
-%doc shlibs/mount/COPYING.libmount
+%doc libmount/COPYING.libmount
 %{_libdir}/libmount.so
 %{_includedir}/libmount
 %{_libdir}/pkgconfig/mount.pc
@@ -722,13 +705,13 @@ fi
 
 %files -n libblkid
 %defattr(-,root,root)
-%doc shlibs/blkid/COPYING.libblkid
+%doc libblkid/COPYING.libblkid
 %dir /etc/blkid
 /%{_lib}/libblkid.so.*
 
 %files -n libblkid-devel
 %defattr(-,root,root)
-%doc shlibs/blkid/COPYING.libblkid
+%doc libblkid/COPYING.libblkid
 %{_libdir}/libblkid.so
 %{_includedir}/blkid
 %{_mandir}/man3/libblkid.3*
@@ -737,12 +720,12 @@ fi
 
 %files -n libuuid
 %defattr(-,root,root)
-%doc shlibs/uuid/COPYING.libuuid
+%doc libuuid/COPYING.libuuid
 /%{_lib}/libuuid.so.*
 
 %files -n libuuid-devel
 %defattr(-,root,root)
-%doc shlibs/uuid/COPYING.libuuid
+%doc libuuid/COPYING.libuuid
 %{_libdir}/libuuid.so
 %{_includedir}/uuid
 %{_mandir}/man3/uuid.3*
@@ -752,6 +735,7 @@ fi
 %{_mandir}/man3/uuid_generate.3*
 %{_mandir}/man3/uuid_generate_random.3*
 %{_mandir}/man3/uuid_generate_time.3*
+%{_mandir}/man3/uuid_generate_time_safe.3*
 %{_mandir}/man3/uuid_is_null.3*
 %{_mandir}/man3/uuid_parse.3*
 %{_mandir}/man3/uuid_time.3*
@@ -760,6 +744,10 @@ fi
 
 
 %changelog
+* Fri Aug  2 2021 Karel Zak <kzak@redhat.com> 2.20.0.1
+- upgrade to the release 2.20-rc1
+  ftp://ftp.kernel.org/pub/linux/utils/util-linux/v2.20/v2.20-ReleaseNotes
+
 * Mon Jul  4 2011 Karel Zak <kzak@redhat.com> 2.19.1-2
 - fix #716483 - /var/tmp --(BIND-mounted)--> /tmp disrupts/hangs bootup
 - fix #709681 - failure to mount if a mount point ends with a slash in /etc/fstab
