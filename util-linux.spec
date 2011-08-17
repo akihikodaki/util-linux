@@ -2,12 +2,12 @@
 Summary: A collection of basic system utilities
 Name: util-linux
 Version: 2.20
-Release: 0.1%{?dist}
+Release: 0.2%{?dist}
 License: GPLv2 and GPLv2+ and GPLv3+ and LGPLv2+ and BSD with advertising and Public Domain
 Group: System Environment/Base
 URL: http://kernel.org/~kzak/util-linux/
 
-%define upstream_version %{version}-rc1
+%define upstream_version %{version}-rc2
 
 ### Features
 %if 0%{?rhel}
@@ -82,7 +82,7 @@ Patch5: util-linux-2.20-blkid-cachefile.patch
 # 151635 - makeing /var/log/lastlog
 Patch7: util-linux-ng-2.13-login-lastlog.patch
 # 231192 - ipcs is not printing correct values on pLinux
-Patch8: util-linux-ng-2.15-ipcs-32bit.patch
+Patch8: util-linux-2.20-ipcs-32bit.patch
 
 %description
 The util-linux package contains a large variety of low-level system
@@ -744,6 +744,10 @@ fi
 
 
 %changelog
+* Wed Aug 17 2021 Karel Zak <kzak@redhat.com> 2.20.0.2
+- upgrade to the release 2.20-rc2
+  ftp://ftp.kernel.org/pub/linux/utils/util-linux/v2.20/v2.20-rc2-ChangeLog
+
 * Fri Aug  2 2021 Karel Zak <kzak@redhat.com> 2.20.0.1
 - upgrade to the release 2.20-rc1
   ftp://ftp.kernel.org/pub/linux/utils/util-linux/v2.20/v2.20-ReleaseNotes
