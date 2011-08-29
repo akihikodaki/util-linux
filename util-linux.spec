@@ -2,12 +2,12 @@
 Summary: A collection of basic system utilities
 Name: util-linux
 Version: 2.20
-Release: 0.2%{?dist}
+Release: 1%{?dist}
 License: GPLv2 and GPLv2+ and GPLv3+ and LGPLv2+ and BSD with advertising and Public Domain
 Group: System Environment/Base
 URL: http://kernel.org/~kzak/util-linux/
 
-%define upstream_version %{version}-rc2
+%define upstream_version %{version}
 
 ### Features
 %if 0%{?rhel}
@@ -214,6 +214,7 @@ export SUID_LDFLAGS="-pie"
 	--enable-login-utils \
 	--enable-kill \
 	--enable-write \
+	--enable-ddate \
 %if %{include_raw}
 	--enable-raw \
 %endif
@@ -744,11 +745,14 @@ fi
 
 
 %changelog
-* Wed Aug 17 2021 Karel Zak <kzak@redhat.com> 2.20.0.2
+* Mon Aug 29 2011 Karel Zak <kzak@redhat.com> 2.20-1
+- upgrade to the release 2.20
+
+* Wed Aug 17 2011 Karel Zak <kzak@redhat.com> 2.20-0.2
 - upgrade to the release 2.20-rc2
   ftp://ftp.kernel.org/pub/linux/utils/util-linux/v2.20/v2.20-rc2-ChangeLog
 
-* Fri Aug  2 2021 Karel Zak <kzak@redhat.com> 2.20.0.1
+* Fri Aug  2 2011 Karel Zak <kzak@redhat.com> 2.20-0.1
 - upgrade to the release 2.20-rc1
   ftp://ftp.kernel.org/pub/linux/utils/util-linux/v2.20/v2.20-ReleaseNotes
 
