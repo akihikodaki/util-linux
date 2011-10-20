@@ -1,7 +1,7 @@
 ### Header
 Summary: A collection of basic system utilities
 Name: util-linux
-Version: 2.20
+Version: 2.20.1
 Release: 1%{?dist}
 License: GPLv2 and GPLv2+ and GPLv3+ and LGPLv2+ and BSD with advertising and Public Domain
 Group: System Environment/Base
@@ -33,7 +33,9 @@ BuildRequires: popt-devel
 BuildRequires: libutempter-devel
 
 ### Sources
-Source0: ftp://ftp.kernel.org/pub/linux/utils/util-linux/v2.19/util-linux-%{upstream_version}.tar.bz2
+#Source0: ftp://ftp.kernel.org/pub/linux/utils/util-linux/v2.19/util-linux-%{upstream_version}.tar.bz2
+#
+Source0: ftp://ftp.infradead.org/pub/util-linux/v2.20/util-linux-%{upstream_version}.tar.bz2
 Source1: util-linux-login.pamd
 Source2: util-linux-remote.pamd
 Source3: util-linux-chsh-chfn.pamd
@@ -745,6 +747,10 @@ fi
 
 
 %changelog
+* Thu Oct 20 2011 Karel Zak <kzak@redhat.com> 2.20.1-1
+- upgrade to the release 2.20.1
+  ftp://ftp.infradead.org/pub/util-linux/v2.20/v2.20.1-ReleaseNotes
+
 * Mon Aug 29 2011 Karel Zak <kzak@redhat.com> 2.20-1
 - upgrade to the release 2.20
 
