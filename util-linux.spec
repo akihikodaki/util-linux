@@ -2,7 +2,7 @@
 Summary: A collection of basic system utilities
 Name: util-linux
 Version: 2.20.1
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: GPLv2 and GPLv2+ and GPLv3+ and LGPLv2+ and BSD with advertising and Public Domain
 Group: System Environment/Base
 URL: http://kernel.org/~kzak/util-linux/
@@ -747,6 +747,9 @@ fi
 
 
 %changelog
+* Wed Oct 26 2011 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 2.20.1-2
+- Rebuilt for glibc bug#747377
+
 * Thu Oct 20 2011 Karel Zak <kzak@redhat.com> 2.20.1-1
 - upgrade to the release 2.20.1
   ftp://ftp.infradead.org/pub/util-linux/v2.20/v2.20.1-ReleaseNotes
