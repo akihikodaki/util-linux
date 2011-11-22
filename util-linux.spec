@@ -2,7 +2,7 @@
 Summary: A collection of basic system utilities
 Name: util-linux
 Version: 2.20.1
-Release: 2%{?dist}
+Release: 3%{?dist}
 License: GPLv2 and GPLv2+ and GPLv3+ and LGPLv2+ and BSD with advertising and Public Domain
 Group: System Environment/Base
 URL: http://kernel.org/~kzak/util-linux/
@@ -53,7 +53,7 @@ Obsoletes: util-linux-ng < 2.19
 Provides: util-linux-ng = %{version}-%{release}
 
 Requires(post): coreutils
-Requires: pam >= 1.0.90, /etc/pam.d/system-auth
+Requires: pam >= 1.1.3-7, /etc/pam.d/system-auth
 Requires: audit-libs >= 1.0.6
 Requires: libuuid = %{version}-%{release}
 Requires: libblkid = %{version}-%{release}
@@ -216,7 +216,6 @@ export SUID_LDFLAGS="-pie"
 	--enable-login-utils \
 	--enable-kill \
 	--enable-write \
-	--enable-ddate \
 %if %{include_raw}
 	--enable-raw \
 %endif
@@ -533,7 +532,6 @@ fi
 %{_bindir}/colcrt
 %{_bindir}/colrm
 %{_bindir}/column
-%{_bindir}/ddate
 %{_bindir}/fallocate
 %{_bindir}/flock
 %{_bindir}/getopt
@@ -575,7 +573,6 @@ fi
 %{_mandir}/man1/colcrt.1*
 %{_mandir}/man1/colrm.1*
 %{_mandir}/man1/column.1*
-%{_mandir}/man1/ddate.1*
 %{_mandir}/man1/dmesg.1*
 %{_mandir}/man1/fallocate.1*
 %{_mandir}/man1/flock.1*
@@ -609,7 +606,6 @@ fi
 %{_mandir}/man1/uuidgen.1*
 %{_mandir}/man1/whereis.1*
 %{_mandir}/man1/write.1*
-%{_mandir}/ru/man1/ddate.1.gz
 
 %{_mandir}/man5/fstab.5*
 
@@ -747,6 +743,10 @@ fi
 
 
 %changelog
+* Tue Nov 22 2011 Karel Zak <kzak@redhat.com> 2.20.1-3
+- fix #748216 - util-linux requires pam >= 1.1.3-7
+- remove ddate(1)
+
 * Wed Oct 26 2011 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 2.20.1-2
 - Rebuilt for glibc bug#747377
 
