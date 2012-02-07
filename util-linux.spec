@@ -1,22 +1,13 @@
 ### Header
 Summary: A collection of basic system utilities
 Name: util-linux
-Version: 2.20.1
-Release: 5%{?dist}
+Version: 2.21
+Release: 0.1%{?dist}
 License: GPLv2 and GPLv2+ and GPLv3+ and LGPLv2+ and BSD with advertising and Public Domain
 Group: System Environment/Base
 URL: http://kernel.org/~kzak/util-linux/
 
-%define upstream_version %{version}
-
-### Features
-%if 0%{?rhel}
-%define include_raw 1
-%else
-%define include_raw 0
-%endif
-
-%define mtab_symlink 1
+%define upstream_version %{version}-rc2
 
 ### Macros
 %define floppyver 0.18
@@ -31,11 +22,10 @@ BuildRequires: pam-devel
 BuildRequires: zlib-devel
 BuildRequires: popt-devel
 BuildRequires: libutempter-devel
+BuildRequires: libudev-devel
 
 ### Sources
-#Source0: ftp://ftp.kernel.org/pub/linux/utils/util-linux/v2.19/util-linux-%{upstream_version}.tar.bz2
-#
-Source0: ftp://ftp.infradead.org/pub/util-linux/v2.20/util-linux-%{upstream_version}.tar.bz2
+Source0: ftp://ftp.kernel.org/pub/linux/utils/util-linux/v2.21/util-linux-%{upstream_version}.tar.xz
 Source1: util-linux-login.pamd
 Source2: util-linux-remote.pamd
 Source3: util-linux-chsh-chfn.pamd
@@ -69,10 +59,7 @@ Requires: audit-libs >= 1.0.6
 Requires: libuuid = %{version}-%{release}
 Requires: libblkid = %{version}-%{release}
 Requires: libmount = %{version}-%{release}
-
-%if %{include_raw}
 Requires: udev >= 176
-%endif
 
 ### Floppy patches (Fedora/RHEL specific)
 ###
@@ -83,19 +70,12 @@ Patch1: util-linux-2.20-fdformat-man-ide.patch
 # 169628 - /usr/bin/floppy doesn't work with /dev/fd0
 Patch2: util-linux-2.19-floppy-generic.patch
 
-### Fedora/RHEL specific patches -- need to die!
-###
-# 199745 - Non-existant simpleinit(8) mentioned in ctrlaltdel(8)
-Patch4: util-linux-ng-2.13-ctrlaltdel-man.patch
-# /etc/blkid.tab --> /etc/blkid/blkid.tab
-Patch5: util-linux-2.20-blkid-cachefile.patch
-
 ### Ready for upstream?
 ###
 # 151635 - makeing /var/log/lastlog
-Patch7: util-linux-ng-2.13-login-lastlog.patch
+Patch3: util-linux-ng-2.21-login-lastlog.patch
 # 231192 - ipcs is not printing correct values on pLinux
-Patch8: util-linux-2.20-ipcs-32bit.patch
+Patch4: util-linux-2.21-ipcs-32bit.patch
 
 %description
 The util-linux package contains a large variety of low-level system
@@ -209,10 +189,8 @@ cp %{SOURCE8} %{SOURCE9} .
 %patch0 -p1
 %patch1 -p1
 %patch2 -p1
+%patch3 -p1
 %patch4 -p1
-%patch5 -p1
-%patch7 -p1
-%patch8 -p1
 
 %build
 unset LINGUAS || :
@@ -227,12 +205,9 @@ export SUID_LDFLAGS="-pie"
 	--enable-login-utils \
 	--enable-kill \
 	--enable-write \
-%if %{include_raw}
 	--enable-raw \
-%endif
-%if %{mtab_symlink}
-	--enable-libmount-mount \
-%endif
+	--enable-new-mount \
+	--with-udev \
 	--with-selinux \
 	--with-audit \
 	--with-utempter \
@@ -255,7 +230,7 @@ rm -rf ${RPM_BUILD_ROOT}
 mkdir -p ${RPM_BUILD_ROOT}%{_bindir}
 mkdir -p ${RPM_BUILD_ROOT}%{_mandir}/man{1,6,8,5}
 mkdir -p ${RPM_BUILD_ROOT}%{_sbindir}
-mkdir -p ${RPM_BUILD_ROOT}%{_sysconfdir}/{pam.d,security/console.apps,blkid}
+mkdir -p ${RPM_BUILD_ROOT}%{_sysconfdir}/{pam.d,security/console.apps}
 mkdir -p ${RPM_BUILD_ROOT}/var/log
 touch ${RPM_BUILD_ROOT}/var/log/lastlog
 chmod 0644 ${RPM_BUILD_ROOT}/var/log/lastlog
@@ -272,7 +247,7 @@ popd
 install -m 755 nologin ${RPM_BUILD_ROOT}%{_sbindir}
 install -m 644 nologin.8 ${RPM_BUILD_ROOT}%{_mandir}/man8
 
-%if %{include_raw}
+# raw
 echo '.so man8/raw.8' > $RPM_BUILD_ROOT%{_mandir}/man8/rawdevices.8
 {
 	# see RH bugzilla #216664
@@ -281,7 +256,9 @@ echo '.so man8/raw.8' > $RPM_BUILD_ROOT%{_mandir}/man8/rawdevices.8
 	install -m 644 %{SOURCE4} ./60-raw.rules
 	popd
 }
-%endif
+
+# sbin -> bin
+mv ${RPM_BUILD_ROOT}%{_sbindir}/raw ${RPM_BUILD_ROOT}%{_bindir}/raw
 
 # Our own initscript for uuidd
 install -D -m 755 %{SOURCE10} ${RPM_BUILD_ROOT}/etc/rc.d/init.d/uuidd
@@ -342,7 +319,7 @@ done
 %ifarch %{sparc}
 for I in /sbin/sfdisk \
 	%{_mandir}/man8/sfdisk.8* \
-	%doc fdisk/sfdisk.examples \
+	%doc Documentation/sfdisk.txt \
 	/sbin/cfdisk \
 	%{_mandir}/man8/cfdisk.8*; do
 	
@@ -351,7 +328,7 @@ done
 %endif
 
 # deprecated commands
-for I in /usr/sbin/fsck.minix /usr/sbin/mkfs.{bfs,minix} /usr/sbin/sln \
+for I in /usr/sbin/mkfs.bfs /usr/sbin/sln \
 	/usr/bin/chkdupexe %{_bindir}/line %{_bindir}/pg %{_bindir}/newgrp \
 	/usr/sbin/shutdown /usr/sbin/vipw /usr/sbin/vigr; do
 	rm -f $RPM_BUILD_ROOT$I
@@ -359,13 +336,12 @@ done
 
 # deprecated man pages
 for I in man1/chkdupexe.1 man1/line.1 man1/pg.1 man1/newgrp.1 \
-	man8/fsck.minix.8 man8/mkfs.minix.8 man8/mkfs.bfs.8 \
-	man8/vipw.8 man8/vigr; do
+	man8/mkfs.bfs.8 man8/vipw.8 man8/vigr; do
 	rm -rf $RPM_BUILD_ROOT%{_mandir}/${I}*
 done
 
 # deprecated docs
-for I in text-utils/README.pg misc-utils/README.reset floppy-%{floppyver}/README.html; do
+for I in floppy-%{floppyver}/README.html; do
 	rm -rf $I
 done
 
@@ -377,18 +353,8 @@ chmod 644 getopt/getopt-*.{bash,tcsh}
 rm -f ${RPM_BUILD_ROOT}%{_datadir}/getopt/*
 rmdir ${RPM_BUILD_ROOT}%{_datadir}/getopt
 
-%if %{mtab_symlink}
-	ln -s /proc/mounts %{buildroot}/etc/mtab
-%else
-	touch %{buildroot}/etc/mtab
-%endif
+ln -s /proc/mounts %{buildroot}/etc/mtab
 
-# /sbin -> /bin
-for I in raw; do
-	if [ -e $RPM_BUILD_ROOT/sbin/$I ]; then
-		mv $RPM_BUILD_ROOT/sbin/$I $RPM_BUILD_ROOT/bin/$I
-	fi
-done
 
 # remove static libs
 rm -f $RPM_BUILD_ROOT%{_libdir}/lib{uuid,blkid,mount}.a
@@ -425,20 +391,22 @@ if [ -x /usr/sbin/selinuxenabled ] && /usr/sbin/selinuxenabled; then
 		/usr/bin/chcon "$SECXT"  /var/log/lastlog >/dev/null 2>&1 || :
 	fi
 fi
-%if %{mtab_symlink}
 rm -f /etc/mtab
 ln -s /proc/mounts /etc/mtab
-%else
-touch /etc/mtab
-/bin/chown root:root /etc/mtab
-/bin/chmod 0644 /etc/mtab
-%endif
-
 
 %post -n libblkid
 /sbin/ldconfig
-[ -e /etc/blkid.tab ] && mv /etc/blkid.tab /etc/blkid/blkid.tab || :
-[ -e /etc/blkid.tab.old ] && mv /etc/blkid.tab.old /etc/blkid/blkid.tab.old || :
+
+### Move blkid cache to /run
+
+# deprecated upstream default
+[ -e /etc/blkid.tab ]     && mv /etc/blkid.tab     /run/blkid/blkid.tab || :
+[ -e /etc/blkid.tab.old ] && mv /etc/blkid.tab.old /run/blkid/blkid.tab.old || :
+
+# deprecated Fedora default
+[ -e /etc/blkid/blkid.tab ]     && mv /etc/blkid/blkid.tab     /run/blkid/blkid.tab || :
+[ -e /etc/blkid/blkid.tab.old ] && mv /etc/blkid/blkid.tab.old /run/blkid/blkid.tab.old || :
+
 
 %postun -n libblkid -p /sbin/ldconfig
 
@@ -467,7 +435,8 @@ fi
 
 %files -f %{name}.files
 %defattr(-,root,root)
-%doc */README.* NEWS AUTHORS licenses/* README*
+%doc README */README.* NEWS AUTHORS
+%doc Documentation/deprecated.txt Documentation/licenses/*
 %doc getopt/getopt-*.{bash,tcsh}
 
 %config(noreplace)	%{_sysconfdir}/pam.d/chfn
@@ -496,17 +465,20 @@ fi
 %{_sbindir}/agetty
 %{_sbindir}/blkid
 %{_sbindir}/blockdev
+%{_sbindir}/chcpu
 %{_sbindir}/ctrlaltdel
 %{_sbindir}/delpart
 %{_sbindir}/fdisk
 %{_sbindir}/findfs
 %{_sbindir}/fsck
 %{_sbindir}/fsck.cramfs
+%{_sbindir}/fsck.minix
 %{_sbindir}/fsfreeze
 %{_sbindir}/fstrim
 %{_sbindir}/losetup
 %{_sbindir}/mkfs
 %{_sbindir}/mkfs.cramfs
+%{_sbindir}/mkfs.minix
 %{_sbindir}/mkswap
 %{_sbindir}/nologin
 %{_sbindir}/partx
@@ -538,6 +510,7 @@ fi
 %{_bindir}/lscpu
 %{_bindir}/mcookie
 %{_bindir}/namei
+%{_bindir}/prlimit
 %{_bindir}/rename
 %{_bindir}/renice
 %{_bindir}/rev
@@ -582,7 +555,7 @@ fi
 %{_mandir}/man1/more.1*
 %{_mandir}/man1/mountpoint.1*
 %{_mandir}/man1/namei.1*
-%{_mandir}/man1/readprofile.1*
+%{_mandir}/man1/prlimit.1*
 %{_mandir}/man1/rename.1*
 %{_mandir}/man1/renice.1*
 %{_mandir}/man1/rev.1*
@@ -604,12 +577,14 @@ fi
 %{_mandir}/man8/agetty.8*
 %{_mandir}/man8/blkid.8*
 %{_mandir}/man8/blockdev.8*
+%{_mandir}/man8/chcpu.8*
 %{_mandir}/man8/ctrlaltdel.8*
 %{_mandir}/man8/delpart.8*
 %{_mandir}/man8/fdisk.8*
 %{_mandir}/man8/findfs.8*
 %{_mandir}/man8/findmnt.8*
 %{_mandir}/man8/fsck.8*
+%{_mandir}/man8/fsck.minix.8*
 %{_mandir}/man8/fsfreeze.8*
 %{_mandir}/man8/fstrim.8*
 %{_mandir}/man8/isosize.8*
@@ -617,11 +592,13 @@ fi
 %{_mandir}/man8/losetup.8*
 %{_mandir}/man8/lsblk.8*
 %{_mandir}/man8/mkfs.8*
+%{_mandir}/man8/mkfs.minix.8*
 %{_mandir}/man8/mkswap.8*
 %{_mandir}/man8/mount.8*
 %{_mandir}/man8/nologin.8*
 %{_mandir}/man8/partx.8*
 %{_mandir}/man8/pivot_root.8*
+%{_mandir}/man8/readprofile.8*
 %{_mandir}/man8/rtcwake.8*
 %{_mandir}/man8/setarch.8*
 %{_mandir}/man8/swaplabel.8*
@@ -631,12 +608,10 @@ fi
 %{_mandir}/man8/umount.8*
 %{_mandir}/man8/wipefs.8*
 
-%if %{include_raw}
 %{_bindir}/raw
-%config(noreplace)	%{_sysconfdir}/udev/rules.d/60-raw.rules
+%config(noreplace)	%{_prefix}/lib/udev/rules.d
 %{_mandir}/man8/raw.8*
 %{_mandir}/man8/rawdevices.8*
-%endif
 
 %ifnarch s390 s390x
 %{_sbindir}/clock
@@ -652,7 +627,7 @@ fi
 %endif
 
 %ifnarch %{sparc}
-%doc fdisk/sfdisk.examples
+%doc Documentation/sfdisk.txt
 %{_sbindir}/cfdisk
 %{_sbindir}/sfdisk
 %{_mandir}/man8/cfdisk.8*
@@ -671,7 +646,7 @@ fi
 
 %files -n uuidd
 %defattr(-,root,root)
-%doc licenses/COPYING.GPL
+%doc Documentation/licenses/COPYING.GPLv2
 /etc/rc.d/init.d/uuidd
 %{_mandir}/man8/uuidd.8*
 %attr(-, uuidd, uuidd) %{_sbindir}/uuidd
@@ -681,12 +656,12 @@ fi
 
 %files -n libmount
 %defattr(-,root,root)
-%doc libmount/COPYING.libmount
+%doc libmount/COPYING
 %{_libdir}/libmount.so.*
 
 %files -n libmount-devel
 %defattr(-,root,root)
-%doc libmount/COPYING.libmount
+%doc libmount/COPYING
 %{_libdir}/libmount.so
 %{_includedir}/libmount
 %{_libdir}/pkgconfig/mount.pc
@@ -694,13 +669,12 @@ fi
 
 %files -n libblkid
 %defattr(-,root,root)
-%doc libblkid/COPYING.libblkid
-%dir /etc/blkid
+%doc libblkid/COPYING
 %{_libdir}/libblkid.so.*
 
 %files -n libblkid-devel
 %defattr(-,root,root)
-%doc libblkid/COPYING.libblkid
+%doc libblkid/COPYING
 %{_libdir}/libblkid.so
 %{_includedir}/blkid
 %{_mandir}/man3/libblkid.3*
@@ -709,12 +683,12 @@ fi
 
 %files -n libuuid
 %defattr(-,root,root)
-%doc libuuid/COPYING.libuuid
+%doc libuuid/COPYING
 %{_libdir}/libuuid.so.*
 
 %files -n libuuid-devel
 %defattr(-,root,root)
-%doc libuuid/COPYING.libuuid
+%doc libuuid/COPYING
 %{_libdir}/libuuid.so
 %{_includedir}/uuid
 %{_mandir}/man3/uuid.3*
@@ -733,6 +707,16 @@ fi
 
 
 %changelog
+* Thu Feb 07 2012 Karel Zak <kzak@redhat.com> 2.21-0.1
+- upgrade to the release 2.21-rc2
+  ftp://ftp.kernel.org/pub/linux/utils/util-linux/v2.21/v2.21-ReleaseNotes
+- add {fsck,mkfs}.minix
+- add new command chcpu(8)
+- add new command prlimit(1)
+- enable raw(8) command
+- move 60-raw.rules from /etc from /usr/lib/udev/rules.d
+- move blkid cache from etc to /run/blkid
+
 * Wed Jan 25 2012 Harald Hoyer <harald@redhat.com> 2.20.1-5
 - install everything in /usr
   https://fedoraproject.org/wiki/Features/UsrMove
