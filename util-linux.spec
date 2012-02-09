@@ -2,7 +2,7 @@
 Summary: A collection of basic system utilities
 Name: util-linux
 Version: 2.21
-Release: 0.1%{?dist}
+Release: 0.2%{?dist}
 License: GPLv2 and GPLv2+ and GPLv3+ and LGPLv2+ and BSD with advertising and Public Domain
 Group: System Environment/Base
 URL: http://kernel.org/~kzak/util-linux/
@@ -376,10 +376,10 @@ find  $RPM_BUILD_ROOT%{_mandir}/man8 -regextype posix-egrep  \
 
 %post
 # only for minimal buildroots without /var/log
-[ -d /var/log ] || /bin/mkdir -p /var/log
-/bin/touch /var/log/lastlog
-/bin/chown root:root /var/log/lastlog
-/bin/chmod 0644 /var/log/lastlog
+[ -d /var/log ] || mkdir -p /var/log
+touch /var/log/lastlog
+chown root:root /var/log/lastlog
+chmod 0644 /var/log/lastlog
 # Fix the file context, do not use restorecon
 if [ -x /usr/sbin/selinuxenabled ] && /usr/sbin/selinuxenabled; then
 	SECXT=$( /usr/sbin/matchpathcon -n /var/log/lastlog 2> /dev/null )
@@ -398,15 +398,14 @@ ln -s /proc/mounts /etc/mtab
 /sbin/ldconfig
 
 ### Move blkid cache to /run
+[ -d /run/blkid ] || mkdir -p /run/blkid
+for I in /etc/blkid.tab /etc/blkid.tab.old \
+         /etc/blkid/blkid.tab /etc/blkid/blkid.tab.old; do
 
-# deprecated upstream default
-[ -e /etc/blkid.tab ]     && mv /etc/blkid.tab     /run/blkid/blkid.tab || :
-[ -e /etc/blkid.tab.old ] && mv /etc/blkid.tab.old /run/blkid/blkid.tab.old || :
-
-# deprecated Fedora default
-[ -e /etc/blkid/blkid.tab ]     && mv /etc/blkid/blkid.tab     /run/blkid/blkid.tab || :
-[ -e /etc/blkid/blkid.tab.old ] && mv /etc/blkid/blkid.tab.old /run/blkid/blkid.tab.old || :
-
+	if [ -f "$I" ]; then
+		mv "$I" /run/blkid/ || :
+	fi
+done
 
 %postun -n libblkid -p /sbin/ldconfig
 
@@ -707,6 +706,9 @@ fi
 
 
 %changelog
+* Thu Feb 09 2012 Karel Zak <kzak@redhat.com> 2.21-0.2
+- fix #788703 - /run/blkid does not exist
+
 * Thu Feb 07 2012 Karel Zak <kzak@redhat.com> 2.21-0.1
 - upgrade to the release 2.21-rc2
   ftp://ftp.kernel.org/pub/linux/utils/util-linux/v2.21/v2.21-ReleaseNotes
