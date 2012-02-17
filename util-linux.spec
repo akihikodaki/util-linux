@@ -113,6 +113,7 @@ Group: Development/Libraries
 License: LGPLv2+
 Requires: libuuid = %{version}-%{release}
 Conflicts: filesystem < 3
+Requires(post): coreutils
 
 %description -n libblkid
 This is block device identification library, part of util-linux.
