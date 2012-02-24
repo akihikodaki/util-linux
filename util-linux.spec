@@ -2,12 +2,12 @@
 Summary: A collection of basic system utilities
 Name: util-linux
 Version: 2.21
-Release: 0.2%{?dist}
+Release: 1%{?dist}
 License: GPLv2 and GPLv2+ and GPLv3+ and LGPLv2+ and BSD with advertising and Public Domain
 Group: System Environment/Base
 URL: http://kernel.org/~kzak/util-linux/
 
-%define upstream_version %{version}-rc2
+%define upstream_version %{version}
 
 ### Macros
 %define floppyver 0.18
@@ -707,6 +707,9 @@ fi
 
 
 %changelog
+* Fri Feb 24 2012 Karel Zak <kzak@redhat.com> 2.21-1
+- upgrade to release 2.21
+
 * Thu Feb 09 2012 Karel Zak <kzak@redhat.com> 2.21-0.2
 - fix #788703 - /run/blkid does not exist
 
