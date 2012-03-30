@@ -1,7 +1,7 @@
 ### Header
 Summary: A collection of basic system utilities
 Name: util-linux
-Version: 2.21
+Version: 2.21.1
 Release: 1%{?dist}
 License: GPLv2 and GPLv2+ and GPLv3+ and LGPLv2+ and BSD with advertising and Public Domain
 Group: System Environment/Base
@@ -707,6 +707,9 @@ fi
 
 
 %changelog
+* Fri Mar 30 2012 Karel Zak <kzak@redhat.com> 2.21.1-1
+- upgrade to bugfix release 2.21.1
+
 * Fri Feb 24 2012 Karel Zak <kzak@redhat.com> 2.21-1
 - upgrade to release 2.21
 
