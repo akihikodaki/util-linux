@@ -1,7 +1,7 @@
 ### Header
 Summary: A collection of basic system utilities
 Name: util-linux
-Version: 2.21.1
+Version: 2.21.2
 Release: 1%{?dist}
 License: GPLv2 and GPLv2+ and GPLv3+ and LGPLv2+ and BSD with advertising and Public Domain
 Group: System Environment/Base
@@ -707,6 +707,13 @@ fi
 
 
 %changelog
+* Fri May 25 2012 Karel Zak <kzak@redhat.com> 2.21.2-1
+- upgrade to bugfix release 2.21.2
+- fix #814699 - namei(1) incorrectly resolves relative symlinks
+- fix #820707 - Impossible to unmount nfsv4/krb5 mounts after network disconnect
+- fix #816877 - libmount does not close device fd before mount(2)
+- fix #822705 - unable to login after installing
+
 * Fri Mar 30 2012 Karel Zak <kzak@redhat.com> 2.21.1-1
 - upgrade to bugfix release 2.21.1
 
