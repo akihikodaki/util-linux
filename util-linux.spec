@@ -2,7 +2,7 @@
 Summary: A collection of basic system utilities
 Name: util-linux
 Version: 2.21.2
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: GPLv2 and GPLv2+ and GPLv3+ and LGPLv2+ and BSD with advertising and Public Domain
 Group: System Environment/Base
 URL: http://kernel.org/~kzak/util-linux/
@@ -22,7 +22,7 @@ BuildRequires: pam-devel
 BuildRequires: zlib-devel
 BuildRequires: popt-devel
 BuildRequires: libutempter-devel
-BuildRequires: libudev-devel
+Buildrequires: systemd-devel
 
 ### Sources
 Source0: ftp://ftp.kernel.org/pub/linux/utils/util-linux/v2.21/util-linux-%{upstream_version}.tar.xz
@@ -59,7 +59,7 @@ Requires: audit-libs >= 1.0.6
 Requires: libuuid = %{version}-%{release}
 Requires: libblkid = %{version}-%{release}
 Requires: libmount = %{version}-%{release}
-Requires: udev >= 176
+Requires: systemd >= 185
 
 ### Floppy patches (Fedora/RHEL specific)
 ###
@@ -707,6 +707,9 @@ fi
 
 
 %changelog
+* Wed Jun 13 2012 Karel Zak <kzak@redhat.com> 2.21.2-2
+- replace udev dependenceis with systemd
+
 * Fri May 25 2012 Karel Zak <kzak@redhat.com> 2.21.2-1
 - upgrade to bugfix release 2.21.2
 - fix #814699 - namei(1) incorrectly resolves relative symlinks
