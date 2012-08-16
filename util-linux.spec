@@ -1,13 +1,13 @@
 ### Header
 Summary: A collection of basic system utilities
 Name: util-linux
-Version: 2.21.2
-Release: 3%{?dist}
+Version: 2.22
+Release: 0.1%{?dist}
 License: GPLv2 and GPLv2+ and GPLv3+ and LGPLv2+ and BSD with advertising and Public Domain
 Group: System Environment/Base
-URL: http://kernel.org/~kzak/util-linux/
+URL: http://en.wikipedia.org/wiki/Util-linux
 
-%define upstream_version %{version}
+%define upstream_version %{version}-rc2
 
 ### Macros
 %define floppyver 0.18
@@ -25,17 +25,18 @@ BuildRequires: libutempter-devel
 Buildrequires: systemd-devel
 
 ### Sources
-Source0: ftp://ftp.kernel.org/pub/linux/utils/util-linux/v2.21/util-linux-%{upstream_version}.tar.xz
+Source0: ftp://ftp.kernel.org/pub/linux/utils/util-linux/v2.22/util-linux-%{upstream_version}.tar.xz
 Source1: util-linux-login.pamd
 Source2: util-linux-remote.pamd
 Source3: util-linux-chsh-chfn.pamd
 Source4: util-linux-60-raw.rules
 Source8: nologin.c
 Source9: nologin.8
-Source10: uuidd.init
 Source11: http://downloads.sourceforge.net/floppyutil/floppy-%{floppyver}.tar.bz2
 
 ### Obsoletes & Conflicts & Provides
+# sulogin, utmpdump merged into util-linux v2.22
+Conflicts: sysvinit-tools < 2.88-8
 # old versions of e2fsprogs contain fsck, uuidgen
 Conflicts: e2fsprogs < 1.41.8-5
 # rename from util-linux-ng back to util-linux
@@ -60,6 +61,8 @@ Requires: libuuid = %{version}-%{release}
 Requires: libblkid = %{version}-%{release}
 Requires: libmount = %{version}-%{release}
 Requires: systemd >= 185
+Requires(post): systemd-units
+Requires(preun): systemd-units
 
 ### Floppy patches (Fedora/RHEL specific)
 ###
@@ -200,14 +203,15 @@ export CFLAGS="-D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64 
 export SUID_CFLAGS="-fpie"
 export SUID_LDFLAGS="-pie"
 %configure \
+	--with-systemdsystemunitdir=%{_unitdir} \
+	--disable-eject \
 	--disable-silent-rules \
 	--disable-wall \
-	--enable-partx \
-	--enable-login-utils \
-	--enable-kill \
+	--enable-socket-activation \
+	--enable-chfn-chsh \
 	--enable-write \
 	--enable-raw \
-	--enable-new-mount \
+	--disable-su \
 	--with-udev \
 	--with-selinux \
 	--with-audit \
@@ -261,10 +265,8 @@ echo '.so man8/raw.8' > $RPM_BUILD_ROOT%{_mandir}/man8/rawdevices.8
 # sbin -> bin
 mv ${RPM_BUILD_ROOT}%{_sbindir}/raw ${RPM_BUILD_ROOT}%{_bindir}/raw
 
-# Our own initscript for uuidd
-install -D -m 755 %{SOURCE10} ${RPM_BUILD_ROOT}/etc/rc.d/init.d/uuidd
 # And a dirs uuidd needs that the makefiles don't create
-install -d ${RPM_BUILD_ROOT}/var/run/uuidd
+install -d ${RPM_BUILD_ROOT}/run/uuidd
 install -d ${RPM_BUILD_ROOT}/var/lib/libuuid
 
 # libtool junk
@@ -349,8 +351,8 @@ done
 # rename docs
 mv floppy-%{floppyver}/README floppy-%{floppyver}/README.floppy
 
-# we install getopt/getopt-*.{bash,tcsh} as doc files
-chmod 644 getopt/getopt-*.{bash,tcsh}
+# we install getopt-*.{bash,tcsh} as doc files
+chmod 644 misc-utils/getopt-*.{bash,tcsh}
 rm -f ${RPM_BUILD_ROOT}%{_datadir}/getopt/*
 rmdir ${RPM_BUILD_ROOT}%{_datadir}/getopt
 
@@ -424,12 +426,21 @@ useradd -r -g uuidd -d /var/lib/libuuid -s /sbin/nologin \
 exit 0
 
 %post -n uuidd
-/sbin/chkconfig --add uuidd
+if [ $1 -eq 1 ]; then
+	# Package install,
+	/bin/systemctl enable uuidd.service >/dev/null 2>&1 || :
+	/bin/systemctl start uuidd.service > /dev/null 2>&1 || :
+else
+	# Package upgrade
+	if /bin/systemctl --quiet is-enabled uuidd.service ; then
+		/bin/systemctl reenable uuidd.service >/dev/null 2>&1 || :
+	fi
+fi
 
 %preun -n uuidd
 if [ "$1" = 0 ]; then
-	/sbin/service uuidd stop > /dev/null 2>&1 || :
-	/sbin/chkconfig --del uuidd
+	/bin/systemctl stop uuidd.service > /dev/null 2>&1 || :
+	/bin/systemctl disable uuidd.service > /dev/null 2>&1 || :
 fi
 
 
@@ -437,12 +448,13 @@ fi
 %defattr(-,root,root)
 %doc README */README.* NEWS AUTHORS
 %doc Documentation/deprecated.txt Documentation/licenses/*
-%doc getopt/getopt-*.{bash,tcsh}
+%doc misc-utils/getopt-*.{bash,tcsh}
 
 %config(noreplace)	%{_sysconfdir}/pam.d/chfn
 %config(noreplace)	%{_sysconfdir}/pam.d/chsh
 %config(noreplace)	%{_sysconfdir}/pam.d/login
 %config(noreplace)	%{_sysconfdir}/pam.d/remote
+%config(noreplace)	%{_prefix}/lib/udev/rules.d
 
 %attr(4755,root,root)	%{_bindir}/mount
 %attr(4755,root,root)	%{_bindir}/umount
@@ -454,48 +466,15 @@ fi
 %ghost %attr(0644,root,root) %verify(not md5 size mtime) /var/log/lastlog
 %ghost %verify(not md5 size mtime) %config(noreplace,missingok) /etc/mtab
 
-%{_bindir}/dmesg
-%{_bindir}/findmnt
-%{_bindir}/lsblk
-%{_bindir}/more
-%{_bindir}/mountpoint
-%{_bindir}/taskset
-
-%{_sbindir}/addpart
-%{_sbindir}/agetty
-%{_sbindir}/blkid
-%{_sbindir}/blockdev
-%{_sbindir}/chcpu
-%{_sbindir}/ctrlaltdel
-%{_sbindir}/delpart
-%{_sbindir}/fdisk
-%{_sbindir}/findfs
-%{_sbindir}/fsck
-%{_sbindir}/fsck.cramfs
-%{_sbindir}/fsck.minix
-%{_sbindir}/fsfreeze
-%{_sbindir}/fstrim
-%{_sbindir}/losetup
-%{_sbindir}/mkfs
-%{_sbindir}/mkfs.cramfs
-%{_sbindir}/mkfs.minix
-%{_sbindir}/mkswap
-%{_sbindir}/nologin
-%{_sbindir}/partx
-%{_sbindir}/pivot_root
-%{_sbindir}/swaplabel
-%{_sbindir}/swapoff
-%{_sbindir}/swapon
-%{_sbindir}/switch_root
-%{_sbindir}/wipefs
-
 %{_bindir}/cal
 %{_bindir}/chrt
 %{_bindir}/col
 %{_bindir}/colcrt
 %{_bindir}/colrm
 %{_bindir}/column
+%{_bindir}/dmesg
 %{_bindir}/fallocate
+%{_bindir}/findmnt
 %{_bindir}/flock
 %{_bindir}/getopt
 %{_bindir}/hexdump
@@ -507,10 +486,15 @@ fi
 %{_bindir}/kill
 %{_bindir}/logger
 %{_bindir}/look
+%{_bindir}/lsblk
 %{_bindir}/lscpu
+%{_bindir}/lslocks
 %{_bindir}/mcookie
+%{_bindir}/more
+%{_bindir}/mountpoint
 %{_bindir}/namei
 %{_bindir}/prlimit
+%{_bindir}/raw
 %{_bindir}/rename
 %{_bindir}/renice
 %{_bindir}/rev
@@ -520,15 +504,13 @@ fi
 %{_bindir}/setsid
 %{_bindir}/setterm
 %{_bindir}/tailf
+%{_bindir}/taskset
 %{_bindir}/ul
 %{_bindir}/unshare
+%{_bindir}/utmpdump
 %{_bindir}/uuidgen
+%{_bindir}/wdctl
 %{_bindir}/whereis
-
-%{_sbindir}/ldattach
-%{_sbindir}/readprofile
-%{_sbindir}/rtcwake
-
 %{_mandir}/man1/cal.1*
 %{_mandir}/man1/chfn.1*
 %{_mandir}/man1/chrt.1*
@@ -567,12 +549,11 @@ fi
 %{_mandir}/man1/taskset.1*
 %{_mandir}/man1/ul.1*
 %{_mandir}/man1/unshare.1*
+%{_mandir}/man1/utmpdump.1.gz
 %{_mandir}/man1/uuidgen.1*
 %{_mandir}/man1/whereis.1*
 %{_mandir}/man1/write.1*
-
 %{_mandir}/man5/fstab.5*
-
 %{_mandir}/man8/addpart.8*
 %{_mandir}/man8/agetty.8*
 %{_mandir}/man8/blkid.8*
@@ -591,6 +572,7 @@ fi
 %{_mandir}/man8/ldattach.8*
 %{_mandir}/man8/losetup.8*
 %{_mandir}/man8/lsblk.8*
+%{_mandir}/man8/lslocks.8.gz
 %{_mandir}/man8/mkfs.8*
 %{_mandir}/man8/mkfs.minix.8*
 %{_mandir}/man8/mkswap.8*
@@ -598,20 +580,52 @@ fi
 %{_mandir}/man8/nologin.8*
 %{_mandir}/man8/partx.8*
 %{_mandir}/man8/pivot_root.8*
+%{_mandir}/man8/raw.8*
+%{_mandir}/man8/rawdevices.8*
 %{_mandir}/man8/readprofile.8*
+%{_mandir}/man8/resizepart.8*
 %{_mandir}/man8/rtcwake.8*
 %{_mandir}/man8/setarch.8*
+%{_mandir}/man8/sulogin.8.gz
 %{_mandir}/man8/swaplabel.8*
 %{_mandir}/man8/swapoff.8*
 %{_mandir}/man8/swapon.8*
 %{_mandir}/man8/switch_root.8*
 %{_mandir}/man8/umount.8*
+%{_mandir}/man8/wdctl.8.gz
 %{_mandir}/man8/wipefs.8*
-
-%{_bindir}/raw
-%config(noreplace)	%{_prefix}/lib/udev/rules.d
-%{_mandir}/man8/raw.8*
-%{_mandir}/man8/rawdevices.8*
+%{_sbindir}/addpart
+%{_sbindir}/agetty
+%{_sbindir}/blkid
+%{_sbindir}/blockdev
+%{_sbindir}/chcpu
+%{_sbindir}/ctrlaltdel
+%{_sbindir}/delpart
+%{_sbindir}/fdisk
+%{_sbindir}/findfs
+%{_sbindir}/fsck
+%{_sbindir}/fsck.cramfs
+%{_sbindir}/fsck.minix
+%{_sbindir}/fsfreeze
+%{_sbindir}/fstrim
+%{_sbindir}/ldattach
+%{_sbindir}/losetup
+%{_sbindir}/mkfs
+%{_sbindir}/mkfs.cramfs
+%{_sbindir}/mkfs.minix
+%{_sbindir}/mkswap
+%{_sbindir}/nologin
+%{_sbindir}/partx
+%{_sbindir}/pivot_root
+%{_sbindir}/readprofile
+%{_sbindir}/resizepart
+%{_sbindir}/rtcwake
+%{_sbindir}/sulogin
+%{_sbindir}/swaplabel
+%{_sbindir}/swapoff
+%{_sbindir}/swapon
+%{_sbindir}/switch_root
+%{_sbindir}/wipefs
 
 %ifnarch s390 s390x
 %{_sbindir}/clock
@@ -647,11 +661,11 @@ fi
 %files -n uuidd
 %defattr(-,root,root)
 %doc Documentation/licenses/COPYING.GPLv2
-/etc/rc.d/init.d/uuidd
 %{_mandir}/man8/uuidd.8*
 %attr(-, uuidd, uuidd) %{_sbindir}/uuidd
+%{_unitdir}/*
 %dir %attr(2775, uuidd, uuidd) /var/lib/libuuid
-%dir %attr(2775, uuidd, uuidd) /var/run/uuidd
+%dir %attr(2775, uuidd, uuidd) /run/uuidd
 
 
 %files -n libmount
@@ -707,6 +721,11 @@ fi
 
 
 %changelog
+* Thu Aug 16 2012 Karel Zak <kzak@redhat.com> 2.22-0.1
+- upgrade to the release 2.22-rc2
+  ftp://ftp.kernel.org/pub/linux/utils/util-linux/v2.22/v2.22-ReleaseNotes
+- add sulogin, utmpdump, lslocks, wdctl
+
 * Fri Jul 27 2012 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 2.21.2-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_18_Mass_Rebuild
 
