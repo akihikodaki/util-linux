@@ -2,12 +2,12 @@
 Summary: A collection of basic system utilities
 Name: util-linux
 Version: 2.22
-Release: 0.1%{?dist}
+Release: 1%{?dist}
 License: GPLv2 and GPLv2+ and GPLv3+ and LGPLv2+ and BSD with advertising and Public Domain
 Group: System Environment/Base
 URL: http://en.wikipedia.org/wiki/Util-linux
 
-%define upstream_version %{version}-rc2
+%define upstream_version %{version}
 
 ### Macros
 %define floppyver 0.18
@@ -35,6 +35,9 @@ Source9: nologin.8
 Source11: http://downloads.sourceforge.net/floppyutil/floppy-%{floppyver}.tar.bz2
 
 ### Obsoletes & Conflicts & Provides
+# eject has been merged into util-linux v2.22
+Obsoletes: eject <= 2.1.5
+Provides: eject = 2.1.6
 # sulogin, utmpdump merged into util-linux v2.22
 Conflicts: sysvinit-tools < 2.88-8
 # old versions of e2fsprogs contain fsck, uuidgen
@@ -201,10 +204,9 @@ unset LINGUAS || :
 
 export CFLAGS="-D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64 $RPM_OPT_FLAGS"
 export SUID_CFLAGS="-fpie"
-export SUID_LDFLAGS="-pie"
+export SUID_LDFLAGS="-pie -Wl,-z,relro -Wl,-z,now"
 %configure \
 	--with-systemdsystemunitdir=%{_unitdir} \
-	--disable-eject \
 	--disable-silent-rules \
 	--disable-wall \
 	--enable-socket-activation \
@@ -473,6 +475,7 @@ fi
 %{_bindir}/colrm
 %{_bindir}/column
 %{_bindir}/dmesg
+%{_bindir}/eject
 %{_bindir}/fallocate
 %{_bindir}/findmnt
 %{_bindir}/flock
@@ -520,6 +523,7 @@ fi
 %{_mandir}/man1/colrm.1*
 %{_mandir}/man1/column.1*
 %{_mandir}/man1/dmesg.1*
+%{_mandir}/man1/eject.1*
 %{_mandir}/man1/fallocate.1*
 %{_mandir}/man1/flock.1*
 %{_mandir}/man1/getopt.1*
@@ -721,6 +725,12 @@ fi
 
 
 %changelog
+* Thu Sep  6 2012 Karel Zak <kzak@redhat.com> 2.22-1
+- upgrade to the release 2.22
+- enable eject(1) from util-linux, obsolete original eject package
+- fix #853164 - setuid program should have full RELRO
+- fix #851230 - probe_ntfs: /usr/sbin/blkid was killed by SIGSEGV
+
 * Thu Aug 16 2012 Karel Zak <kzak@redhat.com> 2.22-0.1
 - upgrade to the release 2.22-rc2
   ftp://ftp.kernel.org/pub/linux/utils/util-linux/v2.22/v2.22-ReleaseNotes
