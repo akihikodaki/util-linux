@@ -2,7 +2,7 @@
 Summary: A collection of basic system utilities
 Name: util-linux
 Version: 2.22
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: GPLv2 and GPLv2+ and GPLv3+ and LGPLv2+ and BSD with advertising and Public Domain
 Group: System Environment/Base
 URL: http://en.wikipedia.org/wiki/Util-linux
@@ -144,7 +144,7 @@ License: BSD
 Conflicts: filesystem < 3
 
 %description -n libuuid
-This is the universally unique ID library, part of e2fsprogs.
+This is the universally unique ID library, part of util-linux.
 
 The libuuid library generates and parses 128-bit universally unique
 id's (UUID's).  A UUID is an identifier that is unique across both
@@ -164,7 +164,7 @@ Requires: pkgconfig
 
 %description -n libuuid-devel
 This is the universally unique ID development library and headers,
-part of e2fsprogs.
+part of util-linux.
 
 The libuuid library generates and parses 128-bit universally unique
 id's (UUID's).  A UUID is an identifier that is unique across both
@@ -725,6 +725,9 @@ fi
 
 
 %changelog
+* Wed Oct  3 2012 Karel Zak <kzak@redhat.com> 2.22-2
+- remove obsolete references to e2fsprogs
+
 * Thu Sep  6 2012 Karel Zak <kzak@redhat.com> 2.22-1
 - upgrade to the release 2.22
 - enable eject(1) from util-linux, obsolete original eject package
