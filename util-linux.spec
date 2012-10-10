@@ -1,8 +1,8 @@
 ### Header
 Summary: A collection of basic system utilities
 Name: util-linux
-Version: 2.22
-Release: 2%{?dist}
+Version: 2.22.1
+Release: 1%{?dist}
 License: GPLv2 and GPLv2+ and GPLv3+ and LGPLv2+ and BSD with advertising and Public Domain
 Group: System Environment/Base
 URL: http://en.wikipedia.org/wiki/Util-linux
@@ -725,6 +725,9 @@ fi
 
 
 %changelog
+* Thu Oct 10 2012 Karel Zak <kzak@redhat.com> 2.22.1-1
+- upgrade to the release 2.22.1
+
 * Wed Oct  3 2012 Karel Zak <kzak@redhat.com> 2.22-2
 - remove obsolete references to e2fsprogs
 
