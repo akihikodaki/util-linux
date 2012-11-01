@@ -1,0 +1,33 @@
+From b426209c5ba2126a9038363a269fec884af470fb Mon Sep 17 00:00:00 2001
+From: Bill Pemberton <wfp5p@virginia.edu>
+Date: Wed, 10 Oct 2012 16:54:02 -0400
+Subject: [PATCH 06/11] mount: add long options for -L and -U to man page
+
+The -L and -U flags both have long options too (--label and --uuid).
+The usage() function will show them but the man page didn't list them.
+
+Signed-off-by: Bill Pemberton <wfp5p@virginia.edu>
+---
+ sys-utils/mount.8 | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/sys-utils/mount.8 b/sys-utils/mount.8
+index 83a4518..0b40bf7 100644
+--- a/sys-utils/mount.8
++++ b/sys-utils/mount.8
+@@ -586,10 +586,10 @@ set the block device to read-only mode, see command
+ .IP "\fB\-w, \-\-rw\fP"
+ Mount the filesystem read/write. This is the default. A synonym is
+ .BR "\-o rw" .
+-.IP "\fB\-L \fIlabel\fP"
++.IP "\fB\-L, \-\-label \fIlabel\fP"
+ Mount the partition that has the specified
+ .IR label .
+-.IP "\fB\-U \fIuuid\fP"
++.IP "\fB\-U, \-\-uuid \fIuuid\fP"
+ Mount the partition that has the specified
+ .IR uuid .
+ These two options require the file
+-- 
+1.7.11.7
+

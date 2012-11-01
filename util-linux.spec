@@ -2,7 +2,7 @@
 Summary: A collection of basic system utilities
 Name: util-linux
 Version: 2.22.1
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: GPLv2 and GPLv2+ and GPLv3+ and LGPLv2+ and BSD with advertising and Public Domain
 Group: System Environment/Base
 URL: http://en.wikipedia.org/wiki/Util-linux
@@ -82,6 +82,23 @@ Patch2: util-linux-2.19-floppy-generic.patch
 Patch3: util-linux-ng-2.21-login-lastlog.patch
 # 231192 - ipcs is not printing correct values on pLinux
 Patch4: util-linux-2.21-ipcs-32bit.patch
+
+
+### Upstream patches from proposed stable/v2.22.2 branch
+### (remove after update to the final 2.22.2)
+###
+Patch101: 0001-libmount-don-t-use-umount-optimization-for-l-or-f.patch
+Patch102: 0002-wipefs-use-O_EXCL.patch
+Patch103: 0003-swapon-remove-loop-declaration-smatch-scan.patch
+Patch104: 0004-libblkid-fix-compiler-warning-Wstrict-aliasing.patch
+Patch105: 0005-mount-add-c-abbreviation-for-no-canonicalize-to-man-.patch
+Patch106: 0006-mount-add-long-options-for-L-and-U-to-man-page.patch
+Patch107: 0007-lib-loopdev-improve-debug-messages.patch
+Patch108: 0008-lib-loopdev-check-for-sys.patch
+Patch109: 0009-fsck.cramfs-compile-with-DINCLUDE_FS_TESTS-for-make-.patch
+Patch110: 0010-login-fix-compiler-warning-Wunused-result.patch
+Patch111: 0011-misc-make-readlink-usage-more-robust.patch
+
 
 %description
 The util-linux package contains a large variety of low-level system
@@ -198,6 +215,18 @@ cp %{SOURCE8} %{SOURCE9} .
 %patch2 -p1
 %patch3 -p1
 %patch4 -p1
+
+%patch101 -p1
+%patch102 -p1
+%patch103 -p1
+%patch104 -p1
+%patch105 -p1
+%patch106 -p1
+%patch107 -p1
+%patch108 -p1
+%patch109 -p1
+%patch110 -p1
+%patch111 -p1
 
 %build
 unset LINGUAS || :
@@ -725,6 +754,10 @@ fi
 
 
 %changelog
+* Thu Nov  1 2012 Karel Zak <kzak@redhat.com> 2.22.1-2
+- apply pathes from upstream stable/v2.22 branch
+- fix #865961 - wipefs -a should use O_EXCL
+
 * Thu Oct 10 2012 Karel Zak <kzak@redhat.com> 2.22.1-1
 - upgrade to the release 2.22.1
 

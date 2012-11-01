@@ -1,0 +1,34 @@
+From 6eeca6c7170295f325b814ee0cd1576da885cd30 Mon Sep 17 00:00:00 2001
+From: Karel Zak <kzak@redhat.com>
+Date: Mon, 15 Oct 2012 11:10:50 +0200
+Subject: [PATCH 01/11] libmount: don't use umount optimization for -l or -f
+
+The options -l (lazy) and -f (force) means that the mountpoint may be
+unreadable (for example because NFS server is unreadable). So we
+should not try to be smart in this case and we should try to minimize
+number of situations when stat() or readlink() is used for the
+mountpoint.
+
+Signed-off-by: Karel Zak <kzak@redhat.com>
+---
+ libmount/src/context_umount.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/libmount/src/context_umount.c b/libmount/src/context_umount.c
+index ce095bf..2c2e64c 100644
+--- a/libmount/src/context_umount.c
++++ b/libmount/src/context_umount.c
+@@ -83,7 +83,9 @@ static int lookup_umount_fs(struct libmnt_context *cxt)
+ 	 * where LABEL, UUID or symlinks are to canonicalized. It means that
+ 	 * it's usable only for canonicalized stuff (e.g. kernel mountinfo).
+ 	 */
+-	if (!cxt->mtab_writable	&& *tgt == '/') {
++	if (!cxt->mtab_writable	&& *tgt == '/' &&
++	    !mnt_context_is_force(cxt) && !mnt_context_is_lazy(cxt)) {
++
+ 		struct stat st;
+ 
+ 		if (stat(tgt, &st) == 0 && S_ISDIR(st.st_mode)) {
+-- 
+1.7.11.7
+

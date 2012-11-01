@@ -1,0 +1,35 @@
+From 939636dd664cc608232c272de77be96e6f089235 Mon Sep 17 00:00:00 2001
+From: Karel Zak <kzak@redhat.com>
+Date: Wed, 17 Oct 2012 11:43:39 +0200
+Subject: [PATCH 08/11] lib/loopdev: check for /sys
+
+The current loopdev code prefers /sys to get information about
+loop devices. The old methods like scan /dev are fallback solution
+only. Unfortunately, the code does not check if /sys is mounted.
+
+Addresses: http://blog.flameeyes.eu/2012/10/sophistication-can-be-bad
+Signed-off-by: Karel Zak <kzak@redhat.com>
+---
+ lib/loopdev.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/lib/loopdev.c b/lib/loopdev.c
+index 0e6033a..f62af83 100644
+--- a/lib/loopdev.c
++++ b/lib/loopdev.c
+@@ -167,6 +167,12 @@ int loopcxt_init(struct loopdev_cxt *lc, int flags)
+ 	if (rc)
+ 		return rc;
+ 
++	if (stat(_PATH_SYS_BLOCK, &st) || !S_ISDIR(st.st_mode)) {
++		lc->flags |= LOOPDEV_FL_NOSYSFS;
++		lc->flags &= ~LOOPDEV_FL_NOIOCTL;
++		DBG(lc, loopdev_debug("init: disable /sys usage"));
++	}
++
+ 	if (!(lc->flags & LOOPDEV_FL_NOSYSFS) &&
+ 	    get_linux_version() >= KERNEL_VERSION(2,6,37)) {
+ 		/*
+-- 
+1.7.11.7
+

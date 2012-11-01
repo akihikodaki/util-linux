@@ -1,0 +1,35 @@
+From 9f6c8591eeffb6591dc6a18512e618f0acf09890 Mon Sep 17 00:00:00 2001
+From: Karel Zak <kzak@redhat.com>
+Date: Mon, 15 Oct 2012 17:01:30 +0200
+Subject: [PATCH 04/11] libblkid: fix compiler warning [-Wstrict-aliasing]
+
+libblkid/src/superblocks/befs.c: In function 'get_uuid':
+libblkid/src/superblocks/befs.c:353:6: warning: dereferencing type-punned pointer will break strict-aliasing rules [-Wstrict-aliasing]
+
+Signed-off-by: Karel Zak <kzak@redhat.com>
+---
+ libblkid/src/superblocks/befs.c | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
+
+diff --git a/libblkid/src/superblocks/befs.c b/libblkid/src/superblocks/befs.c
+index a7f4317..452da1e 100644
+--- a/libblkid/src/superblocks/befs.c
++++ b/libblkid/src/superblocks/befs.c
+@@ -348,9 +348,11 @@ static int get_uuid(blkid_probe pr, const struct befs_super_block *bs,
+ 			&& FS16_TO_CPU(sd->name_size, fs_le) == strlen(KEY_NAME)
+ 			&& FS16_TO_CPU(sd->data_size, fs_le) == KEY_SIZE
+ 			&& strcmp(sd->name, KEY_NAME) == 0) {
+-			*uuid = *(uint64_t *) ((uint8_t *) sd->name
+-					+ FS16_TO_CPU(sd->name_size, fs_le)
+-					+ 3);
++
++			memcpy(uuid,
++			       sd->name + FS16_TO_CPU(sd->name_size, fs_le) + 3,
++			       sizeof(uint64_t));
++
+ 			break;
+ 		} else if (FS32_TO_CPU(sd->type, fs_le) == 0
+ 				&& FS16_TO_CPU(sd->name_size, fs_le) == 0
+-- 
+1.7.11.7
+
