@@ -1,0 +1,63 @@
+From a3528342bc716ecdabdd86609ae5a3198f560870 Mon Sep 17 00:00:00 2001
+From: Karel Zak <kzak@redhat.com>
+Date: Tue, 23 Oct 2012 12:40:39 +0200
+Subject: [PATCH 11/11] misc: make readlink() usage more robust
+
+Signed-off-by: Karel Zak <kzak@redhat.com>
+---
+ misc-utils/lsblk.c   | 4 ++--
+ misc-utils/lslocks.c | 2 +-
+ sys-utils/eject.c    | 2 +-
+ 3 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/misc-utils/lsblk.c b/misc-utils/lsblk.c
+index cc97c05..9c25dd0 100644
+--- a/misc-utils/lsblk.c
++++ b/misc-utils/lsblk.c
+@@ -962,7 +962,7 @@ static int get_wholedisk_from_partition_dirent(DIR *dir, const char *dirname,
+ 	int len;
+ 
+ 	if ((len = readlink_at(dirfd(dir), dirname,
+-			       d->d_name, path, sizeof(path))) < 0)
++			       d->d_name, path, sizeof(path) - 1)) < 0)
+ 		return 0;
+ 
+ 	path[len] = '\0';
+@@ -1075,7 +1075,7 @@ static char *devno_to_sysfs_name(dev_t devno, char *devname, char *buf, size_t b
+ 		return NULL;
+ 	}
+ 
+-	len = readlink(path, buf, buf_size);
++	len = readlink(path, buf, buf_size - 1);
+ 	if (len < 0) {
+ 		warn(_("%s: failed to read link"), path);
+ 		return NULL;
+diff --git a/misc-utils/lslocks.c b/misc-utils/lslocks.c
+index 45fb6de..495eb80 100644
+--- a/misc-utils/lslocks.c
++++ b/misc-utils/lslocks.c
+@@ -196,7 +196,7 @@ static char *get_filename_sz(ino_t inode, pid_t pid, size_t *size)
+ 			continue;
+ 
+ 		if ((len = readlink_at(fd, path, dp->d_name,
+-				       sym, sizeof(path))) < 1)
++				       sym, sizeof(sym) - 1)) < 1)
+ 			goto out;
+ 
+ 		*size = sb.st_size;
+diff --git a/sys-utils/eject.c b/sys-utils/eject.c
+index 1a5b834..6d0da18 100644
+--- a/sys-utils/eject.c
++++ b/sys-utils/eject.c
+@@ -837,7 +837,7 @@ static char *get_subsystem(char *chain, char *buf, size_t bufsz)
+ 		memcpy(chain + len, SUBSYSTEM_LINKNAME, sizeof(SUBSYSTEM_LINKNAME));
+ 
+ 		/* try if subsystem symlink exists */
+-		sz = readlink(chain, buf, bufsz);
++		sz = readlink(chain, buf, bufsz - 1);
+ 
+ 		/* remove last subsystem from chain */
+ 		chain[len] = '\0';
+-- 
+1.7.11.7
+
