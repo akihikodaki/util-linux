@@ -2,7 +2,7 @@
 Summary: A collection of basic system utilities
 Name: util-linux
 Version: 2.22.1
-Release: 2%{?dist}
+Release: 3%{?dist}
 License: GPLv2 and GPLv2+ and GPLv3+ and LGPLv2+ and BSD with advertising and Public Domain
 Group: System Environment/Base
 URL: http://en.wikipedia.org/wiki/Util-linux
@@ -24,6 +24,11 @@ BuildRequires: popt-devel
 BuildRequires: libutempter-devel
 Buildrequires: systemd-devel
 
+# because backported su(1) and runuser(1) patches
+BuildRequires: automake
+BuildRequires: autoconf
+BuildRequires: libtool
+
 ### Sources
 Source0: ftp://ftp.kernel.org/pub/linux/utils/util-linux/v2.22/util-linux-%{upstream_version}.tar.xz
 Source1: util-linux-login.pamd
@@ -33,8 +38,14 @@ Source4: util-linux-60-raw.rules
 Source8: nologin.c
 Source9: nologin.8
 Source11: http://downloads.sourceforge.net/floppyutil/floppy-%{floppyver}.tar.bz2
+Source12: util-linux-su.pamd
+Source13: util-linux-su-l.pamd
+Source14: util-linux-runuser.pamd
+Source15: util-linux-runuser-l.pamd
 
 ### Obsoletes & Conflicts & Provides
+# su(1) and runuser(1) merged into util-linux v2.22
+Conflicts: coreutils < 8.20
 # eject has been merged into util-linux v2.22
 Obsoletes: eject <= 2.1.5
 Provides: eject = 2.1.6
@@ -99,6 +110,20 @@ Patch109: 0009-fsck.cramfs-compile-with-DINCLUDE_FS_TESTS-for-make-.patch
 Patch110: 0010-login-fix-compiler-warning-Wunused-result.patch
 Patch111: 0011-misc-make-readlink-usage-more-robust.patch
 
+### Upstream patches from master branch (will be v2.23) for su(1) and new
+### runuser(1) implementation. This is required for the recent coreutils where
+### is no more su(1).
+###
+Patch200: 0200-su-add-group-and-supp-group-options.patch
+Patch201: 0201-su-move-generic-su-code-to-su-common.c.patch
+Patch202: 0202-runuser-new-command-derived-from-su-1.patch
+Patch203: 0203-su-more-robust-getpwuid-for-GNU-Hurt-coreutils-71b7d.patch
+Patch204: 0204-su-verify-writing-to-streams-was-successful.patch
+Patch205: 0205-su-move-long-options-to-main.patch
+Patch206: 0206-su-add-segmentation-fault-reporting-of-the-child-pro.patch
+Patch207: 0207-su-fixed-a-typo-in-pam-error-message.patch
+Patch208: 0208-runuser-add-u-to-not-execute-shell.patch
+Patch209: 0209-build-sys-move-runuser-to-sbin-dir.patch
 
 %description
 The util-linux package contains a large variety of low-level system
@@ -228,8 +253,21 @@ cp %{SOURCE8} %{SOURCE9} .
 %patch110 -p1
 %patch111 -p1
 
+%patch200 -p1
+%patch201 -p1
+%patch202 -p1
+%patch203 -p1
+%patch204 -p1
+%patch205 -p1
+%patch206 -p1
+%patch207 -p1
+%patch208 -p1
+%patch209 -p1
+
 %build
 unset LINGUAS || :
+
+./autogen.sh
 
 export CFLAGS="-D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64 $RPM_OPT_FLAGS"
 export SUID_CFLAGS="-fpie"
@@ -242,7 +280,6 @@ export SUID_LDFLAGS="-pie -Wl,-z,relro -Wl,-z,now"
 	--enable-chfn-chsh \
 	--enable-write \
 	--enable-raw \
-	--disable-su \
 	--with-udev \
 	--with-selinux \
 	--with-audit \
@@ -327,6 +364,10 @@ chmod 755 ${RPM_BUILD_ROOT}%{_bindir}/sunhostid
 	install -m 644 %{SOURCE2} ./remote
 	install -m 644 %{SOURCE3} ./chsh
 	install -m 644 %{SOURCE3} ./chfn
+	install -m 644 %{SOURCE12} ./su
+	install -m 644 %{SOURCE13} ./su-l
+	install -m 644 %{SOURCE14} ./runuser
+	install -m 644 %{SOURCE15} ./runuser-l
 	popd
 }
 
@@ -485,10 +526,15 @@ fi
 %config(noreplace)	%{_sysconfdir}/pam.d/chsh
 %config(noreplace)	%{_sysconfdir}/pam.d/login
 %config(noreplace)	%{_sysconfdir}/pam.d/remote
+%config(noreplace)	%{_sysconfdir}/pam.d/su
+%config(noreplace)	%{_sysconfdir}/pam.d/su-l
+%config(noreplace)	%{_sysconfdir}/pam.d/runuser
+%config(noreplace)	%{_sysconfdir}/pam.d/runuser-l
 %config(noreplace)	%{_prefix}/lib/udev/rules.d
 
 %attr(4755,root,root)	%{_bindir}/mount
 %attr(4755,root,root)	%{_bindir}/umount
+%attr(4755,root,root)	%{_bindir}/su
 %attr(755,root,root)	%{_bindir}/login
 %attr(4711,root,root)	%{_bindir}/chfn
 %attr(4711,root,root)	%{_bindir}/chsh
@@ -574,10 +620,12 @@ fi
 %{_mandir}/man1/rename.1*
 %{_mandir}/man1/renice.1*
 %{_mandir}/man1/rev.1*
+%{_mandir}/man1/runuser.1*
 %{_mandir}/man1/script.1*
 %{_mandir}/man1/scriptreplay.1*
 %{_mandir}/man1/setsid.1*
 %{_mandir}/man1/setterm.1*
+%{_mandir}/man1/su.1*
 %{_mandir}/man1/tailf.1*
 %{_mandir}/man1/taskset.1*
 %{_mandir}/man1/ul.1*
@@ -653,6 +701,7 @@ fi
 %{_sbindir}/readprofile
 %{_sbindir}/resizepart
 %{_sbindir}/rtcwake
+%{_sbindir}/runuser
 %{_sbindir}/sulogin
 %{_sbindir}/swaplabel
 %{_sbindir}/swapoff
@@ -754,6 +803,10 @@ fi
 
 
 %changelog
+* Thu Nov  1 2012 Karel Zak <kzak@redhat.com> 2.22.1-3
+- backport upstream runuser(1)
+- enable su(1)
+
 * Thu Nov  1 2012 Karel Zak <kzak@redhat.com> 2.22.1-2
 - apply pathes from upstream stable/v2.22 branch
 - fix #865961 - wipefs -a should use O_EXCL

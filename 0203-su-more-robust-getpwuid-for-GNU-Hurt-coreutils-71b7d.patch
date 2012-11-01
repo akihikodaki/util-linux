@@ -1,0 +1,68 @@
+From 8f33f59e72bef913068f9a80338f12d8d4434010 Mon Sep 17 00:00:00 2001
+From: Karel Zak <kzak@redhat.com>
+Date: Wed, 5 Sep 2012 11:13:34 +0200
+Subject: [PATCH 203/208] su: more robust getpwuid() for GNU Hurt [coreutils
+ 71b7ddc]
+
+Let's support GNU Hurd over-engineering where a process can exist
+without UID and getuid() returns -1 and sets errno.
+
+Signed-off-by: Karel Zak <kzak@redhat.com>
+---
+ login-utils/su-common.c | 26 +++++++++++++++++++++++---
+ 1 file changed, 23 insertions(+), 3 deletions(-)
+
+diff --git a/login-utils/su-common.c b/login-utils/su-common.c
+index 770f455..a253dda 100644
+--- a/login-utils/su-common.c
++++ b/login-utils/su-common.c
+@@ -129,6 +129,26 @@ static struct option const longopts[] =
+   {NULL, 0, NULL, 0}
+ };
+ 
++
++static struct passwd *
++current_getpwuid(void)
++{
++  uid_t ruid;
++
++  /* GNU Hurd implementation has an extension where a process can exist in a
++   * non-conforming environment, and thus be outside the realms of POSIX
++   * process identifiers; on this platform, getuid() fails with a status of
++   * (uid_t)(-1) and sets errno if a program is run from a non-conforming
++   * environment.
++   *
++   * http://austingroupbugs.net/view.php?id=511
++   */
++  errno = 0;
++  ruid = getuid ();
++
++  return errno == 0 ? getpwuid (ruid) : NULL;
++}
++
+ /* Log the fact that someone has run su to the user given by PW;
+    if SUCCESSFUL is true, they gave the correct password, etc.  */
+ 
+@@ -145,8 +165,8 @@ log_su (struct passwd const *pw, bool successful)
+     {
+       /* getlogin can fail -- usually due to lack of utmp entry.
+ 	 Resort to getpwuid.  */
+-      struct passwd *pwd = getpwuid (getuid ());
+-      old_user = (pwd ? pwd->pw_name : "");
++      struct passwd *pwd = current_getpwuid();
++      old_user = pwd ? pwd->pw_name : "";
+     }
+   tty = ttyname (STDERR_FILENO);
+   if (!tty)
+@@ -353,7 +373,7 @@ authenticate (const struct passwd *pw)
+ 	goto done;
+     }
+ 
+-  lpw = getpwuid (getuid ());
++  lpw = current_getpwuid ();
+   if (lpw && lpw->pw_name)
+     {
+       retval = pam_set_item (pamh, PAM_RUSER, (const void *) lpw->pw_name);
+-- 
+1.7.11.7
+

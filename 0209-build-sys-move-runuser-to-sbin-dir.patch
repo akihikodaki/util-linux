@@ -1,0 +1,26 @@
+From 69658513d00635048f5de76ed73f4a43a61d374d Mon Sep 17 00:00:00 2001
+From: Karel Zak <kzak@redhat.com>
+Date: Thu, 1 Nov 2012 13:12:02 +0100
+Subject: [PATCH] build-sys: move runuser to sbin dir
+
+Signed-off-by: Karel Zak <kzak@redhat.com>
+---
+ login-utils/Makemodule.am | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/login-utils/Makemodule.am b/login-utils/Makemodule.am
+index e26d9a7..0d8e8b1 100644
+--- a/login-utils/Makemodule.am
++++ b/login-utils/Makemodule.am
+@@ -94,7 +94,7 @@ endif
+ 
+ 
+ if BUILD_RUNUSER
+-bin_PROGRAMS += runuser
++sbin_PROGRAMS += runuser
+ dist_man_MANS += login-utils/runuser.1
+ runuser_SOURCES = \
+ 	login-utils/runuser.c \
+-- 
+1.7.11.7
+
