@@ -2,7 +2,7 @@
 Summary: A collection of basic system utilities
 Name: util-linux
 Version: 2.22.1
-Release: 3%{?dist}
+Release: 4%{?dist}
 License: GPLv2 and GPLv2+ and GPLv3+ and LGPLv2+ and BSD with advertising and Public Domain
 Group: System Environment/Base
 URL: http://en.wikipedia.org/wiki/Util-linux
@@ -124,6 +124,7 @@ Patch206: 0206-su-add-segmentation-fault-reporting-of-the-child-pro.patch
 Patch207: 0207-su-fixed-a-typo-in-pam-error-message.patch
 Patch208: 0208-runuser-add-u-to-not-execute-shell.patch
 Patch209: 0209-build-sys-move-runuser-to-sbin-dir.patch
+Patch210: 0210-su-fix-COMMAND-not-specified-error.patch
 
 %description
 The util-linux package contains a large variety of low-level system
@@ -235,34 +236,9 @@ SMP systems.
 %setup -q -a 11 -n %{name}-%{upstream_version}
 cp %{SOURCE8} %{SOURCE9} .
 
-%patch0 -p1
-%patch1 -p1
-%patch2 -p1
-%patch3 -p1
-%patch4 -p1
-
-%patch101 -p1
-%patch102 -p1
-%patch103 -p1
-%patch104 -p1
-%patch105 -p1
-%patch106 -p1
-%patch107 -p1
-%patch108 -p1
-%patch109 -p1
-%patch110 -p1
-%patch111 -p1
-
-%patch200 -p1
-%patch201 -p1
-%patch202 -p1
-%patch203 -p1
-%patch204 -p1
-%patch205 -p1
-%patch206 -p1
-%patch207 -p1
-%patch208 -p1
-%patch209 -p1
+for p in %{patches}; do
+  %{__patch} -p1 -F%{_default_patch_fuzz} %{_default_patch_flags} -i "$p"
+done
 
 %build
 unset LINGUAS || :
@@ -803,6 +779,9 @@ fi
 
 
 %changelog
+* Fri Nov 16 2012 Karel Zak <kzak@redhat.com> 2.22.1-4
+- fix #872787 - su: COMMAND not specified
+
 * Thu Nov  1 2012 Karel Zak <kzak@redhat.com> 2.22.1-3
 - backport upstream runuser(1)
 - enable su(1)
