@@ -237,7 +237,7 @@ SMP systems.
 cp %{SOURCE8} %{SOURCE9} .
 
 for p in %{patches}; do
-  %{__patch} -p1 -F%{_default_patch_fuzz} %{_default_patch_flags} -i "$p"
+  %{__patch} -p1 -F%{_default_patch_fuzz} -i "$p"
 done
 
 %build
