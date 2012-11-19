@@ -779,6 +779,9 @@ fi
 
 
 %changelog
+* Mon Nov 19 2012 Karel Zak <kzak@redhat.com> 2.22.1-5
+- sources cleanup
+
 * Fri Nov 16 2012 Karel Zak <kzak@redhat.com> 2.22.1-4
 - fix #872787 - su: COMMAND not specified
 
