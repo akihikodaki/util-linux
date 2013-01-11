@@ -2,7 +2,7 @@
 Summary: A collection of basic system utilities
 Name: util-linux
 Version: 2.22.2
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: GPLv2 and GPLv2+ and GPLv3+ and LGPLv2+ and BSD with advertising and Public Domain
 Group: System Environment/Base
 URL: http://en.wikipedia.org/wiki/Util-linux
@@ -94,6 +94,11 @@ Patch3: util-linux-ng-2.21-login-lastlog.patch
 # 231192 - ipcs is not printing correct values on pLinux
 Patch4: util-linux-2.21-ipcs-32bit.patch
 
+###
+### Upstream patches (2.23 or 2.22.x)
+# 889888 - wipefs does not completely wipe btrfs volume
+Patch100: libblkid-add-support-for-btrfs-backup-superblock.patch
+
 ### Upstream patches from master branch (will be v2.23) for su(1) and new
 ### runuser(1) implementation. This is required for the recent coreutils where
 ### is no more su(1).
@@ -109,6 +114,7 @@ Patch207: 0207-su-fixed-a-typo-in-pam-error-message.patch
 Patch208: 0208-runuser-add-u-to-not-execute-shell.patch
 Patch209: 0209-build-sys-move-runuser-to-sbin-dir.patch
 Patch210: 0210-su-fix-COMMAND-not-specified-error.patch
+
 
 %description
 The util-linux package contains a large variety of low-level system
@@ -763,6 +769,9 @@ fi
 
 
 %changelog
+* Tue Jan 15 2013 Karel Zak <kzak@redhat.com> 2.22.2-2
+- fix #889888 - wipefs does not completely wipe btrfs volume
+
 * Thu Dec 13 2012 Karel Zak <kzak@redhat.com> 2.22.2-1
 - upgrade to upstream maintenance release 2.22.2
 
