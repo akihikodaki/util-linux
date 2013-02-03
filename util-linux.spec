@@ -2,7 +2,7 @@
 Summary: A collection of basic system utilities
 Name: util-linux
 Version: 2.22.2
-Release: 2%{?dist}
+Release: 3%{?dist}
 License: GPLv2 and GPLv2+ and GPLv3+ and LGPLv2+ and BSD with advertising and Public Domain
 Group: System Environment/Base
 URL: http://en.wikipedia.org/wiki/Util-linux
@@ -98,6 +98,14 @@ Patch4: util-linux-2.21-ipcs-32bit.patch
 ### Upstream patches (2.23 or 2.22.x)
 # 889888 - wipefs does not completely wipe btrfs volume
 Patch100: libblkid-add-support-for-btrfs-backup-superblock.patch
+# 882305 - agetty: unstable /dev/tty* permissions
+Patch101: agetty-replace-perms-660-to-620.patch
+# 885314 - hexdump segfault
+Patch102: hexdump-do-not-segfault-when-iterating-over-an-empty.patch
+# 896447 - No newlines in piped "cal" command
+Patch103: cal-don-t-mix-ncurses-output-functions-and-printf.patch
+# upstream patch
+Patch104: libblkid-remove-optimization-from-verify-function.patch
 
 ### Upstream patches from master branch (will be v2.23) for su(1) and new
 ### runuser(1) implementation. This is required for the recent coreutils where
@@ -128,6 +136,7 @@ Summary: Device mounting library
 Group: Development/Libraries
 License: LGPLv2+
 Requires: libblkid = %{version}-%{release}
+Requires: libuuid = %{version}-%{release}
 Conflicts: filesystem < 3
 
 %description -n libmount
@@ -710,7 +719,7 @@ fi
 %defattr(-,root,root)
 %doc Documentation/licenses/COPYING.GPLv2
 %{_mandir}/man8/uuidd.8*
-%attr(-, uuidd, uuidd) %{_sbindir}/uuidd
+%{_sbindir}/uuidd
 %{_unitdir}/*
 %dir %attr(2775, uuidd, uuidd) /var/lib/libuuid
 %dir %attr(2775, uuidd, uuidd) /run/uuidd
@@ -769,6 +778,13 @@ fi
 
 
 %changelog
+* Sun Feb  3 2013 Karel Zak <kzak@redhat.com> 2.22.2-3
+- fix #882305 - agetty: unstable /dev/tty* permissions
+- fix #885314 - hexdump segfault
+- fix #896447 - No newlines in piped "cal" command
+- fix libblkid cache usage (upstream patch)
+- fix #905008 - uuidd: /usr/sbin/uuidd has incorrect file permissions
+
 * Tue Jan 15 2013 Karel Zak <kzak@redhat.com> 2.22.2-2
 - fix #889888 - wipefs does not completely wipe btrfs volume
 
