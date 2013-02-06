@@ -2,7 +2,7 @@
 Summary: A collection of basic system utilities
 Name: util-linux
 Version: 2.22.2
-Release: 3%{?dist}
+Release: 4%{?dist}
 License: GPLv2 and GPLv2+ and GPLv3+ and LGPLv2+ and BSD with advertising and Public Domain
 Group: System Environment/Base
 URL: http://en.wikipedia.org/wiki/Util-linux
@@ -74,9 +74,6 @@ Requires: audit-libs >= 1.0.6
 Requires: libuuid = %{version}-%{release}
 Requires: libblkid = %{version}-%{release}
 Requires: libmount = %{version}-%{release}
-Requires: systemd >= 185
-Requires(post): systemd-units
-Requires(preun): systemd-units
 
 ### Floppy patches (Fedora/RHEL specific)
 ###
@@ -223,7 +220,10 @@ Summary: Helper daemon to guarantee uniqueness of time-based UUIDs
 Group: System Environment/Daemons
 Requires: libuuid = %{version}-%{release}
 License: GPLv2
+Requires: systemd
 Requires(pre): shadow-utils
+Requires(post): systemd-units
+Requires(preun): systemd-units
 
 %description -n uuidd
 The uuidd package contains a userspace daemon (uuidd) which guarantees
@@ -441,8 +441,10 @@ if [ -x /usr/sbin/selinuxenabled ] && /usr/sbin/selinuxenabled; then
 		/usr/bin/chcon "$SECXT"  /var/log/lastlog >/dev/null 2>&1 || :
 	fi
 fi
-rm -f /etc/mtab
-ln -s /proc/mounts /etc/mtab
+if [ ! -L /etc/mtab ]; then
+	rm -f /etc/mtab
+	ln -s /proc/mounts /etc/mtab
+fi
 
 %post -n libblkid
 /sbin/ldconfig
@@ -505,7 +507,7 @@ fi
 %config(noreplace)	%{_sysconfdir}/pam.d/su-l
 %config(noreplace)	%{_sysconfdir}/pam.d/runuser
 %config(noreplace)	%{_sysconfdir}/pam.d/runuser-l
-%config(noreplace)	%{_prefix}/lib/udev/rules.d
+%config(noreplace)	%{_prefix}/lib/udev/rules.d/60-raw.rules
 
 %attr(4755,root,root)	%{_bindir}/mount
 %attr(4755,root,root)	%{_bindir}/umount
@@ -778,6 +780,10 @@ fi
 
 
 %changelog
+* Wed Feb  6 2013 Karel Zak <kzak@redhat.com> 2.22.2-4
+- improve convertion to mtab symlink in post script
+- spec file cleanup (based on #894199)
+
 * Sun Feb  3 2013 Karel Zak <kzak@redhat.com> 2.22.2-3
 - fix #882305 - agetty: unstable /dev/tty* permissions
 - fix #885314 - hexdump segfault
