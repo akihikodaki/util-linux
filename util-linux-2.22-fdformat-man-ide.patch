@@ -1,6 +1,6 @@
-diff -up util-linux-2.20-rc1/disk-utils/fdformat.8.orig util-linux-2.20-rc1/disk-utils/fdformat.8
---- util-linux-2.20-rc1/disk-utils/fdformat.8.orig	2011-07-20 21:55:23.000000000 +0200
-+++ util-linux-2.20-rc1/disk-utils/fdformat.8	2011-07-29 21:08:57.558601033 +0200
+diff -up util-linux-2.22.2/disk-utils/fdformat.8.kzak util-linux-2.22.2/disk-utils/fdformat.8
+--- util-linux-2.22.2/disk-utils/fdformat.8.kzak	2012-06-11 12:06:53.620195844 +0200
++++ util-linux-2.22.2/disk-utils/fdformat.8	2013-02-19 16:16:27.130214023 +0100
 @@ -43,6 +43,11 @@ when a non-standard format is being used
  autodetected earlier.  In this case, use
  .BR setfdprm (8)
@@ -13,7 +13,7 @@ diff -up util-linux-2.20-rc1/disk-utils/fdformat.8.orig util-linux-2.20-rc1/disk
  .SH OPTIONS
  .TP
  \fB\-n\fR, \fB\-\-no\-verify\fR
-@@ -58,7 +63,8 @@ Display help and exit.
+@@ -57,7 +62,8 @@ Display help and exit.
  .BR fd (4),
  .BR setfdprm (8),
  .BR mkfs (8),

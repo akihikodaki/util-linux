@@ -2,7 +2,7 @@
 Summary: A collection of basic system utilities
 Name: util-linux
 Version: 2.22.2
-Release: 4%{?dist}
+Release: 5%{?dist}
 License: GPLv2 and GPLv2+ and GPLv3+ and LGPLv2+ and BSD with advertising and Public Domain
 Group: System Environment/Base
 URL: http://en.wikipedia.org/wiki/Util-linux
@@ -80,16 +80,16 @@ Requires: libmount = %{version}-%{release}
 # add a missing header
 Patch0: util-linux-2.19-floppy-locale.patch
 # add note about ATAPI IDE floppy to fdformat.8
-Patch1: util-linux-2.20-fdformat-man-ide.patch
+Patch1: util-linux-2.22-fdformat-man-ide.patch
 # 169628 - /usr/bin/floppy doesn't work with /dev/fd0
 Patch2: util-linux-2.19-floppy-generic.patch
 
 ### Ready for upstream?
 ###
 # 151635 - makeing /var/log/lastlog
-Patch3: util-linux-ng-2.21-login-lastlog.patch
+Patch3: util-linux-ng-2.22-login-lastlog.patch
 # 231192 - ipcs is not printing correct values on pLinux
-Patch4: util-linux-2.21-ipcs-32bit.patch
+Patch4: util-linux-2.22-ipcs-32bit.patch
 
 ###
 ### Upstream patches (2.23 or 2.22.x)
@@ -103,6 +103,8 @@ Patch102: hexdump-do-not-segfault-when-iterating-over-an-empty.patch
 Patch103: cal-don-t-mix-ncurses-output-functions-and-printf.patch
 # upstream patch
 Patch104: libblkid-remove-optimization-from-verify-function.patch
+# 902512 - No boot : Dependency failed for /home (and blkid fails to tell UUID)
+Patch105: libblkid-make-backup-superblock-visible-for-wipefs-8.patch
 
 ### Upstream patches from master branch (will be v2.23) for su(1) and new
 ### runuser(1) implementation. This is required for the recent coreutils where
@@ -403,7 +405,7 @@ chmod 644 misc-utils/getopt-*.{bash,tcsh}
 rm -f ${RPM_BUILD_ROOT}%{_datadir}/getopt/*
 rmdir ${RPM_BUILD_ROOT}%{_datadir}/getopt
 
-ln -s /proc/mounts %{buildroot}/etc/mtab
+ln -sf /proc/mounts %{buildroot}/etc/mtab
 
 
 # remove static libs
@@ -442,8 +444,7 @@ if [ -x /usr/sbin/selinuxenabled ] && /usr/sbin/selinuxenabled; then
 	fi
 fi
 if [ ! -L /etc/mtab ]; then
-	rm -f /etc/mtab
-	ln -s /proc/mounts /etc/mtab
+	ln -fs /proc/mounts /etc/mtab
 fi
 
 %post -n libblkid
@@ -778,8 +779,11 @@ fi
 %{_mandir}/man3/uuid_unparse.3*
 %{_libdir}/pkgconfig/uuid.pc
 
-
 %changelog
+* Tue Feb 19 2013 Karel Zak <kzak@redhat.com> 2.22.2-5
+- fix #902512 - Dependency failed for /home (and blkid fails to tell UUID)
+- refresh old patches
+
 * Wed Feb  6 2013 Karel Zak <kzak@redhat.com> 2.22.2-4
 - improve convertion to mtab symlink in post script
 - spec file cleanup (based on #894199)
