@@ -2,7 +2,7 @@
 Summary: A collection of basic system utilities
 Name: util-linux
 Version: 2.22.2
-Release: 5%{?dist}
+Release: 6%{?dist}
 License: GPLv2 and GPLv2+ and GPLv3+ and LGPLv2+ and BSD with advertising and Public Domain
 Group: System Environment/Base
 URL: http://en.wikipedia.org/wiki/Util-linux
@@ -780,6 +780,9 @@ fi
 %{_libdir}/pkgconfig/uuid.pc
 
 %changelog
+* Wed Feb 20 2013 Karel Zak <kzak@redhat.com> 2.22.2-6
+- fix  #912778 - "runuser -l" doesn't register session to systemd
+
 * Tue Feb 19 2013 Karel Zak <kzak@redhat.com> 2.22.2-5
 - fix #902512 - Dependency failed for /home (and blkid fails to tell UUID)
 - refresh old patches
