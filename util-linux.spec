@@ -1,13 +1,13 @@
 ### Header
 Summary: A collection of basic system utilities
 Name: util-linux
-Version: 2.22.2
-Release: 6%{?dist}
-License: GPLv2 and GPLv2+ and GPLv3+ and LGPLv2+ and BSD with advertising and Public Domain
+Version: 2.23
+Release: 0.1%{?dist}
+License: GPLv2 and GPLv2+ and LGPLv2+ and BSD with advertising and Public Domain
 Group: System Environment/Base
 URL: http://en.wikipedia.org/wiki/Util-linux
 
-%define upstream_version %{version}
+%define upstream_version %{version}-rc1
 
 ### Macros
 %define floppyver 0.18
@@ -23,11 +23,8 @@ BuildRequires: zlib-devel
 BuildRequires: popt-devel
 BuildRequires: libutempter-devel
 Buildrequires: systemd-devel
-
-# because backported su(1) and runuser(1) patches
-BuildRequires: automake
-BuildRequires: autoconf
-BuildRequires: libtool
+Buildrequires: libuser-devel
+BuildRequires: libcap-ng-devel
 
 ### Sources
 Source0: ftp://ftp.kernel.org/pub/linux/utils/util-linux/v2.22/util-linux-%{upstream_version}.tar.xz
@@ -88,40 +85,6 @@ Patch2: util-linux-2.19-floppy-generic.patch
 ###
 # 151635 - makeing /var/log/lastlog
 Patch3: util-linux-ng-2.22-login-lastlog.patch
-# 231192 - ipcs is not printing correct values on pLinux
-Patch4: util-linux-2.22-ipcs-32bit.patch
-
-###
-### Upstream patches (2.23 or 2.22.x)
-# 889888 - wipefs does not completely wipe btrfs volume
-Patch100: libblkid-add-support-for-btrfs-backup-superblock.patch
-# 882305 - agetty: unstable /dev/tty* permissions
-Patch101: agetty-replace-perms-660-to-620.patch
-# 885314 - hexdump segfault
-Patch102: hexdump-do-not-segfault-when-iterating-over-an-empty.patch
-# 896447 - No newlines in piped "cal" command
-Patch103: cal-don-t-mix-ncurses-output-functions-and-printf.patch
-# upstream patch
-Patch104: libblkid-remove-optimization-from-verify-function.patch
-# 902512 - No boot : Dependency failed for /home (and blkid fails to tell UUID)
-Patch105: libblkid-make-backup-superblock-visible-for-wipefs-8.patch
-
-### Upstream patches from master branch (will be v2.23) for su(1) and new
-### runuser(1) implementation. This is required for the recent coreutils where
-### is no more su(1).
-###
-Patch200: 0200-su-add-group-and-supp-group-options.patch
-Patch201: 0201-su-move-generic-su-code-to-su-common.c.patch
-Patch202: 0202-runuser-new-command-derived-from-su-1.patch
-Patch203: 0203-su-more-robust-getpwuid-for-GNU-Hurt-coreutils-71b7d.patch
-Patch204: 0204-su-verify-writing-to-streams-was-successful.patch
-Patch205: 0205-su-move-long-options-to-main.patch
-Patch206: 0206-su-add-segmentation-fault-reporting-of-the-child-pro.patch
-Patch207: 0207-su-fixed-a-typo-in-pam-error-message.patch
-Patch208: 0208-runuser-add-u-to-not-execute-shell.patch
-Patch209: 0209-build-sys-move-runuser-to-sbin-dir.patch
-Patch210: 0210-su-fix-COMMAND-not-specified-error.patch
-
 
 %description
 The util-linux package contains a large variety of low-level system
@@ -244,8 +207,6 @@ done
 %build
 unset LINGUAS || :
 
-./autogen.sh
-
 export CFLAGS="-D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64 $RPM_OPT_FLAGS"
 export SUID_CFLAGS="-fpie"
 export SUID_LDFLAGS="-pie -Wl,-z,relro -Wl,-z,now"
@@ -358,8 +319,8 @@ rm -f $RPM_BUILD_ROOT%{_bindir}/cytune $RPM_BUILD_ROOT%{_mandir}/man8/cytune.8*
 
 # unsupported on s390
 %ifarch s390 s390x
-for I in /usr/{bin,sbin}/{fdformat,tunelp,floppy} \
-	%{_mandir}/man8/{fdformat,tunelp,floppy}.8* \
+for I in /usr/{bin,sbin}/{fdformat,floppy} \
+	%{_mandir}/man8/{fdformat,floppy}.8* \
 	/usr/sbin/{hwclock,clock} \
 	%{_mandir}/man8/{hwclock,clock}.8*; do
 	
@@ -549,6 +510,7 @@ fi
 %{_bindir}/more
 %{_bindir}/mountpoint
 %{_bindir}/namei
+%{_bindir}/nsenter
 %{_bindir}/prlimit
 %{_bindir}/raw
 %{_bindir}/rename
@@ -557,6 +519,7 @@ fi
 %{_bindir}/script
 %{_bindir}/scriptreplay
 %{_bindir}/setarch
+%{_bindir}/setpriv
 %{_bindir}/setsid
 %{_bindir}/setterm
 %{_bindir}/tailf
@@ -594,6 +557,7 @@ fi
 %{_mandir}/man1/more.1*
 %{_mandir}/man1/mountpoint.1*
 %{_mandir}/man1/namei.1*
+%{_mandir}/man1/nsenter.1*
 %{_mandir}/man1/prlimit.1*
 %{_mandir}/man1/rename.1*
 %{_mandir}/man1/renice.1*
@@ -601,6 +565,7 @@ fi
 %{_mandir}/man1/runuser.1*
 %{_mandir}/man1/script.1*
 %{_mandir}/man1/scriptreplay.1*
+%{_mandir}/man1/setpriv.1*
 %{_mandir}/man1/setsid.1*
 %{_mandir}/man1/setterm.1*
 %{_mandir}/man1/su.1*
@@ -615,6 +580,7 @@ fi
 %{_mandir}/man5/fstab.5*
 %{_mandir}/man8/addpart.8*
 %{_mandir}/man8/agetty.8*
+%{_mandir}/man8/blkdiscard.8*
 %{_mandir}/man8/blkid.8*
 %{_mandir}/man8/blockdev.8*
 %{_mandir}/man8/chcpu.8*
@@ -655,6 +621,7 @@ fi
 %{_mandir}/man8/wipefs.8*
 %{_sbindir}/addpart
 %{_sbindir}/agetty
+%{_sbindir}/blkdiscard
 %{_sbindir}/blkid
 %{_sbindir}/blockdev
 %{_sbindir}/chcpu
@@ -692,12 +659,10 @@ fi
 %{_bindir}/floppy
 %{_sbindir}/fdformat
 %{_sbindir}/hwclock
-%{_sbindir}/tunelp
 %{_mandir}/man8/fdformat.8*
 %{_mandir}/man8/floppy.8*
 %{_mandir}/man8/hwclock.8*
 %{_mandir}/man8/clock.8*
-%{_mandir}/man8/tunelp.8*
 %endif
 
 %ifnarch %{sparc}
@@ -780,6 +745,12 @@ fi
 %{_libdir}/pkgconfig/uuid.pc
 
 %changelog
+* Fri Mar 22 2013 Karel Zak <kzak@redhat.com> 2.23-0.1
+- upgrade to the release 2.22-rc1
+  ftp://ftp.kernel.org/pub/linux/utils/util-linux/v2.23/v2.23-ReleaseNotes
+- add nsenter and blkdiscard
+- remove tunelp
+
 * Wed Feb 20 2013 Karel Zak <kzak@redhat.com> 2.22.2-6
 - fix  #912778 - "runuser -l" doesn't register session to systemd
 
