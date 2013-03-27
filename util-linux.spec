@@ -2,7 +2,7 @@
 Summary: A collection of basic system utilities
 Name: util-linux
 Version: 2.23
-Release: 0.2%{?dist}
+Release: 0.3%{?dist}
 License: GPLv2 and GPLv2+ and LGPLv2+ and BSD with advertising and Public Domain
 Group: System Environment/Base
 URL: http://en.wikipedia.org/wiki/Util-linux
@@ -90,6 +90,7 @@ Patch3: util-linux-ng-2.22-login-lastlog.patch
 ###
 Patch100: 0001-libmount-fix-user-mount-by-root-for-mount.-type-help.patch
 Patch101: 0001-libmount-umount-crashes-when-trying-to-umount-a-non-.patch
+Patch102: 0001-libblkid-fix-NTFS-prober-on-big-endian-machines.patch
 
 
 %description
@@ -751,6 +752,9 @@ fi
 %{_libdir}/pkgconfig/uuid.pc
 
 %changelog
+* Wed Mar 27 2013 Karel Zak <kzak@redhat.com> 2.23-0.3
+- libblkid ntfs bugfix for build on s390
+
 * Wed Mar 27 2013 Karel Zak <kzak@redhat.com> 2.23-0.2
 - add upstream patches for to fix umount and mount.<type>
 
