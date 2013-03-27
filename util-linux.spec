@@ -2,7 +2,7 @@
 Summary: A collection of basic system utilities
 Name: util-linux
 Version: 2.23
-Release: 0.1%{?dist}
+Release: 0.2%{?dist}
 License: GPLv2 and GPLv2+ and LGPLv2+ and BSD with advertising and Public Domain
 Group: System Environment/Base
 URL: http://en.wikipedia.org/wiki/Util-linux
@@ -85,6 +85,12 @@ Patch2: util-linux-2.19-floppy-generic.patch
 ###
 # 151635 - makeing /var/log/lastlog
 Patch3: util-linux-ng-2.22-login-lastlog.patch
+
+### Upstream patches for v2.23-rc2
+###
+Patch100: 0001-libmount-fix-user-mount-by-root-for-mount.-type-help.patch
+Patch101: 0001-libmount-umount-crashes-when-trying-to-umount-a-non-.patch
+
 
 %description
 The util-linux package contains a large variety of low-level system
@@ -745,6 +751,9 @@ fi
 %{_libdir}/pkgconfig/uuid.pc
 
 %changelog
+* Wed Mar 27 2013 Karel Zak <kzak@redhat.com> 2.23-0.2
+- add upstream patches for to fix umount and mount.<type>
+
 * Fri Mar 22 2013 Karel Zak <kzak@redhat.com> 2.23-0.1
 - upgrade to the release 2.22-rc1
   ftp://ftp.kernel.org/pub/linux/utils/util-linux/v2.23/v2.23-ReleaseNotes
