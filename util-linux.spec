@@ -2,7 +2,7 @@
 Summary: A collection of basic system utilities
 Name: util-linux
 Version: 2.23
-Release: 0.4%{?dist}
+Release: 0.5%{?dist}
 License: GPLv2 and GPLv2+ and LGPLv2+ and BSD with advertising and Public Domain
 Group: System Environment/Base
 URL: http://en.wikipedia.org/wiki/Util-linux
@@ -87,6 +87,10 @@ Patch2: util-linux-2.19-floppy-generic.patch
 ###
 # 151635 - makeing /var/log/lastlog
 Patch3: util-linux-ng-2.22-login-lastlog.patch
+
+### upstream pathes (2.23)
+# 948274 - interruption code 0x4003B in libmount.so.1.1.0
+Patch100: 0001-libmount-fix-mount.nfs-segfault-rely-on-assert-rathe.patch
 
 %description
 The util-linux package contains a large variety of low-level system
@@ -822,6 +826,9 @@ fi
 %{_libdir}/pkgconfig/uuid.pc
 
 %changelog
+* Fri Apr 12 2013 Karel Zak <kzak@redhat.com> 2.23-0.5
+- fix #948274 - interruption code 0x4003B in libmount.so.1.1.0
+
 * Wed Apr 10 2013 Karel Zak <kzak@redhat.com> 2.23-0.4
 - upgrade to the release 2.23-rc2
 
