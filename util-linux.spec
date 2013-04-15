@@ -2,7 +2,7 @@
 Summary: A collection of basic system utilities
 Name: util-linux
 Version: 2.23
-Release: 0.6%{?dist}
+Release: 0.7%{?dist}
 License: GPLv2 and GPLv2+ and LGPLv2+ and BSD with advertising and Public Domain
 Group: System Environment/Base
 URL: http://en.wikipedia.org/wiki/Util-linux
@@ -788,6 +788,9 @@ fi
 %{_libdir}/pkgconfig/uuid.pc
 
 %changelog
+* Mon Apr 15 2013 Karel Zak <kzak@redhat.com> 2.23-0.7
+- remove unused patches
+
 * Mon Apr 15 2013 Karel Zak <kzak@redhat.com> 2.23-0.6
 - remove floppy from util-linux
 
