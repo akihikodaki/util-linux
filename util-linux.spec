@@ -2,7 +2,7 @@
 Summary: A collection of basic system utilities
 Name: util-linux
 Version: 2.23
-Release: 0.5%{?dist}
+Release: 0.6%{?dist}
 License: GPLv2 and GPLv2+ and LGPLv2+ and BSD with advertising and Public Domain
 Group: System Environment/Base
 URL: http://en.wikipedia.org/wiki/Util-linux
@@ -10,7 +10,6 @@ URL: http://en.wikipedia.org/wiki/Util-linux
 %define upstream_version %{version}-rc2
 
 ### Macros
-%define floppyver 0.18
 %define cytune_archs %{ix86} alpha %{arm}
 %define compldir %{_datadir}/bash-completion/completions/
 
@@ -35,7 +34,6 @@ Source3: util-linux-chsh-chfn.pamd
 Source4: util-linux-60-raw.rules
 Source8: nologin.c
 Source9: nologin.8
-Source11: http://downloads.sourceforge.net/floppyutil/floppy-%{floppyver}.tar.bz2
 Source12: util-linux-su.pamd
 Source13: util-linux-su-l.pamd
 Source14: util-linux-runuser.pamd
@@ -73,15 +71,6 @@ Requires: audit-libs >= 1.0.6
 Requires: libuuid = %{version}-%{release}
 Requires: libblkid = %{version}-%{release}
 Requires: libmount = %{version}-%{release}
-
-### Floppy patches (Fedora/RHEL specific)
-###
-# add a missing header
-Patch0: util-linux-2.19-floppy-locale.patch
-# add note about ATAPI IDE floppy to fdformat.8
-Patch1: util-linux-2.22-fdformat-man-ide.patch
-# 169628 - /usr/bin/floppy doesn't work with /dev/fd0
-Patch2: util-linux-2.19-floppy-generic.patch
 
 ### Ready for upstream?
 ###
@@ -203,7 +192,7 @@ SMP systems.
 
 
 %prep
-%setup -q -a 11 -n %{name}-%{upstream_version}
+%setup -q -n %{name}-%{upstream_version}
 cp %{SOURCE8} %{SOURCE9} .
 
 for p in %{patches}; do
@@ -242,12 +231,6 @@ export SUID_LDFLAGS="-pie -Wl,-z,relro -Wl,-z,now"
 # build util-linux
 make %{?_smp_mflags}
 
-# build floppy stuff
-pushd floppy-%{floppyver}
-%configure --disable-gtk2
-make %{?_smp_mflags}
-popd
-
 # build nologin
 gcc $CFLAGS -o nologin nologin.c
 
@@ -263,11 +246,6 @@ chmod 0644 ${RPM_BUILD_ROOT}/var/log/lastlog
 
 # install util-linux
 make install DESTDIR=${RPM_BUILD_ROOT}
-
-# inslall floppy stuff
-pushd floppy-%{floppyver}
-make install DESTDIR=${RPM_BUILD_ROOT}
-popd
 
 # install nologin
 install -m 755 nologin ${RPM_BUILD_ROOT}%{_sbindir}
@@ -329,12 +307,6 @@ ln -sf hwclock ${RPM_BUILD_ROOT}%{_sbindir}/clock
 echo ".so man8/hwclock.8" > ${RPM_BUILD_ROOT}%{_mandir}/man8/clock.8
 %endif
 
-# unsupported on s390
-%ifarch s390 s390x
-rm -f $RPM_BUILD_ROOT%{_sbindir}floppy
-rm -f $RPM_BUILD_ROOT%{_mandir}/man8/floppy.8*
-%endif
-
 # unsupported on SPARCs
 %ifarch %{sparc}
 for I in /sbin/sfdisk \
@@ -346,14 +318,6 @@ for I in /sbin/sfdisk \
 	rm -f $RPM_BUILD_ROOT$I
 done
 %endif
-
-# deprecated docs
-for I in floppy-%{floppyver}/README.html; do
-	rm -rf $I
-done
-
-# rename docs
-mv floppy-%{floppyver}/README floppy-%{floppyver}/README.floppy
 
 # we install getopt-*.{bash,tcsh} as doc files
 chmod 644 misc-utils/getopt-*.{bash,tcsh}
@@ -451,7 +415,7 @@ fi
 
 %files -f %{name}.files
 %defattr(-,root,root)
-%doc README */README.* NEWS AUTHORS
+%doc README NEWS AUTHORS
 %doc Documentation/deprecated.txt Documentation/licenses/*
 %doc misc-utils/getopt-*.{bash,tcsh}
 
@@ -731,11 +695,9 @@ fi
 
 %ifnarch s390 s390x
 %{_sbindir}/clock
-%{_bindir}/floppy
 %{_sbindir}/fdformat
 %{_sbindir}/hwclock
 %{_mandir}/man8/fdformat.8*
-%{_mandir}/man8/floppy.8*
 %{_mandir}/man8/hwclock.8*
 %{_mandir}/man8/clock.8*
 %{compldir}/fdformat
@@ -826,6 +788,9 @@ fi
 %{_libdir}/pkgconfig/uuid.pc
 
 %changelog
+* Mon Apr 15 2013 Karel Zak <kzak@redhat.com> 2.23-0.6
+- remove floppy from util-linux
+
 * Fri Apr 12 2013 Karel Zak <kzak@redhat.com> 2.23-0.5
 - fix #948274 - interruption code 0x4003B in libmount.so.1.1.0
 
