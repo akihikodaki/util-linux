@@ -2,12 +2,12 @@
 Summary: A collection of basic system utilities
 Name: util-linux
 Version: 2.23
-Release: 0.7%{?dist}
+Release: 1%{?dist}
 License: GPLv2 and GPLv2+ and LGPLv2+ and BSD with advertising and Public Domain
 Group: System Environment/Base
 URL: http://en.wikipedia.org/wiki/Util-linux
 
-%define upstream_version %{version}-rc2
+%define upstream_version %{version}
 
 ### Macros
 %define cytune_archs %{ix86} alpha %{arm}
@@ -76,10 +76,6 @@ Requires: libmount = %{version}-%{release}
 ###
 # 151635 - makeing /var/log/lastlog
 Patch3: util-linux-ng-2.22-login-lastlog.patch
-
-### upstream pathes (2.23)
-# 948274 - interruption code 0x4003B in libmount.so.1.1.0
-Patch100: 0001-libmount-fix-mount.nfs-segfault-rely-on-assert-rathe.patch
 
 %description
 The util-linux package contains a large variety of low-level system
@@ -233,6 +229,14 @@ make %{?_smp_mflags}
 
 # build nologin
 gcc $CFLAGS -o nologin nologin.c
+
+
+%check
+#to run tests use "--with check"
+%if %{?_with_check:1}%{!?_with_check:0}
+make check
+%endif
+
 
 %install
 rm -rf ${RPM_BUILD_ROOT}
@@ -788,6 +792,10 @@ fi
 %{_libdir}/pkgconfig/uuid.pc
 
 %changelog
+* Thu Apr 25 2013 Karel Zak <kzak@redhat.com> 2.23-1
+- upgrade to 2.23
+- add --with check to call make check
+
 * Mon Apr 15 2013 Karel Zak <kzak@redhat.com> 2.23-0.7
 - remove unused patches
 
