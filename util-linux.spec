@@ -1,7 +1,7 @@
 ### Header
 Summary: A collection of basic system utilities
 Name: util-linux
-Version: 2.23
+Version: 2.23.1
 Release: 1%{?dist}
 License: GPLv2 and GPLv2+ and LGPLv2+ and BSD with advertising and Public Domain
 Group: System Environment/Base
@@ -75,7 +75,10 @@ Requires: libmount = %{version}-%{release}
 ### Ready for upstream?
 ###
 # 151635 - makeing /var/log/lastlog
-Patch3: util-linux-ng-2.22-login-lastlog.patch
+Patch0: util-linux-ng-2.22-login-lastlog.patch
+
+### Backport from v2.24
+Patch1: util-linux-2.23-agetty-clocal.patch
 
 %description
 The util-linux package contains a large variety of low-level system
@@ -792,6 +795,10 @@ fi
 %{_libdir}/pkgconfig/uuid.pc
 
 %changelog
+* Tue May 28 2013 Karel Zak <kzak@redhat.com> 2.23.1-1
+- upgrade to 2.23.1
+- backport agetty --local-line path
+
 * Thu Apr 25 2013 Karel Zak <kzak@redhat.com> 2.23-1
 - upgrade to 2.23
 - add --with check to call make check
