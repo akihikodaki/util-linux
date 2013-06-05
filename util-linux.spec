@@ -2,7 +2,7 @@
 Summary: A collection of basic system utilities
 Name: util-linux
 Version: 2.23.1
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: GPLv2 and GPLv2+ and LGPLv2+ and BSD with advertising and Public Domain
 Group: System Environment/Base
 URL: http://en.wikipedia.org/wiki/Util-linux
@@ -79,6 +79,8 @@ Patch0: util-linux-ng-2.22-login-lastlog.patch
 
 ### Backport from v2.24
 Patch1: util-linux-2.23-agetty-clocal.patch
+### 962145 - in.telnetd immediately closes connection
+Patch2: util-linux-2.23-login-TCSANOW.patch
 
 %description
 The util-linux package contains a large variety of low-level system
@@ -795,6 +797,9 @@ fi
 %{_libdir}/pkgconfig/uuid.pc
 
 %changelog
+* Wed Jun  5 2013 Karel Zak <kzak@redhat.com> 2.23.1-2
+- fix #962145 - in.telnetd immediately closes connection
+
 * Tue May 28 2013 Karel Zak <kzak@redhat.com> 2.23.1-1
 - upgrade to 2.23.1
 - backport agetty --local-line path
