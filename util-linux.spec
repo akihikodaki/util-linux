@@ -1,8 +1,8 @@
 ### Header
 Summary: A collection of basic system utilities
 Name: util-linux
-Version: 2.23.1
-Release: 3%{?dist}
+Version: 2.23.2
+Release: 1%{?dist}
 License: GPLv2 and GPLv2+ and LGPLv2+ and BSD with advertising and Public Domain
 Group: System Environment/Base
 URL: http://en.wikipedia.org/wiki/Util-linux
@@ -79,8 +79,6 @@ Patch0: util-linux-ng-2.22-login-lastlog.patch
 
 ### Backport from v2.24 + #972457
 Patch1: util-linux-2.23-agetty-clocal.patch
-### 962145 - in.telnetd immediately closes connection
-Patch2: util-linux-2.23-login-TCSANOW.patch
 
 %description
 The util-linux package contains a large variety of low-level system
@@ -797,6 +795,10 @@ fi
 %{_libdir}/pkgconfig/uuid.pc
 
 %changelog
+* Wed Jul 31 2013 Karel Zak <kzak@redhat.com> 2.23.2-1
+- upgrade to stable release 2.23.2
+  ftp://ftp.kernel.org/pub/linux/utils/util-linux/v2.23/v2.23.2-ReleaseNotes
+
 * Thu Jun 13 2013 Karel Zak <kzak@redhat.com> 2.23.1-3
 - fix #972457 - agetty idle I/O polling causes elevated CPU usage
 
