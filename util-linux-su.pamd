@@ -4,7 +4,7 @@ auth		sufficient	pam_rootok.so
 #auth		sufficient	pam_wheel.so trust use_uid
 # Uncomment the following line to require a user to be in the "wheel" group.
 #auth		required	pam_wheel.so use_uid
-auth		include		system-auth
+auth		substack	system-auth
 auth		include		postlogin
 account		sufficient	pam_succeed_if.so uid = 0 use_uid quiet
 account		include		system-auth
