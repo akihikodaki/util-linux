@@ -2,7 +2,7 @@
 Summary: A collection of basic system utilities
 Name: util-linux
 Version: 2.23.2
-Release: 2%{?dist}
+Release: 3%{?dist}
 License: GPLv2 and GPLv2+ and LGPLv2+ and BSD with advertising and Public Domain
 Group: System Environment/Base
 URL: http://en.wikipedia.org/wiki/Util-linux
@@ -795,6 +795,9 @@ fi
 %{_libdir}/pkgconfig/uuid.pc
 
 %changelog
+* Mon Sep  9 2013 Karel Zak <kzak@redhat.com> 2.23.2-3
+- refresh patches
+
 * Thu Aug  1 2013 Karel Zak <kzak@redhat.com> 2.23.2-2
 - fix 990083 - su doesn't work with pam_ecryptfs
 
