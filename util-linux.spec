@@ -81,6 +81,8 @@ Patch0: 2.23-login-lastlog-create.patch
 Patch1: 2.24-agetty-clocal.patch
 # v2.24 backport: #987787 - Remove lastlogin from su
 Patch2: 2.24-su-suppress-PAM-info-messages.patch
+# v2.24 backport: #950497 - problem umounting loop device
+Patch3: 2.24-libmount-canonicalize-for-conversion-from-loopdev.patch
 
 %description
 The util-linux package contains a large variety of low-level system
@@ -800,6 +802,7 @@ fi
 * Mon Sep  9 2013 Karel Zak <kzak@redhat.com> 2.23.2-3
 - refresh and rename patches
 - fix #987787 - Remove lastlogin from su
+- fix #950497 - problem umounting loop device
 
 * Thu Aug  1 2013 Karel Zak <kzak@redhat.com> 2.23.2-2
 - fix 990083 - su doesn't work with pam_ecryptfs
