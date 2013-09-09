@@ -83,6 +83,8 @@ Patch1: 2.24-agetty-clocal.patch
 Patch2: 2.24-su-suppress-PAM-info-messages.patch
 # v2.24 backport: #950497 - problem umounting loop device
 Patch3: 2.24-libmount-canonicalize-for-conversion-from-loopdev.patch
+# v2.24 backport: #921498 - multiple internal testsuite failures
+Patch4: 2.24-tests-portability.patch
 
 %description
 The util-linux package contains a large variety of low-level system
@@ -803,6 +805,7 @@ fi
 - refresh and rename patches
 - fix #987787 - Remove lastlogin from su
 - fix #950497 - problem umounting loop device
+- fix #921498 - multiple internal testsuite failures
 
 * Thu Aug  1 2013 Karel Zak <kzak@redhat.com> 2.23.2-2
 - fix 990083 - su doesn't work with pam_ecryptfs
