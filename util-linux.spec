@@ -77,8 +77,10 @@ Requires: libmount = %{version}-%{release}
 # 151635 - makeing /var/log/lastlog
 Patch0: 2.23-login-lastlog-create.patch
 
-### Backport from v2.24 + #972457
+# v2.24 backport: #972457
 Patch1: 2.24-agetty-clocal.patch
+# v2.24 backport: #987787 - Remove lastlogin from su
+Patch2: 2.24-su-suppress-PAM-info-messages.patch
 
 %description
 The util-linux package contains a large variety of low-level system
@@ -797,6 +799,7 @@ fi
 %changelog
 * Mon Sep  9 2013 Karel Zak <kzak@redhat.com> 2.23.2-3
 - refresh and rename patches
+- fix #987787 - Remove lastlogin from su
 
 * Thu Aug  1 2013 Karel Zak <kzak@redhat.com> 2.23.2-2
 - fix 990083 - su doesn't work with pam_ecryptfs
