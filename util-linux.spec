@@ -75,10 +75,10 @@ Requires: libmount = %{version}-%{release}
 ### Ready for upstream?
 ###
 # 151635 - makeing /var/log/lastlog
-Patch0: util-linux-ng-2.22-login-lastlog.patch
+Patch0: 2.23-login-lastlog-create.patch
 
 ### Backport from v2.24 + #972457
-Patch1: util-linux-2.23-agetty-clocal.patch
+Patch1: 2.24-agetty-clocal.patch
 
 %description
 The util-linux package contains a large variety of low-level system
@@ -796,7 +796,7 @@ fi
 
 %changelog
 * Mon Sep  9 2013 Karel Zak <kzak@redhat.com> 2.23.2-3
-- refresh patches
+- refresh and rename patches
 
 * Thu Aug  1 2013 Karel Zak <kzak@redhat.com> 2.23.2-2
 - fix 990083 - su doesn't work with pam_ecryptfs
