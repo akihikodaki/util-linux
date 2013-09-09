@@ -2,7 +2,7 @@
 Summary: A collection of basic system utilities
 Name: util-linux
 Version: 2.23.2
-Release: 3%{?dist}
+Release: 4%{?dist}
 License: GPLv2 and GPLv2+ and LGPLv2+ and BSD with advertising and Public Domain
 Group: System Environment/Base
 URL: http://en.wikipedia.org/wiki/Util-linux
@@ -85,6 +85,11 @@ Patch2: 2.24-su-suppress-PAM-info-messages.patch
 Patch3: 2.24-libmount-canonicalize-for-conversion-from-loopdev.patch
 # v2.24 backport: #921498 - multiple internal testsuite failures
 Patch4: 2.24-tests-portability.patch
+# v2.24 backport: #1005566 - recount_geometry: Process /usr/sbin/fdisk was killed by signal 8 (SIGFPE)
+Patch5: 2.24-libfdisk-fix-SIGFPE.patch
+# v2.24 backport: #1005194 - su generates incorrect log entries
+Patch6: 2.24-su-fix-lastlog-and-btmp-logging.patch
+
 
 %description
 The util-linux package contains a large variety of low-level system
@@ -801,6 +806,10 @@ fi
 %{_libdir}/pkgconfig/uuid.pc
 
 %changelog
+* Mon Sep  9 2013 Karel Zak <kzak@redhat.com> 2.23.2-4
+- fix #1005566 - recount_geometry: Process /usr/sbin/fdisk was killed by signal 8 (SIGFPE)
+- fix #1005194 - su generates incorrect log entries
+
 * Mon Sep  9 2013 Karel Zak <kzak@redhat.com> 2.23.2-3
 - refresh and rename patches
 - fix #987787 - Remove lastlogin from su
