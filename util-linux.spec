@@ -1,13 +1,13 @@
 ### Header
 Summary: A collection of basic system utilities
 Name: util-linux
-Version: 2.23.2
-Release: 4%{?dist}
+Version: 2.24
+Release: 0.1%{?dist}
 License: GPLv2 and GPLv2+ and LGPLv2+ and BSD with advertising and Public Domain
 Group: System Environment/Base
 URL: http://en.wikipedia.org/wiki/Util-linux
 
-%define upstream_version %{version}
+%define upstream_version %{version}-rc1
 
 ### Macros
 %define cytune_archs %{ix86} alpha %{arm}
@@ -25,9 +25,10 @@ BuildRequires: libutempter-devel
 Buildrequires: systemd-devel
 Buildrequires: libuser-devel
 BuildRequires: libcap-ng-devel
+BuildRequires: python3-devel
 
 ### Sources
-Source0: ftp://ftp.kernel.org/pub/linux/utils/util-linux/v2.23/util-linux-%{upstream_version}.tar.xz
+Source0: ftp://ftp.kernel.org/pub/linux/utils/util-linux/v2.24/util-linux-%{upstream_version}.tar.xz
 Source1: util-linux-login.pamd
 Source2: util-linux-remote.pamd
 Source3: util-linux-chsh-chfn.pamd
@@ -46,8 +47,9 @@ Conflicts: coreutils < 8.20
 # eject has been merged into util-linux v2.22
 Obsoletes: eject <= 2.1.5
 Provides: eject = 2.1.6
-# sulogin, utmpdump merged into util-linux v2.22
-Conflicts: sysvinit-tools < 2.88-8
+# sulogin, utmpdump merged into util-linux v2.22;
+# last, lastb merged into util-linux v2.24
+Conflicts: sysvinit-tools < 2.88-14
 # old versions of e2fsprogs contain fsck, uuidgen
 Conflicts: e2fsprogs < 1.41.8-5
 # rename from util-linux-ng back to util-linux
@@ -76,20 +78,6 @@ Requires: libmount = %{version}-%{release}
 ###
 # 151635 - makeing /var/log/lastlog
 Patch0: 2.23-login-lastlog-create.patch
-
-# v2.24 backport: #972457
-Patch1: 2.24-agetty-clocal.patch
-# v2.24 backport: #987787 - Remove lastlogin from su
-Patch2: 2.24-su-suppress-PAM-info-messages.patch
-# v2.24 backport: #950497 - problem umounting loop device
-Patch3: 2.24-libmount-canonicalize-for-conversion-from-loopdev.patch
-# v2.24 backport: #921498 - multiple internal testsuite failures
-Patch4: 2.24-tests-portability.patch
-# v2.24 backport: #1005566 - recount_geometry: Process /usr/sbin/fdisk was killed by signal 8 (SIGFPE)
-Patch5: 2.24-libfdisk-fix-SIGFPE.patch
-# v2.24 backport: #1005194 - su generates incorrect log entries
-Patch6: 2.24-su-fix-lastlog-and-btmp-logging.patch
-
 
 %description
 The util-linux package contains a large variety of low-level system
@@ -201,6 +189,18 @@ uniqueness of time-based UUID generation even at very high rates on
 SMP systems.
 
 
+%package -n python3-libmount
+Summary: Python bindings for the libmount library
+Group: Development/Libraries
+Requires: libmount = %{version}-%{release}
+
+%description -n python3-libmount
+The libmount-python package contains a module that permits applications
+written in the Python programming language to use the interface
+supplied by the libmount library to work with mount tables (fstab,
+mountinfo, etc) and mount filesystems.
+
+
 %prep
 %setup -q -n %{name}-%{upstream_version}
 cp %{SOURCE8} %{SOURCE9} .
@@ -218,13 +218,13 @@ export SUID_LDFLAGS="-pie -Wl,-z,relro -Wl,-z,now"
 %configure \
 	--with-systemdsystemunitdir=%{_unitdir} \
 	--disable-silent-rules \
-	--disable-wall \
 	--disable-bfs \
 	--disable-pg \
 	--enable-socket-activation \
 	--enable-chfn-chsh \
 	--enable-write \
 	--enable-raw \
+	--with-python=3 \
 	--with-udev \
 	--with-selinux \
 	--with-audit \
@@ -288,6 +288,8 @@ install -d ${RPM_BUILD_ROOT}/var/lib/libuuid
 
 # libtool junk
 rm -rf ${RPM_BUILD_ROOT}%{_libdir}/*.la
+rm -f $RPM_BUILD_ROOT%{_libdir}/python*/site-packages/*.la
+rm -f $RPM_BUILD_ROOT%{_libdir}/python*/site-packages/*.a
 
 %ifarch %{sparc}
 rm -rf ${RPM_BUILD_ROOT}%{_bindir}/sunhostid
@@ -477,12 +479,15 @@ fi
 %{_bindir}/ipcs
 %{_bindir}/isosize
 %{_bindir}/kill
+%{_bindir}/last
+%{_bindir}/lastb
 %{_bindir}/logger
 %{_bindir}/look
 %{_bindir}/lsblk
 %{_bindir}/lscpu
 %{_bindir}/lslocks
 %{_bindir}/mcookie
+%{_bindir}/mesg
 %{_bindir}/more
 %{_bindir}/mountpoint
 %{_bindir}/namei
@@ -504,6 +509,7 @@ fi
 %{_bindir}/unshare
 %{_bindir}/utmpdump
 %{_bindir}/uuidgen
+%{_bindir}/wall
 %{_bindir}/wdctl
 %{_bindir}/whereis
 %{_mandir}/man1/cal.1*
@@ -525,11 +531,14 @@ fi
 %{_mandir}/man1/ipcrm.1*
 %{_mandir}/man1/ipcs.1*
 %{_mandir}/man1/kill.1*
+%{_mandir}/man1/last.1*
+%{_mandir}/man1/lastb.1*
 %{_mandir}/man1/logger.1*
 %{_mandir}/man1/login.1*
 %{_mandir}/man1/look.1*
 %{_mandir}/man1/lscpu.1*
 %{_mandir}/man1/mcookie.1*
+%{_mandir}/man1/mesg.1*
 %{_mandir}/man1/more.1*
 %{_mandir}/man1/mountpoint.1*
 %{_mandir}/man1/namei.1*
@@ -551,6 +560,7 @@ fi
 %{_mandir}/man1/unshare.1*
 %{_mandir}/man1/utmpdump.1.gz
 %{_mandir}/man1/uuidgen.1*
+%{_mandir}/man1/wall.1*
 %{_mandir}/man1/whereis.1*
 %{_mandir}/man1/write.1*
 %{_mandir}/man5/fstab.5*
@@ -672,6 +682,7 @@ fi
 %{compldir}/lscpu
 %{compldir}/lslocks
 %{compldir}/mcookie
+%{compldir}/mesg
 %{compldir}/mkfs
 %{compldir}/mkfs.cramfs
 %{compldir}/mkfs.minix
@@ -706,6 +717,7 @@ fi
 %{compldir}/unshare
 %{compldir}/utmpdump
 %{compldir}/uuidgen
+%{compldir}/wall
 %{compldir}/wdctl
 %{compldir}/whereis
 %{compldir}/wipefs
@@ -805,7 +817,16 @@ fi
 %{_mandir}/man3/uuid_unparse.3*
 %{_libdir}/pkgconfig/uuid.pc
 
+%files -n python3-libmount
+%defattr(-, root, root)
+%doc libmount/COPYING
+%{_libdir}/python*/site-packages/libmount/*
+
 %changelog
+* Fri Sep 27 2013 Karel Zak <kzak@redhat.com> 2.24-0.1
+- upgrade to upstream release v2.24-rc1
+- add python3 libmount binding
+
 * Mon Sep  9 2013 Karel Zak <kzak@redhat.com> 2.23.2-4
 - fix #1005566 - recount_geometry: Process /usr/sbin/fdisk was killed by signal 8 (SIGFPE)
 - fix #1005194 - su generates incorrect log entries
