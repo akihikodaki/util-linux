@@ -2,12 +2,12 @@
 Summary: A collection of basic system utilities
 Name: util-linux
 Version: 2.24
-Release: 0.1%{?dist}
+Release: 1%{?dist}
 License: GPLv2 and GPLv2+ and LGPLv2+ and BSD with advertising and Public Domain
 Group: System Environment/Base
 URL: http://en.wikipedia.org/wiki/Util-linux
 
-%define upstream_version %{version}-rc1
+%define upstream_version %{version}
 
 ### Macros
 %define cytune_archs %{ix86} alpha %{arm}
@@ -33,8 +33,6 @@ Source1: util-linux-login.pamd
 Source2: util-linux-remote.pamd
 Source3: util-linux-chsh-chfn.pamd
 Source4: util-linux-60-raw.rules
-Source8: nologin.c
-Source9: nologin.8
 Source12: util-linux-su.pamd
 Source13: util-linux-su-l.pamd
 Source14: util-linux-runuser.pamd
@@ -78,6 +76,9 @@ Requires: libmount = %{version}-%{release}
 ###
 # 151635 - makeing /var/log/lastlog
 Patch0: 2.23-login-lastlog-create.patch
+
+# backport from v2.25: 1022217 - fdisk mishandles GPT corruption
+Patch1: 2.25-libfdisk-gpt-recovery.patch
 
 %description
 The util-linux package contains a large variety of low-level system
@@ -203,7 +204,6 @@ mountinfo, etc) and mount filesystems.
 
 %prep
 %setup -q -n %{name}-%{upstream_version}
-cp %{SOURCE8} %{SOURCE9} .
 
 for p in %{patches}; do
   %{__patch} -p1 -F%{_default_patch_fuzz} -i "$p"
@@ -241,10 +241,6 @@ export SUID_LDFLAGS="-pie -Wl,-z,relro -Wl,-z,now"
 # build util-linux
 make %{?_smp_mflags}
 
-# build nologin
-gcc $CFLAGS -o nologin nologin.c
-
-
 %check
 #to run tests use "--with check"
 %if %{?_with_check:1}%{!?_with_check:0}
@@ -264,10 +260,6 @@ chmod 0644 ${RPM_BUILD_ROOT}/var/log/lastlog
 
 # install util-linux
 make install DESTDIR=${RPM_BUILD_ROOT}
-
-# install nologin
-install -m 755 nologin ${RPM_BUILD_ROOT}%{_sbindir}
-install -m 644 nologin.8 ${RPM_BUILD_ROOT}%{_mandir}/man8
 
 # raw
 echo '.so man8/raw.8' > $RPM_BUILD_ROOT%{_mandir}/man8/rawdevices.8
@@ -339,13 +331,12 @@ for I in /sbin/sfdisk \
 done
 %endif
 
-# we install getopt-*.{bash,tcsh} as doc files
+# we install getopt-*.{bash,tcsh} by %doc directive
 chmod 644 misc-utils/getopt-*.{bash,tcsh}
-rm -f ${RPM_BUILD_ROOT}%{_datadir}/getopt/*
-rmdir ${RPM_BUILD_ROOT}%{_datadir}/getopt
+rm -f ${RPM_BUILD_ROOT}%{_datadir}/doc/util-linux/getopt/*
+rmdir ${RPM_BUILD_ROOT}%{_datadir}/doc/util-linux/getopt
 
 ln -sf /proc/mounts %{buildroot}/etc/mtab
-
 
 # remove static libs
 rm -f $RPM_BUILD_ROOT%{_libdir}/lib{uuid,blkid,mount}.a
@@ -823,6 +814,11 @@ fi
 %{_libdir}/python*/site-packages/libmount/*
 
 %changelog
+* Wed Oct 23 2013 Karel Zak <kzak@redhat.com> 2.24-1
+- upgrade to upstream release v2.24
+- remove nologin (merged upstream)
+- fix #1022217 - fdisk mishandles GPT corruption
+
 * Fri Sep 27 2013 Karel Zak <kzak@redhat.com> 2.24-0.1
 - upgrade to upstream release v2.24-rc1
 - add python3 libmount binding
