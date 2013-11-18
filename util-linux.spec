@@ -2,7 +2,7 @@
 Summary: A collection of basic system utilities
 Name: util-linux
 Version: 2.24
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: GPLv2 and GPLv2+ and LGPLv2+ and BSD with advertising and Public Domain
 Group: System Environment/Base
 URL: http://en.wikipedia.org/wiki/Util-linux
@@ -79,6 +79,8 @@ Patch0: 2.23-login-lastlog-create.patch
 
 # backport from v2.25: 1022217 - fdisk mishandles GPT corruption
 Patch1: 2.25-libfdisk-gpt-recovery.patch
+# backport from v2.25 (or v2.24.1) #1031262 - lsblk -D segfault
+Patch2: 2.25-lsblk-D-segfault.patch
 
 %description
 The util-linux package contains a large variety of low-level system
@@ -814,6 +816,9 @@ fi
 %{_libdir}/python*/site-packages/libmount/*
 
 %changelog
+* Mon Nov 18 2013 Karel Zak <kzak@redhat.com> 2.24-2
+- fix #1031262 - lsblk -D segfault
+
 * Wed Oct 23 2013 Karel Zak <kzak@redhat.com> 2.24-1
 - upgrade to upstream release v2.24
 - remove nologin (merged upstream)
