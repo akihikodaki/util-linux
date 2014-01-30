@@ -2,7 +2,7 @@
 Summary: A collection of basic system utilities
 Name: util-linux
 Version: 2.24.1
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: GPLv2 and GPLv2+ and LGPLv2+ and BSD with advertising and Public Domain
 Group: System Environment/Base
 URL: http://en.wikipedia.org/wiki/Util-linux
@@ -200,11 +200,7 @@ mountinfo, etc) and mount filesystems.
 
 
 %prep
-%setup -q -n %{name}-%{upstream_version}
-
-for p in %{patches}; do
-  %{__patch} -p1 -F%{_default_patch_fuzz} -i "$p"
-done
+%autosetup -p1 -n %{name}-%{upstream_version}
 
 %build
 unset LINGUAS || :
@@ -811,6 +807,9 @@ fi
 %{_libdir}/python*/site-packages/libmount/*
 
 %changelog
+* Thu Jan 30 2014 Karel Zak <kzak@redhat.com> 2.24.1-2
+- use rpm autosetup
+
 * Mon Jan 20 2014 Karel Zak <kzak@redhat.com> 2.24.1-1
 - upgrade to stable release 2.24.1
   ftp://ftp.kernel.org/pub/linux/utils/util-linux/v2.24/v2.24.1-ReleaseNotes
