@@ -1,8 +1,8 @@
 ### Header
 Summary: A collection of basic system utilities
 Name: util-linux
-Version: 2.24.1
-Release: 2%{?dist}
+Version: 2.24.2
+Release: 1%{?dist}
 License: GPLv2 and GPLv2+ and LGPLv2+ and BSD with advertising and Public Domain
 Group: System Environment/Base
 URL: http://en.wikipedia.org/wiki/Util-linux
@@ -807,6 +807,10 @@ fi
 %{_libdir}/python*/site-packages/libmount/*
 
 %changelog
+* Thu Apr 24 2014 Karel Zak <kzak@redhat.com> 2.24.2-1
+- upgrade to stable release 2.24.2
+  ftp://ftp.kernel.org/pub/linux/utils/util-linux/v2.24/v2.24.2-ReleaseNotes
+
 * Thu Jan 30 2014 Karel Zak <kzak@redhat.com> 2.24.1-2
 - use rpm autosetup
 
