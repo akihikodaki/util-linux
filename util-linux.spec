@@ -414,7 +414,7 @@ fi
 %preun -n uuidd
 %systemd_preun uuidd.service
 
-%postun
+%postun -n uuidd
 %systemd_postun_with_restart uuidd.service
 
 
