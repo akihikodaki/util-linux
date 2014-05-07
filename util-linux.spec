@@ -2,7 +2,7 @@
 Summary: A collection of basic system utilities
 Name: util-linux
 Version: 2.24.2
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: GPLv2 and GPLv2+ and LGPLv2+ and BSD with advertising and Public Domain
 Group: System Environment/Base
 URL: http://en.wikipedia.org/wiki/Util-linux
@@ -398,6 +398,7 @@ useradd -r -g uuidd -d /var/lib/libuuid -s /sbin/nologin \
     -c "UUID generator helper daemon" uuidd
 exit 0
 
+# Please, keep uuidd running after installation!
 %post -n uuidd
 if [ $1 -eq 1 ]; then
 	# Package install,
@@ -411,10 +412,10 @@ else
 fi
 
 %preun -n uuidd
-if [ "$1" = 0 ]; then
-	/bin/systemctl stop uuidd.service > /dev/null 2>&1 || :
-	/bin/systemctl disable uuidd.service > /dev/null 2>&1 || :
-fi
+%systemd_preun uuidd.service
+
+%postun
+%systemd_postun_with_restart uuidd.service
 
 
 %files -f %{name}.files
@@ -807,6 +808,9 @@ fi
 %{_libdir}/python*/site-packages/libmount/*
 
 %changelog
+* Wed May  7 2014 Karel Zak <kzak@redhat.com> 2.24.2-2
+- use systemd macroized scriptlets (#850355)
+
 * Thu Apr 24 2014 Karel Zak <kzak@redhat.com> 2.24.2-1
 - upgrade to stable release 2.24.2
   ftp://ftp.kernel.org/pub/linux/utils/util-linux/v2.24/v2.24.2-ReleaseNotes
