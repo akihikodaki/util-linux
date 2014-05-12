@@ -2,7 +2,7 @@
 Summary: A collection of basic system utilities
 Name: util-linux
 Version: 2.24.2
-Release: 2%{?dist}
+Release: 3%{?dist}
 License: GPLv2 and GPLv2+ and LGPLv2+ and BSD with advertising and Public Domain
 Group: System Environment/Base
 URL: http://en.wikipedia.org/wiki/Util-linux
@@ -808,6 +808,9 @@ fi
 %{_libdir}/python*/site-packages/libmount/*
 
 %changelog
+* Mon May 12 2014 Karel Zak <kzak@redhat.com> 2.24.2-3
+- fix #1090638 - remove pam_securetty.so from .pamd files
+
 * Wed May  7 2014 Karel Zak <kzak@redhat.com> 2.24.2-2
 - use systemd macroized scriptlets (#850355)
 
