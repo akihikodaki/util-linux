@@ -2,7 +2,7 @@
 Summary: A collection of basic system utilities
 Name: util-linux
 Version: 2.24.2
-Release: 3%{?dist}
+Release: 4%{?dist}
 License: GPLv2 and GPLv2+ and LGPLv2+ and BSD with advertising and Public Domain
 Group: System Environment/Base
 URL: http://en.wikipedia.org/wiki/Util-linux
@@ -400,16 +400,7 @@ exit 0
 
 # Please, keep uuidd running after installation!
 %post -n uuidd
-if [ $1 -eq 1 ]; then
-	# Package install,
-	/bin/systemctl enable uuidd.service >/dev/null 2>&1 || :
-	/bin/systemctl start uuidd.service > /dev/null 2>&1 || :
-else
-	# Package upgrade
-	if /bin/systemctl --quiet is-enabled uuidd.service ; then
-		/bin/systemctl reenable uuidd.service >/dev/null 2>&1 || :
-	fi
-fi
+%systemd_post uuidd.service
 
 %preun -n uuidd
 %systemd_preun uuidd.service
@@ -808,6 +799,9 @@ fi
 %{_libdir}/python*/site-packages/libmount/*
 
 %changelog
+* Mon May 12 2014 Karel Zak <kzak@redhat.com> 2.24.2-4
+- fix #1094935 - script and/or trigger should not directly enable systemd units
+
 * Mon May 12 2014 Karel Zak <kzak@redhat.com> 2.24.2-3
 - fix #1090638 - remove pam_securetty.so from .pamd files
 
