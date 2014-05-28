@@ -2,7 +2,7 @@
 Summary: A collection of basic system utilities
 Name: util-linux
 Version: 2.24.2
-Release: 4%{?dist}
+Release: 5%{?dist}
 License: GPLv2 and GPLv2+ and LGPLv2+ and BSD with advertising and Public Domain
 Group: System Environment/Base
 URL: http://en.wikipedia.org/wiki/Util-linux
@@ -799,6 +799,9 @@ exit 0
 %{_libdir}/python*/site-packages/libmount/*
 
 %changelog
+* Wed May 28 2014 Kalev Lember <kalevlember@gmail.com> - 2.24.2-5
+- Rebuilt for https://fedoraproject.org/wiki/Changes/Python_3.4
+
 * Mon May 12 2014 Karel Zak <kzak@redhat.com> 2.24.2-4
 - fix #1094935 - script and/or trigger should not directly enable systemd units
 
