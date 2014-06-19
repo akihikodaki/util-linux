@@ -1,16 +1,15 @@
 ### Header
 Summary: A collection of basic system utilities
 Name: util-linux
-Version: 2.24.2
-Release: 6%{?dist}
+Version: 2.25
+Release: 0.1%{?dist}
 License: GPLv2 and GPLv2+ and LGPLv2+ and BSD with advertising and Public Domain
 Group: System Environment/Base
 URL: http://en.wikipedia.org/wiki/Util-linux
 
-%define upstream_version %{version}
+%define upstream_version %{version}-rc1
 
 ### Macros
-%define cytune_archs %{ix86} alpha %{arm}
 %define compldir %{_datadir}/bash-completion/completions/
 
 ### Dependencies
@@ -71,6 +70,7 @@ Requires: audit-libs >= 1.0.6
 Requires: libuuid = %{version}-%{release}
 Requires: libblkid = %{version}-%{release}
 Requires: libmount = %{version}-%{release}
+Requires: libsmartcols = %{version}-%{release}
 
 ### Ready for upstream?
 ###
@@ -82,6 +82,27 @@ The util-linux package contains a large variety of low-level system
 utilities that are necessary for a Linux system to function. Among
 others, Util-linux contains the fdisk configuration tool and the login
 program.
+
+
+%package -n libsmartcols
+Summary: Formatting library for ls-like programs.
+Group: Development/Libraries
+License: LGPLv2+
+
+%description -n libsmartcols
+This is library for ls-like terminal programs, part of util-linux.
+
+
+%package -n libsmartcols-devel
+Summary: Formatting library for ls-like programs.
+Group: Development/Libraries
+License: LGPLv2+
+Requires: libsmartcols = %{version}-%{release}
+Requires: pkgconfig
+
+%description -n libsmartcols-devel
+This is development library and headers for ls-like terminal programs,
+part of util-linux.
 
 
 %package -n libmount
@@ -213,19 +234,16 @@ export SUID_LDFLAGS="-pie -Wl,-z,relro -Wl,-z,now"
 	--disable-silent-rules \
 	--disable-bfs \
 	--disable-pg \
-	--enable-socket-activation \
 	--enable-chfn-chsh \
 	--enable-write \
 	--enable-raw \
 	--with-python=3 \
+	--with-systemd \
 	--with-udev \
 	--with-selinux \
 	--with-audit \
 	--with-utempter \
 	--disable-makeinstall-chown \
-%ifnarch %cytune_archs
-	--disable-cytune \
-%endif
 %ifarch s390 s390x
 	--disable-hwclock \
 	--disable-fdformat
@@ -332,7 +350,7 @@ rmdir ${RPM_BUILD_ROOT}%{_datadir}/doc/util-linux/getopt
 ln -sf /proc/mounts %{buildroot}/etc/mtab
 
 # remove static libs
-rm -f $RPM_BUILD_ROOT%{_libdir}/lib{uuid,blkid,mount}.a
+rm -f $RPM_BUILD_ROOT%{_libdir}/lib{uuid,blkid,mount,smartcols}.a
 
 # find MO files
 %find_lang %name
@@ -342,11 +360,11 @@ mv %{name}.lang %{name}.files
 
 # create list of setarch(8) symlinks
 find  $RPM_BUILD_ROOT%{_bindir}/ -regextype posix-egrep -type l \
-	-regex ".*(linux32|linux64|s390|s390x|i386|ppc|ppc64|ppc32|sparc|sparc64|sparc32|sparc32bash|mips|mips64|mips32|ia64|x86_64)$" \
+	-regex ".*(linux32|linux64|s390|s390x|i386|ppc|ppc64|ppc32|sparc|sparc64|sparc32|sparc32bash|mips|mips64|mips32|ia64|x86_64|uname26)$" \
 	-printf "%{_bindir}/%f\n" >> %{name}.files
 
 find  $RPM_BUILD_ROOT%{_mandir}/man8 -regextype posix-egrep  \
-	-regex ".*(linux32|linux64|s390|s390x|i386|ppc|ppc64|ppc32|sparc|sparc64|sparc32|sparc32bash|mips|mips64|mips32|ia64|x86_64)\.8.*" \
+	-regex ".*(linux32|linux64|s390|s390x|i386|ppc|ppc64|ppc32|sparc|sparc64|sparc32|sparc32bash|mips|mips64|mips32|ia64|x86_64|uname26)\.8.*" \
 	-printf "%{_mandir}/man8/%f*\n" >> %{name}.files
 
 %post
@@ -390,6 +408,9 @@ done
 
 %post -n libmount -p /sbin/ldconfig
 %postun -n libmount -p /sbin/ldconfig
+
+%post -n libsmartcols -p /sbin/ldconfig
+%postun -n libsmartcols -p /sbin/ldconfig
 
 %pre -n uuidd
 getent group uuidd >/dev/null || groupadd -r uuidd
@@ -462,6 +483,7 @@ exit 0
 %{_bindir}/lsblk
 %{_bindir}/lscpu
 %{_bindir}/lslocks
+%{_bindir}/lslogins
 %{_bindir}/mcookie
 %{_bindir}/mesg
 %{_bindir}/more
@@ -513,6 +535,7 @@ exit 0
 %{_mandir}/man1/login.1*
 %{_mandir}/man1/look.1*
 %{_mandir}/man1/lscpu.1*
+%{_mandir}/man1/lslogins.1*
 %{_mandir}/man1/mcookie.1*
 %{_mandir}/man1/mesg.1*
 %{_mandir}/man1/more.1*
@@ -540,6 +563,7 @@ exit 0
 %{_mandir}/man1/whereis.1*
 %{_mandir}/man1/write.1*
 %{_mandir}/man5/fstab.5*
+%{_mandir}/man5/terminal-colors.d.5*
 %{_mandir}/man8/addpart.8*
 %{_mandir}/man8/agetty.8*
 %{_mandir}/man8/blkdiscard.8*
@@ -650,6 +674,7 @@ exit 0
 %{compldir}/ipcrm
 %{compldir}/ipcs
 %{compldir}/isosize
+%{compldir}/last
 %{compldir}/ldattach
 %{compldir}/logger
 %{compldir}/look
@@ -724,13 +749,6 @@ exit 0
 %{_bindir}/sunhostid
 %endif
 
-%ifarch %cytune_archs
-%{_bindir}/cytune
-%{_mandir}/man8/cytune.8*
-%{compldir}/cytune
-%endif
-
-
 %files -n uuidd
 %defattr(-,root,root)
 %doc Documentation/licenses/COPYING.GPLv2
@@ -740,6 +758,19 @@ exit 0
 %dir %attr(2775, uuidd, uuidd) /var/lib/libuuid
 %dir %attr(2775, uuidd, uuidd) /run/uuidd
 %{compldir}/uuidd
+
+
+%files -n libsmartcols
+%defattr(-,root,root)
+%doc libsmartcols/COPYING
+%{_libdir}/libsmartcols.so.*
+
+%files -n libsmartcols-devel
+%defattr(-,root,root)
+%doc libsmartcols/COPYING
+%{_libdir}/libsmartcols.so
+%{_includedir}/libsmartcols
+%{_libdir}/pkgconfig/smartcols.pc
 
 
 %files -n libmount
@@ -799,6 +830,10 @@ exit 0
 %{_libdir}/python*/site-packages/libmount/*
 
 %changelog
+* Thu Jun 19 2014 Karel Zak <kzak@redhat.com> 2.25-0.1
+- upgrade to release 2.25-rc1
+  ftp://ftp.kernel.org/pub/linux/utils/util-linux/v2.25/v2.25-ReleaseNotes
+
 * Sun Jun 08 2014 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 2.24.2-6
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_21_Mass_Rebuild
 
