@@ -2,7 +2,7 @@
 Summary: A collection of basic system utilities
 Name: util-linux
 Version: 2.25
-Release: 0.1%{?dist}
+Release: 0.2%{?dist}
 License: GPLv2 and GPLv2+ and LGPLv2+ and BSD with advertising and Public Domain
 Group: System Environment/Base
 URL: http://en.wikipedia.org/wiki/Util-linux
@@ -76,6 +76,9 @@ Requires: libsmartcols = %{version}-%{release}
 ###
 # 151635 - makeing /var/log/lastlog
 Patch0: 2.23-login-lastlog-create.patch
+
+# 1112315 - libblkid: correct the return values in squashfs probe
+Patch1: util-linux-squashfs-probe.patch
 
 %description
 The util-linux package contains a large variety of low-level system
@@ -830,6 +833,10 @@ exit 0
 %{_libdir}/python*/site-packages/libmount/*
 
 %changelog
+* Wed Jun 25 2014 Peter Jones <pjones@redhat.com> - 2.25-0.2
+- Fix libblkid's squashfs probe return checking.
+  Related: rhbz#1112315
+
 * Thu Jun 19 2014 Karel Zak <kzak@redhat.com> 2.25-0.1
 - upgrade to release 2.25-rc1
   ftp://ftp.kernel.org/pub/linux/utils/util-linux/v2.25/v2.25-ReleaseNotes
