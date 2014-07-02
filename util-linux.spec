@@ -830,7 +830,7 @@ exit 0
 %{_libdir}/python*/site-packages/libmount/*
 
 %changelog
-* Thu Jul 02 2014 Karel Zak <kzak@redhat.com> 2.25-0.3
+* Wed Jul 02 2014 Karel Zak <kzak@redhat.com> 2.25-0.3
 - upgrade to release 2.25-rc2
 
 * Wed Jun 25 2014 Peter Jones <pjones@redhat.com> - 2.25-0.2
