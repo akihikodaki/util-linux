@@ -2,7 +2,7 @@
 Summary: A collection of basic system utilities
 Name: util-linux
 Version: 2.25
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: GPLv2 and GPLv2+ and LGPLv2+ and BSD with advertising and Public Domain
 Group: System Environment/Base
 URL: http://en.wikipedia.org/wiki/Util-linux
@@ -457,6 +457,8 @@ exit 0
 %ghost %attr(0644,root,root) %verify(not md5 size mtime) /var/log/lastlog
 %ghost %verify(not md5 size mtime) %config(noreplace,missingok) /etc/mtab
 
+%{_unitdir}/fstrim.*
+
 %{_bindir}/cal
 %{_bindir}/chrt
 %{_bindir}/col
@@ -754,7 +756,7 @@ exit 0
 %doc Documentation/licenses/COPYING.GPLv2
 %{_mandir}/man8/uuidd.8*
 %{_sbindir}/uuidd
-%{_unitdir}/*
+%{_unitdir}/uuidd.*
 %dir %attr(2775, uuidd, uuidd) /var/lib/libuuid
 %dir %attr(2775, uuidd, uuidd) /run/uuidd
 %{compldir}/uuidd
@@ -830,6 +832,9 @@ exit 0
 %{_libdir}/python*/site-packages/libmount/*
 
 %changelog
+* Thu Jul 24 2014 Karel Zak <kzak@redhat.com> 2.25-2
+- remove fstrim unit files from uuidd subpackage
+
 * Tue Jul 22 2014 Karel Zak <kzak@redhat.com> 2.25-1
 - upgrade to stable release 2.25
 
