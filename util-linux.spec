@@ -2,7 +2,7 @@
 Summary: A collection of basic system utilities
 Name: util-linux
 Version: 2.25
-Release: 2%{?dist}
+Release: 3%{?dist}
 License: GPLv2 and GPLv2+ and LGPLv2+ and BSD with advertising and Public Domain
 Group: System Environment/Base
 URL: http://en.wikipedia.org/wiki/Util-linux
@@ -212,6 +212,7 @@ SMP systems.
 Summary: Python bindings for the libmount library
 Group: Development/Libraries
 Requires: libmount = %{version}-%{release}
+License: LGPLv2+
 
 %description -n python3-libmount
 The libmount-python package contains a module that permits applications
@@ -433,7 +434,9 @@ exit 0
 %files -f %{name}.files
 %defattr(-,root,root)
 %doc README NEWS AUTHORS
-%doc Documentation/deprecated.txt Documentation/licenses/*
+%doc Documentation/deprecated.txt 
+%{!?_licensedir:%global license %%doc}
+%license Documentation/licenses/*
 %doc misc-utils/getopt-*.{bash,tcsh}
 
 %config(noreplace)	%{_sysconfdir}/pam.d/chfn
@@ -753,7 +756,8 @@ exit 0
 
 %files -n uuidd
 %defattr(-,root,root)
-%doc Documentation/licenses/COPYING.GPLv2
+%{!?_licensedir:%global license %%doc}
+%license Documentation/licenses/COPYING.GPLv2
 %{_mandir}/man8/uuidd.8*
 %{_sbindir}/uuidd
 %{_unitdir}/uuidd.*
@@ -764,12 +768,12 @@ exit 0
 
 %files -n libsmartcols
 %defattr(-,root,root)
-%doc libsmartcols/COPYING
+%{!?_licensedir:%global license %%doc}
+%license Documentation/licenses/COPYING.LGPLv2.1 libsmartcols/COPYING
 %{_libdir}/libsmartcols.so.*
 
 %files -n libsmartcols-devel
 %defattr(-,root,root)
-%doc libsmartcols/COPYING
 %{_libdir}/libsmartcols.so
 %{_includedir}/libsmartcols
 %{_libdir}/pkgconfig/smartcols.pc
@@ -777,12 +781,12 @@ exit 0
 
 %files -n libmount
 %defattr(-,root,root)
-%doc libmount/COPYING
+%{!?_licensedir:%global license %%doc}
+%license Documentation/licenses/COPYING.LGPLv2.1 libmount/COPYING
 %{_libdir}/libmount.so.*
 
 %files -n libmount-devel
 %defattr(-,root,root)
-%doc libmount/COPYING
 %{_libdir}/libmount.so
 %{_includedir}/libmount
 %{_libdir}/pkgconfig/mount.pc
@@ -804,12 +808,12 @@ exit 0
 
 %files -n libuuid
 %defattr(-,root,root)
-%doc libuuid/COPYING
+%{!?_licensedir:%global license %%doc}
+%license Documentation/licenses/COPYING.BSD-3 libuuid/COPYING
 %{_libdir}/libuuid.so.*
 
 %files -n libuuid-devel
 %defattr(-,root,root)
-%doc libuuid/COPYING
 %{_libdir}/libuuid.so
 %{_includedir}/uuid
 %{_mandir}/man3/uuid.3*
@@ -828,10 +832,14 @@ exit 0
 
 %files -n python3-libmount
 %defattr(-, root, root)
-%doc libmount/COPYING
+%{!?_licensedir:%global license %%doc}
+%license Documentation/licenses/COPYING.LGPLv2.1 libmount/COPYING
 %{_libdir}/python*/site-packages/libmount/*
 
 %changelog
+* Wed Aug  6 2014 Tom Callaway <spot@fedoraproject.org> 2.25-3
+- fix license handling
+
 * Thu Jul 24 2014 Karel Zak <kzak@redhat.com> 2.25-2
 - remove fstrim unit files from uuidd subpackage
 
