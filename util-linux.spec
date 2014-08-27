@@ -1,13 +1,13 @@
 ### Header
 Summary: A collection of basic system utilities
 Name: util-linux
-Version: 2.25
-Release: 4%{?dist}
+Version: 2.25.1
+Release: 0.1%{?dist}
 License: GPLv2 and GPLv2+ and LGPLv2+ and BSD with advertising and Public Domain
 Group: System Environment/Base
 URL: http://en.wikipedia.org/wiki/Util-linux
 
-%define upstream_version %{version}
+%define upstream_version %{version}-rc1
 
 ### Macros
 %define compldir %{_datadir}/bash-completion/completions/
@@ -837,6 +837,10 @@ exit 0
 %{_libdir}/python*/site-packages/libmount/*
 
 %changelog
+* Wed Aug 27 2014 Karel Zak <kzak@redhat.com> 2.25.1-0.1
+- upgrade to release 2.25.1-rc1
+  ftp://ftp.kernel.org/pub/linux/utils/util-linux/v2.25/v2.25.1-ReleaseNotes
+
 * Mon Aug 18 2014 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 2.25-4
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_21_22_Mass_Rebuild
 
