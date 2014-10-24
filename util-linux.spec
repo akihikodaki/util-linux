@@ -1,7 +1,7 @@
 ### Header
 Summary: A collection of basic system utilities
 Name: util-linux
-Version: 2.25.1
+Version: 2.25.2
 Release: 1%{?dist}
 License: GPLv2 and GPLv2+ and LGPLv2+ and BSD with advertising and Public Domain
 Group: System Environment/Base
@@ -335,7 +335,6 @@ echo ".so man8/hwclock.8" > ${RPM_BUILD_ROOT}%{_mandir}/man8/clock.8
 %ifarch %{sparc}
 for I in /sbin/sfdisk \
 	%{_mandir}/man8/sfdisk.8* \
-	%doc Documentation/sfdisk.txt \
 	/sbin/cfdisk \
 	%{_mandir}/man8/cfdisk.8*; do
 	
@@ -741,7 +740,6 @@ exit 0
 %endif
 
 %ifnarch %{sparc}
-%doc Documentation/sfdisk.txt
 %{_sbindir}/cfdisk
 %{_sbindir}/sfdisk
 %{_mandir}/man8/cfdisk.8*
@@ -837,8 +835,13 @@ exit 0
 %{_libdir}/python*/site-packages/libmount/*
 
 %changelog
+* Wed Oct 24 2014 Karel Zak <kzak@redhat.com> 2.25.2-1
+- upgrade to stable 2.25.2
+  ftp://ftp.kernel.org/pub/linux/utils/util-linux/v2.25/v2.25.2-ReleaseNotes
+
 * Wed Sep  3 2014 Karel Zak <kzak@redhat.com> 2.25.1-1
 - upgrade to stable 2.25.1
+  ftp://ftp.kernel.org/pub/linux/utils/util-linux/v2.25/v2.25.1-ReleaseNotes
 
 * Wed Aug 27 2014 Karel Zak <kzak@redhat.com> 2.25.1-0.1
 - upgrade to release 2.25.1-rc1
