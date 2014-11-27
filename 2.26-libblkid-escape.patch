@@ -1,0 +1,126 @@
+diff -up util-linux-2.25.2/include/carefulputc.h.kzak util-linux-2.25.2/include/carefulputc.h
+--- util-linux-2.25.2/include/carefulputc.h.kzak	2014-10-24 11:21:20.309387887 +0200
++++ util-linux-2.25.2/include/carefulputc.h	2014-11-27 14:25:52.814604767 +0100
+@@ -38,6 +38,8 @@ static inline void fputs_quoted(const ch
+ 	for (p = data; p && *p; p++) {
+ 		if ((unsigned char) *p == 0x22 ||		/* " */
+ 		    (unsigned char) *p == 0x5c ||		/* \ */
++		    (unsigned char) *p == 0x60 ||		/* ` */
++		    (unsigned char) *p == 0x24 ||		/* $ */
+ 		    !isprint((unsigned char) *p) ||
+ 		    iscntrl((unsigned char) *p)) {
+ 
+diff -up util-linux-2.25.2/libblkid/src/read.c.kzak util-linux-2.25.2/libblkid/src/read.c
+--- util-linux-2.25.2/libblkid/src/read.c.kzak	2014-09-16 14:37:06.147551766 +0200
++++ util-linux-2.25.2/libblkid/src/read.c	2014-11-27 14:26:02.848721993 +0100
+@@ -252,15 +252,30 @@ static int parse_token(char **name, char
+ 	*value = skip_over_blank(*value + 1);
+ 
+ 	if (**value == '"') {
+-		end = strchr(*value + 1, '"');
+-		if (!end) {
++		char *p = end = *value + 1;
++
++		/* convert 'foo\"bar'  to 'foo"bar' */
++		while (*p) {
++			if (*p == '\\') {
++				p++;
++				*end = *p;
++			} else {
++				*end = *p;
++				if (*p == '"')
++					break;
++			}
++			p++;
++			end++;
++		}
++
++		if (*end != '"') {
+ 			DBG(READ, ul_debug("unbalanced quotes at: %s", *value));
+ 			*cp = *value;
+ 			return -BLKID_ERR_CACHE;
+ 		}
+ 		(*value)++;
+ 		*end = '\0';
+-		end++;
++		end = ++p;
+ 	} else {
+ 		end = skip_over_word(*value);
+ 		if (*end) {
+diff -up util-linux-2.25.2/libblkid/src/save.c.kzak util-linux-2.25.2/libblkid/src/save.c
+--- util-linux-2.25.2/libblkid/src/save.c.kzak	2014-09-16 14:37:06.147551766 +0200
++++ util-linux-2.25.2/libblkid/src/save.c	2014-11-27 14:26:02.848721993 +0100
+@@ -26,6 +26,21 @@
+ 
+ #include "blkidP.h"
+ 
++
++static void save_quoted(const char *data, FILE *file)
++{
++	const char *p;
++
++	fputc('"', file);
++	for (p = data; p && *p; p++) {
++		if ((unsigned char) *p == 0x22 ||		/* " */
++		    (unsigned char) *p == 0x5c)			/* \ */
++			fputc('\\', file);
++
++		fputc(*p, file);
++	}
++	fputc('"', file);
++}
+ static int save_dev(blkid_dev dev, FILE *file)
+ {
+ 	struct list_head *p;
+@@ -43,9 +58,14 @@ static int save_dev(blkid_dev dev, FILE
+ 
+ 	if (dev->bid_pri)
+ 		fprintf(file, " PRI=\"%d\"", dev->bid_pri);
++
+ 	list_for_each(p, &dev->bid_tags) {
+ 		blkid_tag tag = list_entry(p, struct blkid_struct_tag, bit_tags);
+-		fprintf(file, " %s=\"%s\"", tag->bit_name,tag->bit_val);
++
++		fputc(' ', file);			/* space between tags */
++		fputs(tag->bit_name, file);		/* tag NAME */
++		fputc('=', file);			/* separator between NAME and VALUE */
++		save_quoted(tag->bit_val, file);	/* tag "VALUE" */
+ 	}
+ 	fprintf(file, ">%s</device>\n", dev->bid_name);
+ 
+diff -up util-linux-2.25.2/misc-utils/blkid.8.kzak util-linux-2.25.2/misc-utils/blkid.8
+--- util-linux-2.25.2/misc-utils/blkid.8.kzak	2013-09-18 15:50:12.690263681 +0200
++++ util-linux-2.25.2/misc-utils/blkid.8	2014-11-27 14:26:02.849722005 +0100
+@@ -193,7 +193,10 @@ partitions.  This output format is \fBDE
+ .TP
+ .B export
+ print key=value pairs for easy import into the environment; this output format
+-is automatically enabled when I/O Limits (\fB-i\fR option) are requested
++is automatically enabled when I/O Limits (\fB-i\fR option) are requested.
++
++The non-printing characters are encoded by ^ and M- notation and all
++potentially unsafe characters are escaped.
+ .RE
+ .TP
+ .BI \-O " offset"
+diff -up util-linux-2.25.2/misc-utils/blkid.c.kzak util-linux-2.25.2/misc-utils/blkid.c
+--- util-linux-2.25.2/misc-utils/blkid.c.kzak	2014-10-24 11:29:07.834363569 +0200
++++ util-linux-2.25.2/misc-utils/blkid.c	2014-11-27 14:26:02.849722005 +0100
+@@ -306,7 +306,7 @@ static void print_value(int output, int
+ 			printf("DEVNAME=%s\n", devname);
+ 		fputs(name, stdout);
+ 		fputs("=", stdout);
+-		safe_print(value, valsz, NULL);
++		safe_print(value, valsz, " \\\"'$`<>");
+ 		fputs("\n", stdout);
+ 
+ 	} else {
+@@ -315,7 +315,7 @@ static void print_value(int output, int
+ 		fputs(" ", stdout);
+ 		fputs(name, stdout);
+ 		fputs("=\"", stdout);
+-		safe_print(value, valsz, "\"");
++		safe_print(value, valsz, "\"\\");
+ 		fputs("\"", stdout);
+ 	}
+ }

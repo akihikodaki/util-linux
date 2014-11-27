@@ -2,7 +2,7 @@
 Summary: A collection of basic system utilities
 Name: util-linux
 Version: 2.25.2
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: GPLv2 and GPLv2+ and LGPLv2+ and BSD with advertising and Public Domain
 Group: System Environment/Base
 URL: http://en.wikipedia.org/wiki/Util-linux
@@ -27,7 +27,7 @@ BuildRequires: libcap-ng-devel
 BuildRequires: python3-devel
 
 ### Sources
-Source0: ftp://ftp.kernel.org/pub/linux/utils/util-linux/v2.24/util-linux-%{upstream_version}.tar.xz
+Source0: ftp://ftp.kernel.org/pub/linux/utils/util-linux/v2.25/util-linux-%{upstream_version}.tar.xz
 Source1: util-linux-login.pamd
 Source2: util-linux-remote.pamd
 Source3: util-linux-chsh-chfn.pamd
@@ -76,6 +76,9 @@ Requires: libsmartcols = %{version}-%{release}
 ###
 # 151635 - makeing /var/log/lastlog
 Patch0: 2.23-login-lastlog-create.patch
+
+# 1168490 - CVE-2014-9114 util-linux: command injection flaw in blkid
+Patch1: 2.26-libblkid-escape.patch
 
 %description
 The util-linux package contains a large variety of low-level system
@@ -835,6 +838,9 @@ exit 0
 %{_libdir}/python*/site-packages/libmount/*
 
 %changelog
+* Thu Nov 27 2014 Karel Zak <kzak@redhat.com> 2.25.2-2
+- fix #1168490 - CVE-2014-9114 util-linux: command injection flaw in blkid
+
 * Wed Oct 24 2014 Karel Zak <kzak@redhat.com> 2.25.2-1
 - upgrade to stable 2.25.2
   ftp://ftp.kernel.org/pub/linux/utils/util-linux/v2.25/v2.25.2-ReleaseNotes
