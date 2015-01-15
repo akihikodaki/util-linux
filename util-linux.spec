@@ -1,13 +1,13 @@
 ### Header
 Summary: A collection of basic system utilities
 Name: util-linux
-Version: 2.25.2
-Release: 2%{?dist}
+Version: 2.26
+Release: 0.1%{?dist}
 License: GPLv2 and GPLv2+ and LGPLv2+ and BSD with advertising and Public Domain
 Group: System Environment/Base
 URL: http://en.wikipedia.org/wiki/Util-linux
 
-%define upstream_version %{version}
+%define upstream_version %{version}-rc1
 
 ### Macros
 %define compldir %{_datadir}/bash-completion/completions/
@@ -71,20 +71,39 @@ Requires: libuuid = %{version}-%{release}
 Requires: libblkid = %{version}-%{release}
 Requires: libmount = %{version}-%{release}
 Requires: libsmartcols = %{version}-%{release}
+Requires: libfdisk = %{version}-%{release}
 
 ### Ready for upstream?
 ###
 # 151635 - makeing /var/log/lastlog
 Patch0: 2.23-login-lastlog-create.patch
 
-# 1168490 - CVE-2014-9114 util-linux: command injection flaw in blkid
-Patch1: 2.26-libblkid-escape.patch
-
 %description
 The util-linux package contains a large variety of low-level system
 utilities that are necessary for a Linux system to function. Among
 others, Util-linux contains the fdisk configuration tool and the login
 program.
+
+
+%package -n libfdisk
+Summary: Partitioning library for fdisk-like programs.
+Group: Development/Libraries
+License: LGPLv2+
+
+%description -n libfdisk
+This is library for fdisk-like programs, part of util-linux.
+
+
+%package -n libfdisk-devel
+Summary:  Partitioning library for fdisk-like programs.
+Group: Development/Libraries
+License: LGPLv2+
+Requires: libfdisk = %{version}-%{release}
+Requires: pkgconfig
+
+%description -n libfdisk-devel
+This is development library and headers for fdisk-like programs,
+part of util-linux.
 
 
 %package -n libsmartcols
@@ -233,6 +252,8 @@ unset LINGUAS || :
 export CFLAGS="-D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64 $RPM_OPT_FLAGS"
 export SUID_CFLAGS="-fpie"
 export SUID_LDFLAGS="-pie -Wl,-z,relro -Wl,-z,now"
+export DAEMON_CFLAGS="$SUID_CFLAGS"
+export DAEMON_LDFLAGS="$SUID_LDFLAGS"
 %configure \
 	--with-systemdsystemunitdir=%{_unitdir} \
 	--disable-silent-rules \
@@ -353,7 +374,7 @@ rmdir ${RPM_BUILD_ROOT}%{_datadir}/doc/util-linux/getopt
 ln -sf /proc/mounts %{buildroot}/etc/mtab
 
 # remove static libs
-rm -f $RPM_BUILD_ROOT%{_libdir}/lib{uuid,blkid,mount,smartcols}.a
+rm -f $RPM_BUILD_ROOT%{_libdir}/lib{uuid,blkid,mount,smartcols,fdisk}.a
 
 # find MO files
 %find_lang %name
@@ -414,6 +435,9 @@ done
 
 %post -n libsmartcols -p /sbin/ldconfig
 %postun -n libsmartcols -p /sbin/ldconfig
+
+%post -n libfdisk -p /sbin/ldconfig
+%postun -n libfdisk -p /sbin/ldconfig
 
 %pre -n uuidd
 getent group uuidd >/dev/null || groupadd -r uuidd
@@ -614,6 +638,7 @@ exit 0
 %{_mandir}/man8/umount.8*
 %{_mandir}/man8/wdctl.8.gz
 %{_mandir}/man8/wipefs.8*
+%{_mandir}/man8/zramctl.8*
 %{_sbindir}/addpart
 %{_sbindir}/agetty
 %{_sbindir}/blkdiscard
@@ -648,6 +673,7 @@ exit 0
 %{_sbindir}/swapon
 %{_sbindir}/switch_root
 %{_sbindir}/wipefs
+%{_sbindir}/zramctl
 
 %{compldir}/addpart
 %{compldir}/blkdiscard
@@ -730,6 +756,7 @@ exit 0
 %{compldir}/whereis
 %{compldir}/wipefs
 %{compldir}/write
+%{compldir}/zramctl
 
 %ifnarch s390 s390x
 %{_sbindir}/clock
@@ -765,6 +792,19 @@ exit 0
 %dir %attr(2775, uuidd, uuidd) /var/lib/libuuid
 %dir %attr(2775, uuidd, uuidd) /run/uuidd
 %{compldir}/uuidd
+
+
+%files -n libfdisk
+%defattr(-,root,root)
+%{!?_licensedir:%global license %%doc}
+%license Documentation/licenses/COPYING.LGPLv2.1 libfdisk/COPYING
+%{_libdir}/libfdisk.so.*
+
+%files -n libfdisk-devel
+%defattr(-,root,root)
+%{_libdir}/libfdisk.so
+%{_includedir}/libfdisk
+%{_libdir}/pkgconfig/fdisk.pc
 
 
 %files -n libsmartcols
@@ -838,6 +878,12 @@ exit 0
 %{_libdir}/python*/site-packages/libmount/*
 
 %changelog
+* Thu Jan 15 2015 Karel Zak <kzak@redhat.com> 2.26-0.1
+- upgrade to 2.26-rc1
+  ftp://ftp.kernel.org/pub/linux/utils/util-linux/v2.26/v2.26-ReleaseNotes
+- build with -pie for uuidd
+- new command zramctl
+
 * Thu Nov 27 2014 Karel Zak <kzak@redhat.com> 2.25.2-2
 - fix #1168490 - CVE-2014-9114 util-linux: command injection flaw in blkid
 
