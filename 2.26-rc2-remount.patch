@@ -1,0 +1,83 @@
+From 2498303575b85fe0a81dabb3775eb0a60a5f420a Mon Sep 17 00:00:00 2001
+From: Karel Zak <kzak@redhat.com>
+Date: Fri, 16 Jan 2015 12:24:57 +0100
+Subject: [PATCH] libmount: revert "read mtab on remount" idea
+
+It's backwardly incompatible nonsense to prefer mtab on remount.
+
+ mount -o remount /foo
+
+has to read mount options from fstab otherwise the remount has no
+effect. (The ideal solution would be to read both mtab, then modify
+the options according to fstab -- but for now more important is to be
+backwardly compatible.)
+
+References: https://bugzilla.redhat.com/show_bug.cgi?id=1182778
+Signed-off-by: Karel Zak <kzak@redhat.com>
+---
+ libmount/src/context.c |  7 +------
+ sys-utils/mount.8      | 17 ++++++++---------
+ 2 files changed, 9 insertions(+), 15 deletions(-)
+
+diff --git a/libmount/src/context.c b/libmount/src/context.c
+index 14fa44b..f623f34 100644
+--- a/libmount/src/context.c
++++ b/libmount/src/context.c
+@@ -2051,13 +2051,8 @@ int mnt_context_apply_fstab(struct libmnt_context *cxt)
+ 		cxt->optsmode &= ~MNT_OMODE_FORCE;
+ 	}
+ 
+-	if (mnt_context_get_mflags(cxt, &mflags) == 0 && mflags & MS_REMOUNT) {
+-		/* preffer mtab on remount */
+-		DBG(CXT, ul_debugobj(cxt, "force mtab parsing on remount"));
+-		cxt->optsmode |= MNT_OMODE_MTAB;
+-		cxt->optsmode &= ~MNT_OMODE_FSTAB;
++	if (mnt_context_get_mflags(cxt, &mflags) == 0 && mflags & MS_REMOUNT)
+ 		isremount = 1;
+-	}
+ 
+ 	if (cxt->fs) {
+ 		src = mnt_fs_get_source(cxt->fs);
+diff --git a/sys-utils/mount.8 b/sys-utils/mount.8
+index 854268a..6941216 100644
+--- a/sys-utils/mount.8
++++ b/sys-utils/mount.8
+@@ -1070,10 +1070,9 @@ Attempt to remount an already-mounted filesystem.  This is commonly
+ used to change the mount flags for a filesystem, especially to make a
+ readonly filesystem writable.  It does not change device or mount point.
+ 
+-The remount functionality follows the standard way the mount command works with
+-options, but preferred source for the options is mtab (or /proc/self/mouninfo)
+-rather than fstab.  The mount command only does not read mtab 
+-when both the
++The remount functionality follows the standard way the mount command works
++with options from fstab.  This means that the mount command only doesn't
++read fstab (or mtab) when both the
+ .I device
+ and
+ .I dir
+@@ -1082,16 +1081,16 @@ are specified.
+ .B "mount \-o remount,rw /dev/foo /dir"
+ 
+ After this call all old mount options are replaced and arbitrary stuff from
+-mtab is ignored, except the loop= option which is internally generated and
+-maintained by the mount command.
++fstab (or mtab) is ignored, except the loop= option which is internally
++generated and maintained by the mount command.
+ 
+ .B "mount \-o remount,rw  /dir"
+ 
+-After this call mount reads mtab and merges these options with
++After this call mount reads fstab and merges these options with
+ the options from the command line (\c
+ .B \-o\c
+-). If no mtab (or /proc/self/mountinfo) is available than remount with unspecified
+-source is allowed.
++). If no mountpoint found in fstab than remount with unspecified source is
++allowed.
+ .TP
+ .B ro
+ Mount the filesystem read-only.
+-- 
+1.9.3
+
