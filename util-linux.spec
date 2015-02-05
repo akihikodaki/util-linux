@@ -2,12 +2,12 @@
 Summary: A collection of basic system utilities
 Name: util-linux
 Version: 2.26
-Release: 0.2%{?dist}
+Release: 0.3%{?dist}
 License: GPLv2 and GPLv2+ and LGPLv2+ and BSD with advertising and Public Domain
 Group: System Environment/Base
 URL: http://en.wikipedia.org/wiki/Util-linux
 
-%define upstream_version %{version}-rc1
+%define upstream_version %{version}-rc2
 
 ### Macros
 %define compldir %{_datadir}/bash-completion/completions/
@@ -77,9 +77,6 @@ Requires: libfdisk = %{version}-%{release}
 ###
 # 151635 - makeing /var/log/lastlog
 Patch0: 2.23-login-lastlog-create.patch
-
-# 1182778 - util-linux 2.26-0.1.fc22 causes ro / and /home on boot
-Patch1: 2.26-rc2-remount.patch
 
 %description
 The util-linux package contains a large variety of low-level system
@@ -881,6 +878,9 @@ exit 0
 %{_libdir}/python*/site-packages/libmount/*
 
 %changelog
+* Thu Feb 5 2015 Karel Zak <kzak@redhat.com> 2.26-0.3
+- upgrade to 2.26-rc2
+
 * Fri Jan 16 2015 Karel Zak <kzak@redhat.com> 2.26-0.2
 - fix 1182778 - remount causes ro / and /home on boot
 
