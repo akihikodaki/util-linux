@@ -2,12 +2,12 @@
 Summary: A collection of basic system utilities
 Name: util-linux
 Version: 2.26
-Release: 0.4%{?dist}
+Release: 1%{?dist}
 License: GPLv2 and GPLv2+ and LGPLv2+ and BSD with advertising and Public Domain
 Group: System Environment/Base
 URL: http://en.wikipedia.org/wiki/Util-linux
 
-%define upstream_version %{version}-rc2
+%define upstream_version %{version}
 
 ### Macros
 %define compldir %{_datadir}/bash-completion/completions/
@@ -77,9 +77,6 @@ Requires: libfdisk = %{version}-%{release}
 ###
 # 151635 - makeing /var/log/lastlog
 Patch0: 2.23-login-lastlog-create.patch
-
-# fix PPC build
-Patch1: 2.26-setarch-ppc.patch
 
 %description
 The util-linux package contains a large variety of low-level system
@@ -265,6 +262,7 @@ export DAEMON_LDFLAGS="$SUID_LDFLAGS"
 	--enable-chfn-chsh \
 	--enable-write \
 	--enable-raw \
+	--enable-libmount-force-mountinfo \
 	--with-python=3 \
 	--with-systemd \
 	--with-udev \
@@ -881,6 +879,9 @@ exit 0
 %{_libdir}/python*/site-packages/libmount/*
 
 %changelog
+* Thu Feb 19 2015 Karel Zak <kzak@redhat.com> 2.26-1
+- upgrade to stable release 2.26
+
 * Tue Feb 10 2015 Karel Zak <kzak@redhat.com> 2.26-0.4
 - fix setarch build on PPC
 
