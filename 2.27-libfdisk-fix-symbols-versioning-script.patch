@@ -1,0 +1,41 @@
+From 6ece2f94849d5c61920d435804fb72b59503686f Mon Sep 17 00:00:00 2001
+From: Karel Zak <kzak@redhat.com>
+Date: Wed, 25 Mar 2015 11:08:22 +0100
+Subject: [PATCH 1/5] libfdisk: fix symbols versioning script
+
+Really stupid copy & past mistake. The libfdisk symbols should not be
+prefixed by MOUNT_ suffix.
+
+This change makes binaries linked with libfdisk 2.26 incompatible with
+new libfdisk. Fortunately, 2.26 has been the first release and very
+probably the library has been used for util-linux fdisks only.
+
+Signed-off-by: Karel Zak <kzak@redhat.com>
+---
+ libfdisk/src/libfdisk.sym | 9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
+
+diff --git a/libfdisk/src/libfdisk.sym b/libfdisk/src/libfdisk.sym
+index 8364fe7..541b247 100644
+--- a/libfdisk/src/libfdisk.sym
++++ b/libfdisk/src/libfdisk.sym
+@@ -1,11 +1,12 @@
+ /*
+  * The symbol versioning ensures that a new application requiring symbol foo;
+- * can't run with old libblkid.so not providing foo;
+- * version info can't enforce this since we never change the SONAME.
++ * can't run with old library.so not providing foo.
++
++ * Version info can't enforce this since we never change the SONAME.
+  *
+- * Copyright (C) 2014 Karel Zak <kzak@redhat.com>
++ * Copyright (C) 2014-2015 Karel Zak <kzak@redhat.com>
+  */
+-MOUNT_2.26 {
++FDISK_2.26 {
+ global:
+ 	fdisk_add_partition;
+ 	fdisk_align_lba;
+-- 
+2.1.0
+

@@ -1,7 +1,7 @@
 ### Header
 Summary: A collection of basic system utilities
 Name: util-linux
-Version: 2.26
+Version: 2.26.1
 Release: 1%{?dist}
 License: GPLv2 and GPLv2+ and LGPLv2+ and BSD with advertising and Public Domain
 Group: System Environment/Base
@@ -27,7 +27,7 @@ BuildRequires: libcap-ng-devel
 BuildRequires: python3-devel
 
 ### Sources
-Source0: ftp://ftp.kernel.org/pub/linux/utils/util-linux/v2.25/util-linux-%{upstream_version}.tar.xz
+Source0: ftp://ftp.kernel.org/pub/linux/utils/util-linux/v2.26/util-linux-%{upstream_version}.tar.xz
 Source1: util-linux-login.pamd
 Source2: util-linux-remote.pamd
 Source3: util-linux-chsh-chfn.pamd
@@ -77,6 +77,13 @@ Requires: libfdisk = %{version}-%{release}
 ###
 # 151635 - makeing /var/log/lastlog
 Patch0: 2.23-login-lastlog-create.patch
+
+# upstream v2.27 / v2.26.2 backports (#1210428 and #1210912)
+Patch1: 2.27-libfdisk-fix-symbols-versioning-script.patch
+Patch2: 2.27-libfdisk-dos-retain-existing-boot-flag-when-resizing.patch
+Patch3: 2.27-sfdisk-improve-N-warnings.patch
+Patch4: 2.27-libfdisk-support-bootbits-protection-from-p-MBR.patch
+Patch5: 2.27-sfdisk-enable-bootbits-protection.patch
 
 %description
 The util-linux package contains a large variety of low-level system
@@ -879,6 +886,12 @@ exit 0
 %{_libdir}/python*/site-packages/libmount/*
 
 %changelog
+* Mon Apr 13 2015 Karel Zak <kzak@redhat.com> 2.26.1-1
+- upgrade to v2.26.1
+  ftp://ftp.kernel.org/pub/linux/utils/util-linux/v2.26/v2.26.1-ReleaseNotes
+- fix #1210912 - sfdisk 2.26 does not retain existing boot flag when resizing a partition
+- fix #1210428 - sfdisk 2.26 destroys existing boot sector when editing disk label
+
 * Thu Feb 19 2015 Karel Zak <kzak@redhat.com> 2.26-1
 - upgrade to stable release 2.26
 

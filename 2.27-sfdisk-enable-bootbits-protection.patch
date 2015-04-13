@@ -1,0 +1,26 @@
+From 67414f247ef7a3177c1349de7e18fbfe7ad5f904 Mon Sep 17 00:00:00 2001
+From: Karel Zak <kzak@redhat.com>
+Date: Mon, 13 Apr 2015 13:41:10 +0200
+Subject: [PATCH 5/5] sfdisk: enable bootbits protection
+
+Addresses: https://bugzilla.redhat.com/show_bug.cgi?id=1210428
+Signed-off-by: Karel Zak <kzak@redhat.com>
+---
+ disk-utils/sfdisk.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/disk-utils/sfdisk.c b/disk-utils/sfdisk.c
+index 8846df8..dcdae33 100644
+--- a/disk-utils/sfdisk.c
++++ b/disk-utils/sfdisk.c
+@@ -190,6 +190,7 @@ static void sfdisk_init(struct sfdisk *sf)
+ 	if (!sf->cxt)
+ 		err(EXIT_FAILURE, _("failed to allocate libfdisk context"));
+ 	fdisk_set_ask(sf->cxt, ask_callback, (void *) sf);
++	fdisk_enable_bootbits_protection(sf->cxt, 1);
+ 
+ 	if (sf->label_nested) {
+ 		struct fdisk_context *x = fdisk_new_nested_context(sf->cxt,
+-- 
+2.1.0
+
