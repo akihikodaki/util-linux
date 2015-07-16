@@ -22,6 +22,7 @@ BuildRequires: zlib-devel
 BuildRequires: popt-devel
 BuildRequires: libutempter-devel
 Buildrequires: systemd-devel
+BuildRequires: systemd
 Buildrequires: libuser-devel
 BuildRequires: libcap-ng-devel
 BuildRequires: python3-devel
