@@ -2,7 +2,7 @@
 Summary: A collection of basic system utilities
 Name: util-linux
 Version: 2.26.2
-Release: 2%{?dist}
+Release: 3%{?dist}
 License: GPLv2 and GPLv2+ and LGPLv2+ and BSD with advertising and Public Domain
 Group: System Environment/Base
 URL: http://en.wikipedia.org/wiki/Util-linux
@@ -367,7 +367,7 @@ for I in /sbin/sfdisk \
 done
 %endif
 
-# we install getopt-*.{bash,tcsh} by %doc directive
+# we install getopt-*.{bash,tcsh} by doc directive
 chmod 644 misc-utils/getopt-*.{bash,tcsh}
 rm -f ${RPM_BUILD_ROOT}%{_datadir}/doc/util-linux/getopt/*
 rmdir ${RPM_BUILD_ROOT}%{_datadir}/doc/util-linux/getopt
@@ -879,6 +879,9 @@ exit 0
 %{_libdir}/python*/site-packages/libmount/*
 
 %changelog
+* Thu Jul 16 2015 Karel Zak <kzak@redhat.com> - 2.26.2-3
+- fix dates in the spec file
+
 * Fri Jun 19 2015 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 2.26.2-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_23_Mass_Rebuild
 
@@ -911,7 +914,7 @@ exit 0
 * Thu Nov 27 2014 Karel Zak <kzak@redhat.com> 2.25.2-2
 - fix #1168490 - CVE-2014-9114 util-linux: command injection flaw in blkid
 
-* Wed Oct 24 2014 Karel Zak <kzak@redhat.com> 2.25.2-1
+* Fri Oct 24 2014 Karel Zak <kzak@redhat.com> 2.25.2-1
 - upgrade to stable 2.25.2
   ftp://ftp.kernel.org/pub/linux/utils/util-linux/v2.25/v2.25.2-ReleaseNotes
 
@@ -1077,7 +1080,7 @@ exit 0
 - apply pathes from upstream stable/v2.22 branch
 - fix #865961 - wipefs -a should use O_EXCL
 
-* Thu Oct 10 2012 Karel Zak <kzak@redhat.com> 2.22.1-1
+* Wed Oct 10 2012 Karel Zak <kzak@redhat.com> 2.22.1-1
 - upgrade to the release 2.22.1
 
 * Wed Oct  3 2012 Karel Zak <kzak@redhat.com> 2.22-2
@@ -1116,7 +1119,7 @@ exit 0
 * Thu Feb 09 2012 Karel Zak <kzak@redhat.com> 2.21-0.2
 - fix #788703 - /run/blkid does not exist
 
-* Thu Feb 07 2012 Karel Zak <kzak@redhat.com> 2.21-0.1
+* Tue Feb 07 2012 Karel Zak <kzak@redhat.com> 2.21-0.1
 - upgrade to the release 2.21-rc2
   ftp://ftp.kernel.org/pub/linux/utils/util-linux/v2.21/v2.21-ReleaseNotes
 - add {fsck,mkfs}.minix
@@ -1151,7 +1154,7 @@ exit 0
 - upgrade to the release 2.20-rc2
   ftp://ftp.kernel.org/pub/linux/utils/util-linux/v2.20/v2.20-rc2-ChangeLog
 
-* Fri Aug  2 2011 Karel Zak <kzak@redhat.com> 2.20-0.1
+* Tue Aug  2 2011 Karel Zak <kzak@redhat.com> 2.20-0.1
 - upgrade to the release 2.20-rc1
   ftp://ftp.kernel.org/pub/linux/utils/util-linux/v2.20/v2.20-ReleaseNotes
 
@@ -1259,7 +1262,7 @@ exit 0
 - remove Provides: lib{uuid,blkid}-static (thanks to Michael Schwendt)
 - remove useless URL to sf.net
 
-* Thu Jan  8 2010 Karel Zak <kzak@redhat.com> 2.17-1
+* Fri Jan  8 2010 Karel Zak <kzak@redhat.com> 2.17-1
 - upgrade to the final 2.17
   ftp://ftp.kernel.org/pub/linux/utils/util-linux-ng/v2.17/v2.17-ReleaseNotes
   ftp://ftp.kernel.org/pub/linux/utils/util-linux-ng/v2.17/v2.17-ChangeLog
@@ -1531,7 +1534,7 @@ exit 0
 - fix #217240 - namei ignores non-directory components instead of saying "Not a directory"
 - fix #217241 - namei enforces symlink limits inconsistently
 
-* Wed Dec 14 2006 Karel Zak <kzak@redhat.com> 2.13-0.46
+* Thu Dec 14 2006 Karel Zak <kzak@redhat.com> 2.13-0.46
 - fix leaking file descriptor in the more command (patch by Steve Grubb)
 
 * Wed Dec 13 2006 Karel Zak <kzak@redhat.com> 2.13-0.45
@@ -1655,11 +1658,11 @@ exit 0
 		This drastically increases the total number of tcp mounts
 		that can happen at once (ala autofs).
 
-* Wed Mar  9 2006 Jesse Keating <jkeating@redhat.com> 2.13-0.20
+* Thu Mar  9 2006 Jesse Keating <jkeating@redhat.com> 2.13-0.20
 - Better calling of restorecon as suggested by Bill Nottingham
 - prereq restorecon to avoid ordering issues
 
-* Wed Mar  9 2006 Jesse Keating <jkeating@redhat.com> 2.13-0.19
+* Thu Mar  9 2006 Jesse Keating <jkeating@redhat.com> 2.13-0.19
 - restorecon /var/log/lastlog
 
 * Wed Mar  8 2006 Karel Zak <kzak@redhat.com> 2.13-0.17
@@ -1923,7 +1926,7 @@ exit 0
 - Ping NFS v4 servers before diving into kernel
 - Make v4 mount interruptible which also make the intr option on by default 
 
-* Sun Mar 13 2004  <SteveD@RedHat.com>
+* Sat Mar 13 2004  <SteveD@RedHat.com>
 - Reworked how the rpc.idmapd and rpc.gssd checks were
   done due to review comments from upstream.
 - Added rpc_strerror() so the '-v' flag will show RPC errors.
@@ -2022,7 +2025,7 @@ exit 0
 * Wed Jul 23 2003 Elliot Lee <sopwith@redhat.com> 2.11y-22
 - #100433 patch
 
-* Mon Jun 14 2003 Elliot Lee <sopwith@redhat.com> 2.11y-20
+* Sat Jun 14 2003 Elliot Lee <sopwith@redhat.com> 2.11y-20
 - #97381 patch
 
 * Wed Jun 04 2003 Elliot Lee <sopwith@redhat.com>
@@ -2204,7 +2207,7 @@ slang-devel.
 * Tue Feb 26 2002 Elliot Lee <sopwith@redhat.com> 2.11n-5
 - Fix #60363 (tweak raw.8 man page, make rawdevices.8 symlink).
 
-* Tue Jan 28 2002 Bill Nottingham <notting@redhat.com> 2.11n-4
+* Mon Jan 28 2002 Bill Nottingham <notting@redhat.com> 2.11n-4
 - remove kbdrate (fixes kbd conflict)
 
 * Fri Dec 28 2001 Elliot Lee <sopwith@redhat.com> 2.11n-3
