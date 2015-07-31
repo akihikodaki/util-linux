@@ -1,13 +1,13 @@
 ### Header
 Summary: A collection of basic system utilities
 Name: util-linux
-Version: 2.26.2
-Release: 3%{?dist}
+Version: 2.27
+Release: 0.1%{?dist}
 License: GPLv2 and GPLv2+ and LGPLv2+ and BSD with advertising and Public Domain
 Group: System Environment/Base
 URL: http://en.wikipedia.org/wiki/Util-linux
 
-%define upstream_version %{version}
+%define upstream_version %{version}-rc1
 
 ### Macros
 %define compldir %{_datadir}/bash-completion/completions/
@@ -515,6 +515,7 @@ exit 0
 %{_bindir}/look
 %{_bindir}/lsblk
 %{_bindir}/lscpu
+%{_bindir}/lsipc
 %{_bindir}/lslocks
 %{_bindir}/lslogins
 %{_bindir}/mcookie
@@ -568,6 +569,7 @@ exit 0
 %{_mandir}/man1/login.1*
 %{_mandir}/man1/look.1*
 %{_mandir}/man1/lscpu.1*
+%{_mandir}/man1/lsipc.1*
 %{_mandir}/man1/lslogins.1*
 %{_mandir}/man1/mcookie.1*
 %{_mandir}/man1/mesg.1*
@@ -716,6 +718,7 @@ exit 0
 %{compldir}/losetup
 %{compldir}/lsblk
 %{compldir}/lscpu
+%{compldir}/lsipc
 %{compldir}/lslocks
 %{compldir}/mcookie
 %{compldir}/mesg
@@ -880,6 +883,11 @@ exit 0
 %{_libdir}/python*/site-packages/libmount/*
 
 %changelog
+* Fri Jul 31 2015 Karel Zak <kzak@redhat.com> - 2.27-0.1
+- upgrade to v2.27-rc1
+  http://ftp.kernel.org/pub/linux/utils/util-linux/v2.27/v2.27-ReleaseNotes
+- add lsipc
+
 * Thu Jul 16 2015 Karel Zak <kzak@redhat.com> - 2.26.2-3
 - fix dates in the spec file
 
