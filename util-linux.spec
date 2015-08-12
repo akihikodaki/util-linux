@@ -2,12 +2,19 @@
 Summary: A collection of basic system utilities
 Name: util-linux
 Version: 2.27
-Release: 0.1%{?dist}
+Release: 0.2%{?dist}
 License: GPLv2 and GPLv2+ and LGPLv2+ and BSD with advertising and Public Domain
 Group: System Environment/Base
 URL: http://en.wikipedia.org/wiki/Util-linux
 
 %define upstream_version %{version}-rc1
+%if 0%{?fedora} >= 23
+%define pypkg python3
+%define pyver 3
+%else
+%define pypkg python
+%define pyver 2
+%endif
 
 ### Macros
 %define compldir %{_datadir}/bash-completion/completions/
@@ -25,10 +32,10 @@ Buildrequires: systemd-devel
 BuildRequires: systemd
 Buildrequires: libuser-devel
 BuildRequires: libcap-ng-devel
-BuildRequires: python3-devel
+BuildRequires: %{pypkg}-devel
 
 ### Sources
-Source0: ftp://ftp.kernel.org/pub/linux/utils/util-linux/v2.26/util-linux-%{upstream_version}.tar.xz
+Source0: ftp://ftp.kernel.org/pub/linux/utils/util-linux/v%{version}/util-linux-%{upstream_version}.tar.xz
 Source1: util-linux-login.pamd
 Source2: util-linux-remote.pamd
 Source3: util-linux-chsh-chfn.pamd
@@ -231,13 +238,13 @@ uniqueness of time-based UUID generation even at very high rates on
 SMP systems.
 
 
-%package -n python3-libmount
+%package -n %{pypkg}-libmount
 Summary: Python bindings for the libmount library
 Group: Development/Libraries
 Requires: libmount = %{version}-%{release}
 License: LGPLv2+
 
-%description -n python3-libmount
+%description -n %{pypkg}-libmount
 The libmount-python package contains a module that permits applications
 written in the Python programming language to use the interface
 supplied by the libmount library to work with mount tables (fstab,
@@ -261,10 +268,11 @@ export DAEMON_LDFLAGS="$SUID_LDFLAGS"
 	--disable-bfs \
 	--disable-pg \
 	--enable-chfn-chsh \
+	--enable-usrdir-path \
 	--enable-write \
 	--enable-raw \
 	--enable-libmount-force-mountinfo \
-	--with-python=3 \
+	--with-python=%{pyver} \
 	--with-systemd \
 	--with-udev \
 	--with-selinux \
@@ -876,13 +884,17 @@ exit 0
 %{_mandir}/man3/uuid_unparse.3*
 %{_libdir}/pkgconfig/uuid.pc
 
-%files -n python3-libmount
+%files -n %{pypkg}-libmount
 %defattr(-, root, root)
 %{!?_licensedir:%global license %%doc}
 %license Documentation/licenses/COPYING.LGPLv2.1 libmount/COPYING
 %{_libdir}/python*/site-packages/libmount/*
 
 %changelog
+* Wed Aug 12 2015 Karel Zak <kzak@redhat.com> - 2.27-0.2
+- fix #1251320 - rfe: please change login to not add /bin:/sbin to $PATH
+- apply patches from Lokesh Mandvekar to make spec file more portable
+
 * Fri Jul 31 2015 Karel Zak <kzak@redhat.com> - 2.27-0.1
 - upgrade to v2.27-rc1
   http://ftp.kernel.org/pub/linux/utils/util-linux/v2.27/v2.27-ReleaseNotes
