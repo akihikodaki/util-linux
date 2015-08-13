@@ -2,12 +2,17 @@
 Summary: A collection of basic system utilities
 Name: util-linux
 Version: 2.27
-Release: 0.2%{?dist}
+Release: 0.3%{?dist}
 License: GPLv2 and GPLv2+ and LGPLv2+ and BSD with advertising and Public Domain
 Group: System Environment/Base
 URL: http://en.wikipedia.org/wiki/Util-linux
 
+### Macros
 %define upstream_version %{version}-rc1
+%define upstream_major %(eval echo %{version} | %{__sed} -e 's/\([[:digit:]]*\)\.\([[:digit:]]*\)\.[[:digit:]]*$/\1.\2/')
+
+%define compldir %{_datadir}/bash-completion/completions/
+
 %if 0%{?fedora} >= 23
 %define pypkg python3
 %define pyver 3
@@ -16,8 +21,6 @@ URL: http://en.wikipedia.org/wiki/Util-linux
 %define pyver 2
 %endif
 
-### Macros
-%define compldir %{_datadir}/bash-completion/completions/
 
 ### Dependencies
 BuildRequires: audit-libs-devel >= 1.0.6
@@ -35,7 +38,7 @@ BuildRequires: libcap-ng-devel
 BuildRequires: %{pypkg}-devel
 
 ### Sources
-Source0: ftp://ftp.kernel.org/pub/linux/utils/util-linux/v%{version}/util-linux-%{upstream_version}.tar.xz
+Source0: ftp://ftp.kernel.org/pub/linux/utils/util-linux/v%{upstream_major}/util-linux-%{upstream_version}.tar.xz
 Source1: util-linux-login.pamd
 Source2: util-linux-remote.pamd
 Source3: util-linux-chsh-chfn.pamd
@@ -891,6 +894,9 @@ exit 0
 %{_libdir}/python*/site-packages/libmount/*
 
 %changelog
+* Thu Aug 13 2015 Karel Zak <kzak@redhat.com> - 2.27-0.3
+- improve version usage in source url
+
 * Wed Aug 12 2015 Karel Zak <kzak@redhat.com> - 2.27-0.2
 - fix #1251320 - rfe: please change login to not add /bin:/sbin to $PATH
 - apply patches from Lokesh Mandvekar to make spec file more portable
