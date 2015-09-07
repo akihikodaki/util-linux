@@ -2,13 +2,13 @@
 Summary: A collection of basic system utilities
 Name: util-linux
 Version: 2.27
-Release: 0.4%{?dist}
+Release: 1%{?dist}
 License: GPLv2 and GPLv2+ and LGPLv2+ and BSD with advertising and Public Domain
 Group: System Environment/Base
 URL: http://en.wikipedia.org/wiki/Util-linux
 
 ### Macros
-%define upstream_version %{version}-rc2
+%define upstream_version %{version}
 %define upstream_major %(eval echo %{version} | %{__sed} -e 's/\([[:digit:]]*\)\.\([[:digit:]]*\)\.[[:digit:]]*$/\1.\2/')
 
 %define compldir %{_datadir}/bash-completion/completions/
@@ -894,6 +894,9 @@ exit 0
 %{_libdir}/python*/site-packages/libmount/*
 
 %changelog
+* Mon Sep  7 2015 Karel Zak <kzak@redhat.com> - 2.27
+- upgrade to v2.27
+
 * Mon Aug 24 2015 Karel Zak <kzak@redhat.com> - 2.27-0.4
 - upgrade to v2.27-rc2
 
