@@ -1,7 +1,7 @@
 ### Header
 Summary: A collection of basic system utilities
 Name: util-linux
-Version: 2.27
+Version: 2.27.1
 Release: 1%{?dist}
 License: GPLv2 and GPLv2+ and LGPLv2+ and BSD with advertising and Public Domain
 Group: System Environment/Base
@@ -894,6 +894,10 @@ exit 0
 %{_libdir}/python*/site-packages/libmount/*
 
 %changelog
+* Mon Nov  2 2015 Karel Zak <kzak@redhat.com> - 2.27.1
+- upgrade to v2.27.1
+  http://ftp.kernel.org/pub/linux/utils/util-linux/v2.27/v2.27.1-ReleaseNotes
+
 * Mon Sep  7 2015 Karel Zak <kzak@redhat.com> - 2.27
 - upgrade to v2.27
 
