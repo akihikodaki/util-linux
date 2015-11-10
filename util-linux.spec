@@ -2,7 +2,7 @@
 Summary: A collection of basic system utilities
 Name: util-linux
 Version: 2.27.1
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: GPLv2 and GPLv2+ and LGPLv2+ and BSD with advertising and Public Domain
 Group: System Environment/Base
 URL: http://en.wikipedia.org/wiki/Util-linux
@@ -894,6 +894,9 @@ exit 0
 %{_libdir}/python*/site-packages/libmount/*
 
 %changelog
+* Tue Nov 10 2015 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 2.27.1-2
+- Rebuilt for https://fedoraproject.org/wiki/Changes/python3.5
+
 * Mon Nov  2 2015 Karel Zak <kzak@redhat.com> - 2.27.1
 - upgrade to v2.27.1
   http://ftp.kernel.org/pub/linux/utils/util-linux/v2.27/v2.27.1-ReleaseNotes
