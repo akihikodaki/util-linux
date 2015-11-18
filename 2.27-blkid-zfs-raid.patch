@@ -1,0 +1,13 @@
+diff -up util-linux-2.27.1/libblkid/src/probe.c.kzak util-linux-2.27.1/libblkid/src/probe.c
+diff -up util-linux-2.27.1/libblkid/src/superblocks/zfs.c.kzak util-linux-2.27.1/libblkid/src/superblocks/zfs.c
+--- util-linux-2.27.1/libblkid/src/superblocks/zfs.c.kzak	2015-11-02 10:07:34.567648465 +0100
++++ util-linux-2.27.1/libblkid/src/superblocks/zfs.c	2015-11-18 12:13:32.716188023 +0100
+@@ -258,7 +258,7 @@ static int probe_zfs(blkid_probe pr, con
+ const struct blkid_idinfo zfs_idinfo =
+ {
+ 	.name		= "zfs_member",
+-	.usage		= BLKID_USAGE_RAID,
++	.usage		= BLKID_USAGE_FILESYSTEM,
+ 	.probefunc	= probe_zfs,
+ 	.minsz		= 64 * 1024 * 1024,
+ 	.magics		= BLKID_NONE_MAGIC
