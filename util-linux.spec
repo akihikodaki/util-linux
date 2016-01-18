@@ -2,7 +2,7 @@
 Summary: A collection of basic system utilities
 Name: util-linux
 Version: 2.27.1
-Release: 3%{?dist}
+Release: 4%{?dist}
 License: GPLv2 and GPLv2+ and LGPLv2+ and BSD with advertising and Public Domain
 Group: System Environment/Base
 URL: http://en.wikipedia.org/wiki/Util-linux
@@ -90,6 +90,8 @@ Requires: libfdisk = %{version}-%{release}
 Patch0: 2.23-login-lastlog-create.patch
 # 1259745 - Can't start installation in Rawhide or F23 recent development images
 Patch1: 2.27-blkid-zfs-raid.patch
+# 1299255 - boot.iso (from 20160117 Rawhide compose) incorrectly detected as minix FS
+Patch2: libblkid-minix.patch
 
 %description
 The util-linux package contains a large variety of low-level system
@@ -896,6 +898,9 @@ exit 0
 %{_libdir}/python*/site-packages/libmount/*
 
 %changelog
+* Mon Jan 18 2016 Karel Zak <kzak@redhat.com> - 2.27.1-4
+- fix #1299255 - boot.iso (from 20160117 Rawhide compose) incorrectly detected as minix FS
+
 * Wed Nov 18 2015 Karel Zak <kzak@redhat.com> - 2.27.1-3
 - fix #1259745 - Can't start installation in Rawhide or F23 recent development images
 
