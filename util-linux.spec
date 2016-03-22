@@ -1,14 +1,14 @@
 ### Header
 Summary: A collection of basic system utilities
 Name: util-linux
-Version: 2.27.1
-Release: 5%{?dist}
+Version: 2.28
+Release: 0.1%{?dist}
 License: GPLv2 and GPLv2+ and LGPLv2+ and BSD with advertising and Public Domain
 Group: System Environment/Base
 URL: http://en.wikipedia.org/wiki/Util-linux
 
 ### Macros
-%define upstream_version %{version}
+%define upstream_version %{version}-rc1
 %define upstream_major %(eval echo %{version} | %{__sed} -e 's/\([[:digit:]]*\)\.\([[:digit:]]*\)\.[[:digit:]]*$/\1.\2/')
 
 %define compldir %{_datadir}/bash-completion/completions/
@@ -88,10 +88,8 @@ Requires: libfdisk = %{version}-%{release}
 ###
 # 151635 - makeing /var/log/lastlog
 Patch0: 2.23-login-lastlog-create.patch
-# 1259745 - Can't start installation in Rawhide or F23 recent development images
-Patch1: 2.27-blkid-zfs-raid.patch
-# 1299255 - boot.iso (from 20160117 Rawhide compose) incorrectly detected as minix FS
-Patch2: libblkid-minix.patch
+# temporary for v2.28-rc1 (fixed in upstream tree)
+Patch1: 2.28-rc2-swapon.c
 
 %description
 The util-linux package contains a large variety of low-level system
@@ -256,6 +254,16 @@ The libmount-python package contains a module that permits applications
 written in the Python programming language to use the interface
 supplied by the libmount library to work with mount tables (fstab,
 mountinfo, etc) and mount filesystems.
+
+
+%package -n util-linux-user
+Summary: libuser based util-linux utilities
+Group: System Environment/Base
+Requires: util-linux = %{version}-%{release}
+License: GPLv2
+
+%description -n util-linux-user
+chfn and chsh utilities with dependence on libuser
 
 
 %prep
@@ -482,8 +490,6 @@ exit 0
 %license Documentation/licenses/*
 %doc misc-utils/getopt-*.{bash,tcsh}
 
-%config(noreplace)	%{_sysconfdir}/pam.d/chfn
-%config(noreplace)	%{_sysconfdir}/pam.d/chsh
 %config(noreplace)	%{_sysconfdir}/pam.d/login
 %config(noreplace)	%{_sysconfdir}/pam.d/remote
 %config(noreplace)	%{_sysconfdir}/pam.d/su
@@ -496,8 +502,6 @@ exit 0
 %attr(4755,root,root)	%{_bindir}/umount
 %attr(4755,root,root)	%{_bindir}/su
 %attr(755,root,root)	%{_bindir}/login
-%attr(4711,root,root)	%{_bindir}/chfn
-%attr(4711,root,root)	%{_bindir}/chsh
 %attr(2755,root,tty)	%{_bindir}/write
 
 %ghost %attr(0644,root,root) %verify(not md5 size mtime) /var/log/lastlog
@@ -533,6 +537,7 @@ exit 0
 %{_bindir}/lsipc
 %{_bindir}/lslocks
 %{_bindir}/lslogins
+%{_bindir}/lsns
 %{_bindir}/mcookie
 %{_bindir}/mesg
 %{_bindir}/more
@@ -560,9 +565,7 @@ exit 0
 %{_bindir}/wdctl
 %{_bindir}/whereis
 %{_mandir}/man1/cal.1*
-%{_mandir}/man1/chfn.1*
 %{_mandir}/man1/chrt.1*
-%{_mandir}/man1/chsh.1*
 %{_mandir}/man1/col.1*
 %{_mandir}/man1/colcrt.1*
 %{_mandir}/man1/colrm.1*
@@ -634,7 +637,8 @@ exit 0
 %{_mandir}/man8/ldattach.8*
 %{_mandir}/man8/losetup.8*
 %{_mandir}/man8/lsblk.8*
-%{_mandir}/man8/lslocks.8.gz
+%{_mandir}/man8/lslocks.8*
+%{_mandir}/man8/lsns.8*
 %{_mandir}/man8/mkfs.8*
 %{_mandir}/man8/mkfs.cramfs.8*
 %{_mandir}/man8/mkfs.minix.8*
@@ -700,9 +704,7 @@ exit 0
 %{compldir}/blockdev
 %{compldir}/cal
 %{compldir}/chcpu
-%{compldir}/chfn
 %{compldir}/chrt
-%{compldir}/chsh
 %{compldir}/col
 %{compldir}/colcrt
 %{compldir}/colrm
@@ -802,6 +804,18 @@ exit 0
 %{_bindir}/sunhostid
 %endif
 
+
+%files -n util-linux-user
+%config(noreplace)	%{_sysconfdir}/pam.d/chfn
+%config(noreplace)	%{_sysconfdir}/pam.d/chsh
+%attr(4711,root,root)	%{_bindir}/chfn
+%attr(4711,root,root)	%{_bindir}/chsh
+%{_mandir}/man1/chfn.1*
+%{_mandir}/man1/chsh.1*
+%{compldir}/chfn
+%{compldir}/chsh
+
+
 %files -n uuidd
 %defattr(-,root,root)
 %{!?_licensedir:%global license %%doc}
@@ -898,6 +912,12 @@ exit 0
 %{_libdir}/python*/site-packages/libmount/*
 
 %changelog
+* Tue Mar 22 2016 Karel Zak <kzak@redhat.com> - 2.28-0.1
+- upgrade to v2.27-rc1
+  http://ftp.kernel.org/pub/linux/utils/util-linux/v2.28/v2.28-ReleaseNotes
+- add patch to fix broken swapon
+- add subpackage util-linux-user (utils with dependence on libuser)
+
 * Fri Feb 05 2016 Fedora Release Engineering <releng@fedoraproject.org> - 2.27.1-5
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_24_Mass_Rebuild
 
