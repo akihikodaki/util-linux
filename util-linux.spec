@@ -399,6 +399,9 @@ ln -sf /proc/mounts %{buildroot}/etc/mtab
 # remove static libs
 rm -f $RPM_BUILD_ROOT%{_libdir}/lib{uuid,blkid,mount,smartcols,fdisk}.a
 
+# temporary remove to avoid conflicts with bash-completion pkg
+rm -f $RPM_BUILD_ROOT%{compldir}/{mount,umount}
+
 # find MO files
 %find_lang %name
 
@@ -723,6 +726,7 @@ exit 0
 %{compldir}/getopt
 %{compldir}/hexdump
 %{compldir}/ionice
+%{compldir}/ipcmk
 %{compldir}/ipcrm
 %{compldir}/ipcs
 %{compldir}/isosize
@@ -735,6 +739,8 @@ exit 0
 %{compldir}/lscpu
 %{compldir}/lsipc
 %{compldir}/lslocks
+%{compldir}/lslogins
+%{compldir}/lsns
 %{compldir}/mcookie
 %{compldir}/mesg
 %{compldir}/mkfs
@@ -742,6 +748,7 @@ exit 0
 %{compldir}/mkfs.minix
 %{compldir}/mkswap
 %{compldir}/more
+#%{compldir}/mount
 %{compldir}/mountpoint
 %{compldir}/namei
 %{compldir}/nsenter
@@ -764,10 +771,12 @@ exit 0
 %{compldir}/setterm
 %{compldir}/su
 %{compldir}/swaplabel
+%{compldir}/swapoff
 %{compldir}/swapon
 %{compldir}/tailf
 %{compldir}/taskset
 %{compldir}/ul
+#%{compldir}/umount
 %{compldir}/unshare
 %{compldir}/utmpdump
 %{compldir}/uuidgen
