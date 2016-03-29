@@ -2,13 +2,13 @@
 Summary: A collection of basic system utilities
 Name: util-linux
 Version: 2.28
-Release: 0.1%{?dist}
+Release: 0.2%{?dist}
 License: GPLv2 and GPLv2+ and LGPLv2+ and BSD with advertising and Public Domain
 Group: System Environment/Base
 URL: http://en.wikipedia.org/wiki/Util-linux
 
 ### Macros
-%define upstream_version %{version}-rc1
+%define upstream_version %{version}-rc2
 %define upstream_major %(eval echo %{version} | %{__sed} -e 's/\([[:digit:]]*\)\.\([[:digit:]]*\)\.[[:digit:]]*$/\1.\2/')
 
 %define compldir %{_datadir}/bash-completion/completions/
@@ -88,8 +88,6 @@ Requires: libfdisk = %{version}-%{release}
 ###
 # 151635 - makeing /var/log/lastlog
 Patch0: 2.23-login-lastlog-create.patch
-# temporary for v2.28-rc1 (fixed in upstream tree)
-Patch1: 2.28-rc2-swapon.c
 
 %description
 The util-linux package contains a large variety of low-level system
@@ -912,8 +910,11 @@ exit 0
 %{_libdir}/python*/site-packages/libmount/*
 
 %changelog
+* Tue Mar 29 2016 Karel Zak <kzak@redhat.com> - 2.28-0.2
+- upgrade to v2.28-rc2
+
 * Tue Mar 22 2016 Karel Zak <kzak@redhat.com> - 2.28-0.1
-- upgrade to v2.27-rc1
+- upgrade to v2.28-rc1
   http://ftp.kernel.org/pub/linux/utils/util-linux/v2.28/v2.28-ReleaseNotes
 - add patch to fix broken swapon
 - add subpackage util-linux-user (utils with dependence on libuser)
