@@ -2,13 +2,13 @@
 Summary: A collection of basic system utilities
 Name: util-linux
 Version: 2.28
-Release: 0.3%{?dist}
+Release: 1%{?dist}
 License: GPLv2 and GPLv2+ and LGPLv2+ and BSD with advertising and Public Domain
 Group: System Environment/Base
 URL: http://en.wikipedia.org/wiki/Util-linux
 
 ### Macros
-%define upstream_version %{version}-rc2
+%define upstream_version %{version}
 %define upstream_major %(eval echo %{version} | %{__sed} -e 's/\([[:digit:]]*\)\.\([[:digit:]]*\)\.[[:digit:]]*$/\1.\2/')
 
 %define compldir %{_datadir}/bash-completion/completions/
@@ -88,8 +88,6 @@ Requires: libfdisk = %{version}-%{release}
 ###
 # 151635 - makeing /var/log/lastlog
 Patch0: 2.23-login-lastlog-create.patch
-# upstream patch, revert mmap() based probing
-Patch1: 2.28-libblkid-mmap.patch
 
 %description
 The util-linux package contains a large variety of low-level system
@@ -921,6 +919,9 @@ exit 0
 %{_libdir}/python*/site-packages/libmount/*
 
 %changelog
+* Tue Apr 12 2016 Karel Zak <kzak@redhat.com> - 2.28-1
+- upgrade to stable v2.28
+
 * Wed Mar 30 2016 Karel Zak <kzak@redhat.com> - 2.28-0.3
 - fix libblkid
 
