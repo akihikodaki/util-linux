@@ -2,7 +2,7 @@
 Summary: A collection of basic system utilities
 Name: util-linux
 Version: 2.28
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: GPLv2 and GPLv2+ and LGPLv2+ and BSD with advertising and Public Domain
 Group: System Environment/Base
 URL: http://en.wikipedia.org/wiki/Util-linux
@@ -87,7 +87,7 @@ Requires: libfdisk = %{version}-%{release}
 ### Ready for upstream?
 ###
 # 151635 - makeing /var/log/lastlog
-Patch0: 2.23-login-lastlog-create.patch
+Patch0: 2.28-login-lastlog-create.patch
 
 %description
 The util-linux package contains a large variety of low-level system
@@ -919,6 +919,9 @@ exit 0
 %{_libdir}/python*/site-packages/libmount/*
 
 %changelog
+* Tue Apr 26 2016 Karel Zak <kzak@redhat.com> - 2.28-2
+- refresh login-lastlog-create.patch
+
 * Tue Apr 12 2016 Karel Zak <kzak@redhat.com> - 2.28-1
 - upgrade to stable v2.28
 
