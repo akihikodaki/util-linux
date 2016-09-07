@@ -1,7 +1,7 @@
 ### Header
 Summary: A collection of basic system utilities
 Name: util-linux
-Version: 2.28.1
+Version: 2.28.2
 Release: 1%{?dist}
 License: GPLv2 and GPLv2+ and LGPLv2+ and BSD with advertising and Public Domain
 Group: System Environment/Base
@@ -919,6 +919,10 @@ exit 0
 %{_libdir}/python*/site-packages/libmount/*
 
 %changelog
+* Wed Sep  7 2016 Karel Zak <kzak@redhat.com> - 2.28.2-1
+- upgrade to stable 2.28.2
+  http://ftp.kernel.org/pub/linux/utils/util-linux/v2.28/v2.28.2-ReleaseNotes
+
 * Thu Aug 18 2016 Karel Zak <kzak@redhat.com> - 2.28.1-1
 - upgrade to stable 2.28.1
   http://ftp.kernel.org/pub/linux/utils/util-linux/v2.28/v2.28.1-ReleaseNotes
