@@ -1,8 +1,8 @@
 ### Header
 Summary: A collection of basic system utilities
 Name: util-linux
-Version: 2.29
-Release: 2%{?dist}
+Version: 2.29.1
+Release: 1%{?dist}
 License: GPLv2 and GPLv2+ and LGPLv2+ and BSD with advertising and Public Domain
 Group: System Environment/Base
 URL: http://en.wikipedia.org/wiki/Util-linux
@@ -919,6 +919,10 @@ exit 0
 %{_libdir}/python*/site-packages/libmount/*
 
 %changelog
+* Fri Jan 20 2017 Karel Zak <kzak@redhat.com> - 2.29.1-1
+- upgrade to v2.29.1
+  http://ftp.kernel.org/pub/linux/utils/util-linux/v2.29/v2.29.1-ReleaseNotes
+
 * Mon Dec 19 2016 Miro Hrončok <mhroncok@redhat.com> - 2.29-2
 - Rebuild for Python 3.6
 
