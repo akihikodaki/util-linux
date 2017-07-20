@@ -1,7 +1,7 @@
 ### Header
 Summary: A collection of basic system utilities
 Name: util-linux
-Version: 2.30
+Version: 2.30.1
 Release: 1%{?dist}
 License: GPLv2 and GPLv2+ and LGPLv2+ and BSD with advertising and Public Domain
 Group: System Environment/Base
@@ -930,6 +930,10 @@ exit 0
 %{_libdir}/python*/site-packages/libmount/*
 
 %changelog
+* Thu Jul 20 2017 Karel Zak <kzak@redhat.com> - 2.30.1-1
+- upgrade to v2.30.1
+  http://ftp.kernel.org/pub/linux/utils/util-linux/v2.30/v2.30.1-ReleaseNotes
+
 * Fri Jun  2 2017 Karel Zak <kzak@redhat.com> - 2.30-1
 - upgrade to v2.30
 
