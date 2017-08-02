@@ -2,7 +2,7 @@
 Summary: A collection of basic system utilities
 Name: util-linux
 Version: 2.30.1
-Release: 2%{?dist}
+Release: 3%{?dist}
 License: GPLv2 and GPLv2+ and LGPLv2+ and BSD with advertising and Public Domain
 Group: System Environment/Base
 URL: http://en.wikipedia.org/wiki/Util-linux
@@ -394,7 +394,7 @@ chmod 644 misc-utils/getopt-*.{bash,tcsh}
 rm -f ${RPM_BUILD_ROOT}%{_datadir}/doc/util-linux/getopt/*
 rmdir ${RPM_BUILD_ROOT}%{_datadir}/doc/util-linux/getopt
 
-ln -sf /proc/mounts %{buildroot}/etc/mtab
+ln -sf ../proc/self/mounts %{buildroot}/etc/mtab
 
 # remove static libs
 rm -f $RPM_BUILD_ROOT%{_libdir}/lib{uuid,blkid,mount,smartcols,fdisk}.a
@@ -435,7 +435,7 @@ if [ -x /usr/sbin/selinuxenabled ] && /usr/sbin/selinuxenabled; then
 	fi
 fi
 if [ ! -L /etc/mtab ]; then
-	ln -fs /proc/mounts /etc/mtab
+	ln -sf ../proc/self/mounts %{buildroot}/etc/mtab
 fi
 
 %post -n libblkid
@@ -930,6 +930,9 @@ exit 0
 %{_libdir}/python*/site-packages/libmount/*
 
 %changelog
+* Wed Aug  2 2017 Karel Zak <kzak@redhat.com> - 2.30.1-3
+- fix #1390191 - systemd read-only container produces errors
+
 * Thu Jul 27 2017 Fedora Release Engineering <releng@fedoraproject.org> - 2.30.1-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_27_Mass_Rebuild
 
