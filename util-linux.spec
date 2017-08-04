@@ -2,7 +2,7 @@
 Summary: A collection of basic system utilities
 Name: util-linux
 Version: 2.30.1
-Release: 3%{?dist}
+Release: 4%{?dist}
 License: GPLv2 and GPLv2+ and LGPLv2+ and BSD with advertising and Public Domain
 Group: System Environment/Base
 URL: http://en.wikipedia.org/wiki/Util-linux
@@ -435,7 +435,7 @@ if [ -x /usr/sbin/selinuxenabled ] && /usr/sbin/selinuxenabled; then
 	fi
 fi
 if [ ! -L /etc/mtab ]; then
-	ln -sf ../proc/self/mounts %{buildroot}/etc/mtab
+	ln -sf ../proc/self/mounts /etc/mtab
 fi
 
 %post -n libblkid
@@ -930,6 +930,9 @@ exit 0
 %{_libdir}/python*/site-packages/libmount/*
 
 %changelog
+* Fri Aug  4 2017 Karel Zak <kzak@redhat.com> - 2.30.1-4
+- fix post install script
+
 * Wed Aug  2 2017 Karel Zak <kzak@redhat.com> - 2.30.1-3
 - fix #1390191 - systemd read-only container produces errors
 
