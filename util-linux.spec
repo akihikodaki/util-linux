@@ -1,14 +1,14 @@
 ### Header
 Summary: A collection of basic system utilities
 Name: util-linux
-Version: 2.30.2
-Release: 1%{?dist}
+Version: 2.31
+Release: 0.1%{?dist}
 License: GPLv2 and GPLv2+ and LGPLv2+ and BSD with advertising and Public Domain
 Group: System Environment/Base
 URL: http://en.wikipedia.org/wiki/Util-linux
 
 ### Macros
-%define upstream_version %{version}
+%define upstream_version %{version}-rc1
 %define upstream_major %(eval echo %{version} | %{__sed} -e 's/\([[:digit:]]*\)\.\([[:digit:]]*\)\.[[:digit:]]*$/\1.\2/')
 
 %define compldir %{_datadir}/bash-completion/completions/
@@ -553,6 +553,7 @@ exit 0
 %{_bindir}/rename
 %{_bindir}/renice
 %{_bindir}/rev
+%{_bindir}/rfkill
 %{_bindir}/script
 %{_bindir}/scriptreplay
 %{_bindir}/setarch
@@ -564,6 +565,7 @@ exit 0
 %{_bindir}/unshare
 %{_bindir}/utmpdump
 %{_bindir}/uuidgen
+%{_bindir}/uuidparse
 %{_bindir}/wall
 %{_bindir}/wdctl
 %{_bindir}/whereis
@@ -616,6 +618,7 @@ exit 0
 %{_mandir}/man1/unshare.1*
 %{_mandir}/man1/utmpdump.1.gz
 %{_mandir}/man1/uuidgen.1*
+%{_mandir}/man1/uuidparse.1*
 %{_mandir}/man1/wall.1*
 %{_mandir}/man1/whereis.1*
 %{_mandir}/man1/write.1*
@@ -657,6 +660,7 @@ exit 0
 %{_mandir}/man8/rawdevices.8*
 %{_mandir}/man8/readprofile.8*
 %{_mandir}/man8/resizepart.8*
+%{_mandir}/man8/rfkill.8*
 %{_mandir}/man8/rtcwake.8*
 %{_mandir}/man8/setarch.8*
 %{_mandir}/man8/sulogin.8.gz
@@ -772,6 +776,7 @@ exit 0
 %{compldir}/renice
 %{compldir}/resizepart
 %{compldir}/rev
+%{compldir}/rfkill
 %{compldir}/rtcwake
 %{compldir}/runuser
 %{compldir}/script
@@ -790,6 +795,7 @@ exit 0
 %{compldir}/unshare
 %{compldir}/utmpdump
 %{compldir}/uuidgen
+%{compldir}/uuidparse
 %{compldir}/wall
 %{compldir}/wdctl
 %{compldir}/whereis
@@ -930,6 +936,10 @@ exit 0
 %{_libdir}/python*/site-packages/libmount/*
 
 %changelog
+* Fri Sep 22 2017 Karel Zak <kzak@redhat.com> - 2.31-0.1
+- upgrade to v2.31-rc1
+  http://ftp.kernel.org/pub/linux/utils/util-linux/v2.31/v2.31-ReleaseNotes
+
 * Fri Sep 22 2017 Karel Zak <kzak@redhat.com> - 2.30.2-1
 - upgrade to v2.30.2
   http://ftp.kernel.org/pub/linux/utils/util-linux/v2.30/v2.30.2-ReleaseNotes
