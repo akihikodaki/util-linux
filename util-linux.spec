@@ -2,7 +2,7 @@
 Summary: A collection of basic system utilities
 Name: util-linux
 Version: 2.31
-Release: 0.1%{?dist}
+Release: 0.2%{?dist}
 License: GPLv2 and GPLv2+ and LGPLv2+ and BSD with advertising and Public Domain
 Group: System Environment/Base
 URL: http://en.wikipedia.org/wiki/Util-linux
@@ -278,6 +278,7 @@ export DAEMON_LDFLAGS="$SUID_LDFLAGS"
 %configure \
 	--with-systemdsystemunitdir=%{_unitdir} \
 	--disable-silent-rules \
+	--disable-rfkill \
 	--disable-bfs \
 	--disable-pg \
 	--enable-chfn-chsh \
@@ -553,7 +554,7 @@ exit 0
 %{_bindir}/rename
 %{_bindir}/renice
 %{_bindir}/rev
-%{_bindir}/rfkill
+#%{_bindir}/rfkill
 %{_bindir}/script
 %{_bindir}/scriptreplay
 %{_bindir}/setarch
@@ -660,7 +661,7 @@ exit 0
 %{_mandir}/man8/rawdevices.8*
 %{_mandir}/man8/readprofile.8*
 %{_mandir}/man8/resizepart.8*
-%{_mandir}/man8/rfkill.8*
+#%{_mandir}/man8/rfkill.8*
 %{_mandir}/man8/rtcwake.8*
 %{_mandir}/man8/setarch.8*
 %{_mandir}/man8/sulogin.8.gz
@@ -776,7 +777,7 @@ exit 0
 %{compldir}/renice
 %{compldir}/resizepart
 %{compldir}/rev
-%{compldir}/rfkill
+#%{compldir}/rfkill
 %{compldir}/rtcwake
 %{compldir}/runuser
 %{compldir}/script
@@ -936,6 +937,9 @@ exit 0
 %{_libdir}/python*/site-packages/libmount/*
 
 %changelog
+* Mon Sep 25 2017 Karel Zak <kzak@redhat.com> - 2.31-0.2
+- temporary disable rfkill (fix #1494855)
+
 * Fri Sep 22 2017 Karel Zak <kzak@redhat.com> - 2.31-0.1
 - upgrade to v2.31-rc1
   http://ftp.kernel.org/pub/linux/utils/util-linux/v2.31/v2.31-ReleaseNotes
