@@ -2,7 +2,7 @@
 Summary: A collection of basic system utilities
 Name: util-linux
 Version: 2.31
-Release: 0.3%{?dist}
+Release: 0.4%{?dist}
 License: GPLv2 and GPLv2+ and LGPLv2+ and BSD with advertising and Public Domain
 Group: System Environment/Base
 URL: http://en.wikipedia.org/wiki/Util-linux
@@ -91,6 +91,9 @@ Requires: libfdisk = %{version}-%{release}
 ###
 # 151635 - makeing /var/log/lastlog
 Patch0: 2.28-login-lastlog-create.patch
+
+# upstream patch
+Patch1: 0001-losetup-fix-conflicting-types-for-loopcxt_set_blocks.patch
 
 %description
 The util-linux package contains a large variety of low-level system
@@ -766,7 +769,6 @@ exit 0
 %{compldir}/mkfs.minix
 %{compldir}/mkswap
 %{compldir}/more
-#%{compldir}/mount
 %{compldir}/mountpoint
 %{compldir}/namei
 %{compldir}/nsenter
@@ -794,7 +796,6 @@ exit 0
 %{compldir}/swapon
 %{compldir}/taskset
 %{compldir}/ul
-#%{compldir}/umount
 %{compldir}/unshare
 %{compldir}/utmpdump
 %{compldir}/uuidgen
@@ -939,6 +940,9 @@ exit 0
 %{_libdir}/python*/site-packages/libmount/*
 
 %changelog
+* Mon Oct  9 2017 Karel Zak <kzak@redhat.com> - 2.31-0.4
+- fix build error
+
 * Mon Oct  9 2017 Karel Zak <kzak@redhat.com> - 2.31-0.3
 - upgrade to v2.31-rc2
 - enable rfkill
