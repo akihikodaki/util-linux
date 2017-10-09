@@ -2,13 +2,13 @@
 Summary: A collection of basic system utilities
 Name: util-linux
 Version: 2.31
-Release: 0.2%{?dist}
+Release: 0.3%{?dist}
 License: GPLv2 and GPLv2+ and LGPLv2+ and BSD with advertising and Public Domain
 Group: System Environment/Base
 URL: http://en.wikipedia.org/wiki/Util-linux
 
 ### Macros
-%define upstream_version %{version}-rc1
+%define upstream_version %{version}-rc2
 %define upstream_major %(eval echo %{version} | %{__sed} -e 's/\([[:digit:]]*\)\.\([[:digit:]]*\)\.[[:digit:]]*$/\1.\2/')
 
 %define compldir %{_datadir}/bash-completion/completions/
@@ -55,6 +55,9 @@ Conflicts: coreutils < 8.20
 # eject has been merged into util-linux v2.22
 Obsoletes: eject <= 2.1.5
 Provides: eject = 2.1.6
+# rfkill has been merged into util-linux v2.31
+Obsoletes: rfkill <= 0.5
+Provides: rfkill = 0.5
 # sulogin, utmpdump merged into util-linux v2.22;
 # last, lastb merged into util-linux v2.24
 Conflicts: sysvinit-tools < 2.88-14
@@ -278,7 +281,6 @@ export DAEMON_LDFLAGS="$SUID_LDFLAGS"
 %configure \
 	--with-systemdsystemunitdir=%{_unitdir} \
 	--disable-silent-rules \
-	--disable-rfkill \
 	--disable-bfs \
 	--disable-pg \
 	--enable-chfn-chsh \
@@ -554,7 +556,7 @@ exit 0
 %{_bindir}/rename
 %{_bindir}/renice
 %{_bindir}/rev
-#%{_bindir}/rfkill
+%{_bindir}/rfkill
 %{_bindir}/script
 %{_bindir}/scriptreplay
 %{_bindir}/setarch
@@ -661,7 +663,7 @@ exit 0
 %{_mandir}/man8/rawdevices.8*
 %{_mandir}/man8/readprofile.8*
 %{_mandir}/man8/resizepart.8*
-#%{_mandir}/man8/rfkill.8*
+%{_mandir}/man8/rfkill.8*
 %{_mandir}/man8/rtcwake.8*
 %{_mandir}/man8/setarch.8*
 %{_mandir}/man8/sulogin.8.gz
@@ -777,7 +779,7 @@ exit 0
 %{compldir}/renice
 %{compldir}/resizepart
 %{compldir}/rev
-#%{compldir}/rfkill
+%{compldir}/rfkill
 %{compldir}/rtcwake
 %{compldir}/runuser
 %{compldir}/script
@@ -937,6 +939,10 @@ exit 0
 %{_libdir}/python*/site-packages/libmount/*
 
 %changelog
+* Mon Oct  9 2017 Karel Zak <kzak@redhat.com> - 2.31-0.3
+- upgrade to v2.31-rc2
+- enable rfkill
+
 * Mon Sep 25 2017 Karel Zak <kzak@redhat.com> - 2.31-0.2
 - temporary disable rfkill (fix #1494855)
 
