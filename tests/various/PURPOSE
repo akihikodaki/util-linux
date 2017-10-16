@@ -1,0 +1,3 @@
+PURPOSE of /CoreOS/util-linux/various
+Description: This test groups small sanity and regression tests for util-linux
+Author: Miroslav Vadkerti <mvadkert@redhat.com>

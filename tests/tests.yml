@@ -1,0 +1,12 @@
+# Test which run in classic and docker environemnt
+- hosts: localhost
+  tags:
+  - classic
+  - container
+  roles:
+  - role: standard-test-beakerlib
+    tests:
+    - various
+    required_packages:
+    - util-linux
+    - util-linux-user
