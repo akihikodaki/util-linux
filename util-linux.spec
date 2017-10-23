@@ -2,13 +2,13 @@
 Summary: A collection of basic system utilities
 Name: util-linux
 Version: 2.31
-Release: 0.4%{?dist}
+Release: 1%{?dist}
 License: GPLv2 and GPLv2+ and LGPLv2+ and BSD with advertising and Public Domain
 Group: System Environment/Base
 URL: http://en.wikipedia.org/wiki/Util-linux
 
 ### Macros
-%define upstream_version %{version}-rc2
+%define upstream_version %{version}
 %define upstream_major %(eval echo %{version} | %{__sed} -e 's/\([[:digit:]]*\)\.\([[:digit:]]*\)\.[[:digit:]]*$/\1.\2/')
 
 %define compldir %{_datadir}/bash-completion/completions/
@@ -339,6 +339,9 @@ echo '.so man8/raw.8' > $RPM_BUILD_ROOT%{_mandir}/man8/rawdevices.8
 # sbin -> bin
 mv ${RPM_BUILD_ROOT}%{_sbindir}/raw ${RPM_BUILD_ROOT}%{_bindir}/raw
 
+# bin -> sbin (v2.31 bug, will be fixed in v2.31.1)
+mv ${RPM_BUILD_ROOT}%{_bindir}/rfkill ${RPM_BUILD_ROOT}%{_sbindir}/rfkill
+
 # And a dirs uuidd needs that the makefiles don't create
 install -d ${RPM_BUILD_ROOT}/run/uuidd
 install -d ${RPM_BUILD_ROOT}/var/lib/libuuid
@@ -559,7 +562,6 @@ exit 0
 %{_bindir}/rename
 %{_bindir}/renice
 %{_bindir}/rev
-%{_bindir}/rfkill
 %{_bindir}/script
 %{_bindir}/scriptreplay
 %{_bindir}/setarch
@@ -705,6 +707,7 @@ exit 0
 %{_sbindir}/pivot_root
 %{_sbindir}/readprofile
 %{_sbindir}/resizepart
+%{_sbindir}/rfkill
 %{_sbindir}/rtcwake
 %{_sbindir}/runuser
 %{_sbindir}/sulogin
@@ -940,6 +943,10 @@ exit 0
 %{_libdir}/python*/site-packages/libmount/*
 
 %changelog
+* Mon Oct 23 2017 Karel Zak <kzak@redhat.com> - 2.31-1
+- upgrade to final v2.31
+- move rfkill to sbin (for backward compatibility)
+
 * Mon Oct  9 2017 Karel Zak <kzak@redhat.com> - 2.31-0.4
 - fix build error
 
