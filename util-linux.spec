@@ -92,9 +92,6 @@ Requires: libfdisk = %{version}-%{release}
 # 151635 - makeing /var/log/lastlog
 Patch0: 2.28-login-lastlog-create.patch
 
-# upstream patch
-Patch1: 0001-losetup-fix-conflicting-types-for-loopcxt_set_blocks.patch
-
 %description
 The util-linux package contains a large variety of low-level system
 utilities that are necessary for a Linux system to function. Among
