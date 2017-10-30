@@ -2,7 +2,7 @@
 Summary: A collection of basic system utilities
 Name: util-linux
 Version: 2.31
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: GPLv2 and GPLv2+ and LGPLv2+ and BSD with advertising and Public Domain
 Group: System Environment/Base
 URL: http://en.wikipedia.org/wiki/Util-linux
@@ -91,6 +91,9 @@ Requires: libfdisk = %{version}-%{release}
 ###
 # 151635 - makeing /var/log/lastlog
 Patch0: 2.28-login-lastlog-create.patch
+
+# upstream
+Patch1: 0001-Revert-dmesg-fragment-concatenation.patch
 
 %description
 The util-linux package contains a large variety of low-level system
@@ -940,6 +943,9 @@ exit 0
 %{_libdir}/python*/site-packages/libmount/*
 
 %changelog
+* Mon Oct 30 2017 Karel Zak <kzak@redhat.com> - 2.31-2
+- fix dmesg for multi-line records
+
 * Mon Oct 23 2017 Karel Zak <kzak@redhat.com> - 2.31-1
 - upgrade to final v2.31
 - move rfkill to sbin (for backward compatibility)
