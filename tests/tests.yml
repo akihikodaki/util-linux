@@ -3,6 +3,7 @@
   tags:
   - classic
   - container
+  - atomic
   roles:
   - role: standard-test-beakerlib
     tests:
