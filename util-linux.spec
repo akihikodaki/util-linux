@@ -2,7 +2,7 @@
 Summary: A collection of basic system utilities
 Name: util-linux
 Version: 2.31
-Release: 2%{?dist}
+Release: 3%{?dist}
 License: GPLv2 and GPLv2+ and LGPLv2+ and BSD with advertising and Public Domain
 Group: System Environment/Base
 URL: http://en.wikipedia.org/wiki/Util-linux
@@ -940,9 +940,12 @@ exit 0
 %defattr(-, root, root)
 %{!?_licensedir:%global license %%doc}
 %license Documentation/licenses/COPYING.LGPLv2.1 libmount/COPYING
-%{_libdir}/python*/site-packages/libmount/*
+%{_libdir}/python*/site-packages/libmount/
 
 %changelog
+* Wed Jan 03 2018 Lumír Balhar <lbalhar@redhat.com> - 2.31-3
+- Fix directory ownership in python subpackage
+
 * Mon Oct 30 2017 Karel Zak <kzak@redhat.com> - 2.31-2
 - fix dmesg for multi-line records
 
