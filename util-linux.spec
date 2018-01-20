@@ -2,7 +2,7 @@
 Summary: A collection of basic system utilities
 Name: util-linux
 Version: 2.31
-Release: 3%{?dist}
+Release: 4%{?dist}
 License: GPLv2 and GPLv2+ and LGPLv2+ and BSD with advertising and Public Domain
 Group: System Environment/Base
 URL: http://en.wikipedia.org/wiki/Util-linux
@@ -943,6 +943,9 @@ exit 0
 %{_libdir}/python*/site-packages/libmount/
 
 %changelog
+* Sat Jan 20 2018 Björn Esser <besser82@fedoraproject.org> - 2.31-4
+- Rebuilt for switch to libxcrypt
+
 * Wed Jan 03 2018 Lumír Balhar <lbalhar@redhat.com> - 2.31-3
 - Fix directory ownership in python subpackage
 
