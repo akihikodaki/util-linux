@@ -1,14 +1,14 @@
 ### Header
 Summary: A collection of basic system utilities
 Name: util-linux
-Version: 2.31
-Release: 5%{?dist}
+Version: 2.32
+Release: 0.1%{?dist}
 License: GPLv2 and GPLv2+ and LGPLv2+ and BSD with advertising and Public Domain
 Group: System Environment/Base
 URL: http://en.wikipedia.org/wiki/Util-linux
 
 ### Macros
-%define upstream_version %{version}
+%define upstream_version %{version}-rc1
 %define upstream_major %(eval echo %{version} | %{__sed} -e 's/\([[:digit:]]*\)\.\([[:digit:]]*\)\.[[:digit:]]*$/\1.\2/')
 
 %define compldir %{_datadir}/bash-completion/completions/
@@ -91,9 +91,6 @@ Requires: libfdisk = %{version}-%{release}
 ###
 # 151635 - makeing /var/log/lastlog
 Patch0: 2.28-login-lastlog-create.patch
-
-# upstream
-Patch1: 0001-Revert-dmesg-fragment-concatenation.patch
 
 %description
 The util-linux package contains a large variety of low-level system
@@ -338,9 +335,6 @@ echo '.so man8/raw.8' > $RPM_BUILD_ROOT%{_mandir}/man8/rawdevices.8
 
 # sbin -> bin
 mv ${RPM_BUILD_ROOT}%{_sbindir}/raw ${RPM_BUILD_ROOT}%{_bindir}/raw
-
-# bin -> sbin (v2.31 bug, will be fixed in v2.31.1)
-mv ${RPM_BUILD_ROOT}%{_bindir}/rfkill ${RPM_BUILD_ROOT}%{_sbindir}/rfkill
 
 # And a dirs uuidd needs that the makefiles don't create
 install -d ${RPM_BUILD_ROOT}/run/uuidd
@@ -943,6 +937,10 @@ exit 0
 %{_libdir}/python*/site-packages/libmount/
 
 %changelog
+* Tue Feb 13 2018 Karel Zak <kzak@redhat.com> - 2.32-0.1
+- upgrade to v2.32-rc1
+  http://www.kernel.org/pub/linux/utils/util-linux/v2.32/v2.32-ReleaseNotes
+
 * Fri Feb 09 2018 Fedora Release Engineering <releng@fedoraproject.org> - 2.31-5
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_28_Mass_Rebuild
 
