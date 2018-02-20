@@ -2,7 +2,7 @@
 Summary: A collection of basic system utilities
 Name: util-linux
 Version: 2.32
-Release: 0.1%{?dist}
+Release: 0.2%{?dist}
 License: GPLv2 and GPLv2+ and LGPLv2+ and BSD with advertising and Public Domain
 Group: System Environment/Base
 URL: http://en.wikipedia.org/wiki/Util-linux
@@ -36,6 +36,7 @@ BuildRequires: systemd
 Buildrequires: libuser-devel
 BuildRequires: libcap-ng-devel
 BuildRequires: %{pypkg}-devel
+BuildRequires: gcc
 
 ### Sources
 Source0: ftp://ftp.kernel.org/pub/linux/utils/util-linux/v%{upstream_major}/util-linux-%{upstream_version}.tar.xz
@@ -937,6 +938,9 @@ exit 0
 %{_libdir}/python*/site-packages/libmount/
 
 %changelog
+* Tue Feb 20 2018 Karel Zak <kzak@redhat.com> - 2.32-0.2
+- add BuildRequires gcc
+
 * Tue Feb 13 2018 Karel Zak <kzak@redhat.com> - 2.32-0.1
 - upgrade to v2.32-rc1
   http://www.kernel.org/pub/linux/utils/util-linux/v2.32/v2.32-ReleaseNotes
