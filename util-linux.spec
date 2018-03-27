@@ -2,7 +2,7 @@
 Summary: A collection of basic system utilities
 Name: util-linux
 Version: 2.32
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: GPLv2 and GPLv2+ and LGPLv2+ and BSD with advertising and Public Domain
 Group: System Environment/Base
 URL: http://en.wikipedia.org/wiki/Util-linux
@@ -92,6 +92,8 @@ Requires: libfdisk = %{version}-%{release}
 ###
 # 151635 - makeing /var/log/lastlog
 Patch0: 2.28-login-lastlog-create.patch
+# 1560283 - column does not properly handle spaces at beginning of tab-separated table columns
+Patch1: column-fix-leading-space-characters-bug.patch
 
 %description
 The util-linux package contains a large variety of low-level system
@@ -938,6 +940,9 @@ exit 0
 %{_libdir}/python*/site-packages/libmount/
 
 %changelog
+* Tue Mar 27 2018 Karel Zak <kzak@redhat.com> - 2.32-2
+- fix #1560283 - column does not properly handle spaces at beginning of tab-separated table columns
+
 * Wed Mar 21 2018 Karel Zak <kzak@redhat.com> - 2.32-1
 - upgrade to v2.32
 
