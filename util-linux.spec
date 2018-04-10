@@ -2,7 +2,7 @@
 Summary: A collection of basic system utilities
 Name: util-linux
 Version: 2.32
-Release: 2%{?dist}
+Release: 3%{?dist}
 License: GPLv2 and GPLv2+ and LGPLv2+ and BSD with advertising and Public Domain
 Group: System Environment/Base
 URL: http://en.wikipedia.org/wiki/Util-linux
@@ -290,7 +290,6 @@ export DAEMON_LDFLAGS="$SUID_LDFLAGS"
 	--enable-usrdir-path \
 	--enable-write \
 	--enable-raw \
-	--enable-libmount-force-mountinfo \
 	--with-python=%{pyver} \
 	--with-systemd \
 	--with-udev \
@@ -940,6 +939,9 @@ exit 0
 %{_libdir}/python*/site-packages/libmount/
 
 %changelog
+* Tue Apr 10 2018 Karel Zak <kzak@redhat.com> - 2.32-3
+- remove unused build option --enable-libmount-force-mountinfo (it's default now)
+
 * Tue Mar 27 2018 Karel Zak <kzak@redhat.com> - 2.32-2
 - fix #1560283 - column does not properly handle spaces at beginning of tab-separated table columns
 
