@@ -2,7 +2,7 @@
 Summary: A collection of basic system utilities
 Name: util-linux
 Version: 2.32
-Release: 3%{?dist}
+Release: 4%{?dist}
 License: GPLv2 and GPLv2+ and LGPLv2+ and BSD with advertising and Public Domain
 Group: System Environment/Base
 URL: http://en.wikipedia.org/wiki/Util-linux
@@ -477,9 +477,13 @@ useradd -r -g uuidd -d /var/lib/libuuid -s /sbin/nologin \
     -c "UUID generator helper daemon" uuidd
 exit 0
 
-# Please, keep uuidd running after installation!
+# Please, keep uuidd running after installation! Note that systemd_post is
+# "systemctl preset" and it enable/disable service only.
 %post -n uuidd
 %systemd_post uuidd.service
+if [ $1 -eq 1 ]; then
+	/bin/systemctl start uuidd.service > /dev/null 2>&1 || :
+fi
 
 %preun -n uuidd
 %systemd_preun uuidd.service
@@ -939,6 +943,9 @@ exit 0
 %{_libdir}/python*/site-packages/libmount/
 
 %changelog
+* Wed Apr 11 2018 Karel Zak <kzak@redhat.com> - 2.32-4
+- fix #1560642 - uuidd.service does not start
+
 * Tue Apr 10 2018 Karel Zak <kzak@redhat.com> - 2.32-3
 - remove unused build option --enable-libmount-force-mountinfo (it's default now)
 
