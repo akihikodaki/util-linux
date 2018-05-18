@@ -2,7 +2,7 @@
 Summary: A collection of basic system utilities
 Name: util-linux
 Version: 2.32
-Release: 4%{?dist}
+Release: 5%{?dist}
 License: GPLv2 and GPLv2+ and LGPLv2+ and BSD with advertising and Public Domain
 Group: System Environment/Base
 URL: http://en.wikipedia.org/wiki/Util-linux
@@ -50,6 +50,7 @@ Source14: util-linux-runuser.pamd
 Source15: util-linux-runuser-l.pamd
 
 ### Obsoletes & Conflicts & Provides
+Conflicts: initscripts < 9.79-4
 Conflicts: bash-completion < 1:2.1-1
 # su(1) and runuser(1) merged into util-linux v2.22
 Conflicts: coreutils < 8.20
@@ -508,6 +509,8 @@ fi
 %config(noreplace)	%{_sysconfdir}/pam.d/runuser-l
 %config(noreplace)	%{_prefix}/lib/udev/rules.d/60-raw.rules
 
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/adjtime
+
 %attr(4755,root,root)	%{_bindir}/mount
 %attr(4755,root,root)	%{_bindir}/umount
 %attr(4755,root,root)	%{_bindir}/su
@@ -943,6 +946,9 @@ fi
 %{_libdir}/python*/site-packages/libmount/
 
 %changelog
+* Fri May 18 2018 Karel Zak <kzak@redhat.com> - 2.32-5
+- move /etc/adjtime config from initscripts to util-linux
+
 * Wed Apr 11 2018 Karel Zak <kzak@redhat.com> - 2.32-4
 - fix #1560642 - uuidd.service does not start
 
