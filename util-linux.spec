@@ -44,6 +44,7 @@ Source1: util-linux-login.pamd
 Source2: util-linux-remote.pamd
 Source3: util-linux-chsh-chfn.pamd
 Source4: util-linux-60-raw.rules
+Source5: adjtime
 Source12: util-linux-su.pamd
 Source13: util-linux-su-l.pamd
 Source14: util-linux-runuser.pamd
@@ -342,6 +343,9 @@ mv ${RPM_BUILD_ROOT}%{_sbindir}/raw ${RPM_BUILD_ROOT}%{_bindir}/raw
 # And a dirs uuidd needs that the makefiles don't create
 install -d ${RPM_BUILD_ROOT}/run/uuidd
 install -d ${RPM_BUILD_ROOT}/var/lib/libuuid
+
+# /etc/adjtime
+install -m 644 %{SOURCE5} ${RPM_BUILD_ROOT}%{_sysconfdir}/adjtime
 
 # libtool junk
 rm -rf ${RPM_BUILD_ROOT}%{_libdir}/*.la
