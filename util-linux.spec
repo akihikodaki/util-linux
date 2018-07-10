@@ -498,7 +498,6 @@ fi
 
 
 %files -f %{name}.files
-%defattr(-,root,root)
 %doc README NEWS AUTHORS
 %doc Documentation/deprecated.txt 
 %{!?_licensedir:%global license %%doc}
@@ -855,7 +854,6 @@ fi
 
 
 %files -n uuidd
-%defattr(-,root,root)
 %{!?_licensedir:%global license %%doc}
 %license Documentation/licenses/COPYING.GPLv2
 %{_mandir}/man8/uuidd.8*
@@ -867,51 +865,43 @@ fi
 
 
 %files -n libfdisk
-%defattr(-,root,root)
 %{!?_licensedir:%global license %%doc}
 %license Documentation/licenses/COPYING.LGPLv2.1 libfdisk/COPYING
 %{_libdir}/libfdisk.so.*
 
 %files -n libfdisk-devel
-%defattr(-,root,root)
 %{_libdir}/libfdisk.so
 %{_includedir}/libfdisk
 %{_libdir}/pkgconfig/fdisk.pc
 
 
 %files -n libsmartcols
-%defattr(-,root,root)
 %{!?_licensedir:%global license %%doc}
 %license Documentation/licenses/COPYING.LGPLv2.1 libsmartcols/COPYING
 %{_libdir}/libsmartcols.so.*
 
 %files -n libsmartcols-devel
-%defattr(-,root,root)
 %{_libdir}/libsmartcols.so
 %{_includedir}/libsmartcols
 %{_libdir}/pkgconfig/smartcols.pc
 
 
 %files -n libmount
-%defattr(-,root,root)
 %{!?_licensedir:%global license %%doc}
 %license Documentation/licenses/COPYING.LGPLv2.1 libmount/COPYING
 %{_libdir}/libmount.so.*
 
 %files -n libmount-devel
-%defattr(-,root,root)
 %{_libdir}/libmount.so
 %{_includedir}/libmount
 %{_libdir}/pkgconfig/mount.pc
 
 
 %files -n libblkid
-%defattr(-,root,root)
 %doc libblkid/COPYING
 %{_libdir}/libblkid.so.*
 
 %files -n libblkid-devel
-%defattr(-,root,root)
 %doc libblkid/COPYING
 %{_libdir}/libblkid.so
 %{_includedir}/blkid
@@ -920,13 +910,11 @@ fi
 
 
 %files -n libuuid
-%defattr(-,root,root)
 %{!?_licensedir:%global license %%doc}
 %license Documentation/licenses/COPYING.BSD-3 libuuid/COPYING
 %{_libdir}/libuuid.so.*
 
 %files -n libuuid-devel
-%defattr(-,root,root)
 %{_libdir}/libuuid.so
 %{_includedir}/uuid
 %{_mandir}/man3/uuid.3*
@@ -944,7 +932,6 @@ fi
 %{_libdir}/pkgconfig/uuid.pc
 
 %files -n %{pypkg}-libmount
-%defattr(-, root, root)
 %{!?_licensedir:%global license %%doc}
 %license Documentation/licenses/COPYING.LGPLv2.1 libmount/COPYING
 %{_libdir}/python*/site-packages/libmount/
