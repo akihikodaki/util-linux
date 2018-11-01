@@ -1,14 +1,14 @@
 ### Header
 Summary: A collection of basic system utilities
 Name: util-linux
-Version: 2.32.1
-Release: 1%{?dist}
+Version: 2.33
+Release: 0.1%{?dist}
 License: GPLv2 and GPLv2+ and LGPLv2+ and BSD with advertising and Public Domain
 Group: System Environment/Base
 URL: http://en.wikipedia.org/wiki/Util-linux
 
 ### Macros
-%define upstream_version %{version}
+%define upstream_version %{version}-rc2
 %define upstream_major %(eval echo %{version} | %{__sed} -e 's/\([[:digit:]]*\)\.\([[:digit:]]*\)\.[[:digit:]]*$/\1.\2/')
 
 %define compldir %{_datadir}/bash-completion/completions/
@@ -459,20 +459,6 @@ for I in /etc/blkid.tab /etc/blkid.tab.old \
 	fi
 done
 
-%postun -n libblkid -p /sbin/ldconfig
-
-%post -n libuuid -p /sbin/ldconfig
-%postun -n libuuid -p /sbin/ldconfig
-
-%post -n libmount -p /sbin/ldconfig
-%postun -n libmount -p /sbin/ldconfig
-
-%post -n libsmartcols -p /sbin/ldconfig
-%postun -n libsmartcols -p /sbin/ldconfig
-
-%post -n libfdisk -p /sbin/ldconfig
-%postun -n libfdisk -p /sbin/ldconfig
-
 %pre -n uuidd
 getent group uuidd >/dev/null || groupadd -r uuidd
 getent passwd uuidd >/dev/null || \
@@ -529,6 +515,7 @@ fi
 %{_bindir}/colcrt
 %{_bindir}/colrm
 %{_bindir}/column
+%{_bindir}/choom
 %{_bindir}/chmem
 %{_bindir}/dmesg
 %{_bindir}/eject
@@ -582,6 +569,7 @@ fi
 %{_bindir}/wdctl
 %{_bindir}/whereis
 %{_mandir}/man1/cal.1*
+%{_mandir}/man1/choom.1*
 %{_mandir}/man1/chrt.1*
 %{_mandir}/man1/col.1*
 %{_mandir}/man1/colcrt.1*
@@ -634,6 +622,7 @@ fi
 %{_mandir}/man1/wall.1*
 %{_mandir}/man1/whereis.1*
 %{_mandir}/man1/write.1*
+%{_mandir}/man5/adjtime_config.5*
 %{_mandir}/man5/fstab.5*
 %{_mandir}/man5/terminal-colors.d.5*
 %{_mandir}/man8/addpart.8*
@@ -853,7 +842,7 @@ fi
 
 %files -n uuidd
 %{!?_licensedir:%global license %%doc}
-%license Documentation/licenses/COPYING.GPLv2
+%license Documentation/licenses/COPYING.GPL-2.0-or-later
 %{_mandir}/man8/uuidd.8*
 %{_sbindir}/uuidd
 %{_unitdir}/uuidd.*
@@ -864,7 +853,7 @@ fi
 
 %files -n libfdisk
 %{!?_licensedir:%global license %%doc}
-%license Documentation/licenses/COPYING.LGPLv2.1 libfdisk/COPYING
+%license Documentation/licenses/COPYING.LGPL-2.1-or-later libfdisk/COPYING
 %{_libdir}/libfdisk.so.*
 
 %files -n libfdisk-devel
@@ -875,7 +864,7 @@ fi
 
 %files -n libsmartcols
 %{!?_licensedir:%global license %%doc}
-%license Documentation/licenses/COPYING.LGPLv2.1 libsmartcols/COPYING
+%license Documentation/licenses/COPYING.LGPL-2.1-or-later libsmartcols/COPYING
 %{_libdir}/libsmartcols.so.*
 
 %files -n libsmartcols-devel
@@ -886,7 +875,7 @@ fi
 
 %files -n libmount
 %{!?_licensedir:%global license %%doc}
-%license Documentation/licenses/COPYING.LGPLv2.1 libmount/COPYING
+%license Documentation/licenses/COPYING.LGPL-2.1-or-later libmount/COPYING
 %{_libdir}/libmount.so.*
 
 %files -n libmount-devel
@@ -909,7 +898,7 @@ fi
 
 %files -n libuuid
 %{!?_licensedir:%global license %%doc}
-%license Documentation/licenses/COPYING.BSD-3 libuuid/COPYING
+%license Documentation/licenses/COPYING.BSD-3-Clause libuuid/COPYING
 %{_libdir}/libuuid.so.*
 
 %files -n libuuid-devel
@@ -931,10 +920,15 @@ fi
 
 %files -n %{pypkg}-libmount
 %{!?_licensedir:%global license %%doc}
-%license Documentation/licenses/COPYING.LGPLv2.1 libmount/COPYING
+%license Documentation/licenses/COPYING.LGPL-2.1-or-later libmount/COPYING
 %{_libdir}/python*/site-packages/libmount/
 
 %changelog
+* Thu Nov  1 2018 Karel Zak <kzak@redhat.com> - 2.33-0.1
+- Remove ldconfig scriptlet, now done via. transfiletrigger in glibc [James Antill]
+- upgrade to v2.33-rc2
+  http://www.kernel.org/pub/linux/utils/util-linux/v2.33/v2.33-ReleaseNotes
+
 * Mon Jul 16 2018 Karel Zak <kzak@redhat.com> - 2.32.1-1
 - upgrade to v2.32.1
   http://www.kernel.org/pub/linux/utils/util-linux/v2.32/v2.32.1-ReleaseNotes
