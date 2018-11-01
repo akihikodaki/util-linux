@@ -622,7 +622,6 @@ fi
 %{_mandir}/man1/wall.1*
 %{_mandir}/man1/whereis.1*
 %{_mandir}/man1/write.1*
-%{_mandir}/man5/adjtime_config.5*
 %{_mandir}/man5/fstab.5*
 %{_mandir}/man5/terminal-colors.d.5*
 %{_mandir}/man8/addpart.8*
@@ -811,6 +810,7 @@ fi
 %{_mandir}/man8/fdformat.8*
 %{_mandir}/man8/hwclock.8*
 %{_mandir}/man8/clock.8*
+%{_mandir}/man5/adjtime_config.5*
 %{compldir}/fdformat
 %{compldir}/hwclock
 %endif
