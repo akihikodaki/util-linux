@@ -1,14 +1,14 @@
 ### Header
 Summary: A collection of basic system utilities
 Name: util-linux
-Version: 2.33
-Release: 0.1%{?dist}
+Version: 2.33.1
+Release: 1%{?dist}
 License: GPLv2 and GPLv2+ and LGPLv2+ and BSD with advertising and Public Domain
 Group: System Environment/Base
 URL: http://en.wikipedia.org/wiki/Util-linux
 
 ### Macros
-%define upstream_version %{version}-rc2
+%define upstream_version %{version}
 %define upstream_major %(eval echo %{version} | %{__sed} -e 's/\([[:digit:]]*\)\.\([[:digit:]]*\)\.[[:digit:]]*$/\1.\2/')
 
 %define compldir %{_datadir}/bash-completion/completions/
@@ -924,6 +924,10 @@ fi
 %{_libdir}/python*/site-packages/libmount/
 
 %changelog
+* Wed Jan  9 2019 Karel Zak <kzak@redhat.com> - 2.33.1-1
+- upgrade to v2.33.1
+  https://mirrors.edge.kernel.org/pub/linux/utils/util-linux/v2.33/v2.33.1-ReleaseNotes
+
 * Thu Nov  1 2018 Karel Zak <kzak@redhat.com> - 2.33-0.1
 - Remove ldconfig scriptlet, now done via. transfiletrigger in glibc [James Antill]
 - upgrade to v2.33-rc2
