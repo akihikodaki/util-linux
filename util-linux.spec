@@ -2,7 +2,7 @@
 Summary: A collection of basic system utilities
 Name: util-linux
 Version: 2.33.1
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: GPLv2 and GPLv2+ and LGPLv2+ and BSD with advertising and Public Domain
 Group: System Environment/Base
 URL: http://en.wikipedia.org/wiki/Util-linux
@@ -924,6 +924,9 @@ fi
 %{_libdir}/python*/site-packages/libmount/
 
 %changelog
+* Mon Jan 14 2019 Björn Esser <besser82@fedoraproject.org> - 2.33.1-2
+- Rebuilt for libcrypt.so.2 (#1666033)
+
 * Wed Jan  9 2019 Karel Zak <kzak@redhat.com> - 2.33.1-1
 - upgrade to v2.33.1
   https://mirrors.edge.kernel.org/pub/linux/utils/util-linux/v2.33/v2.33.1-ReleaseNotes
