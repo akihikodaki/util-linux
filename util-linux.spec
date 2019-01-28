@@ -4,7 +4,6 @@ Name: util-linux
 Version: 2.33.1
 Release: 2%{?dist}
 License: GPLv2 and GPLv2+ and LGPLv2+ and BSD with advertising and Public Domain
-Group: System Environment/Base
 URL: http://en.wikipedia.org/wiki/Util-linux
 
 ### Macros
@@ -104,7 +103,6 @@ program.
 
 %package -n libfdisk
 Summary: Partitioning library for fdisk-like programs.
-Group: Development/Libraries
 License: LGPLv2+
 
 %description -n libfdisk
@@ -113,7 +111,6 @@ This is library for fdisk-like programs, part of util-linux.
 
 %package -n libfdisk-devel
 Summary:  Partitioning library for fdisk-like programs.
-Group: Development/Libraries
 License: LGPLv2+
 Requires: libfdisk = %{version}-%{release}
 Requires: pkgconfig
@@ -125,7 +122,6 @@ part of util-linux.
 
 %package -n libsmartcols
 Summary: Formatting library for ls-like programs.
-Group: Development/Libraries
 License: LGPLv2+
 
 %description -n libsmartcols
@@ -134,7 +130,6 @@ This is library for ls-like terminal programs, part of util-linux.
 
 %package -n libsmartcols-devel
 Summary: Formatting library for ls-like programs.
-Group: Development/Libraries
 License: LGPLv2+
 Requires: libsmartcols = %{version}-%{release}
 Requires: pkgconfig
@@ -146,7 +141,6 @@ part of util-linux.
 
 %package -n libmount
 Summary: Device mounting library
-Group: Development/Libraries
 License: LGPLv2+
 Requires: libblkid = %{version}-%{release}
 Requires: libuuid = %{version}-%{release}
@@ -158,7 +152,6 @@ This is the device mounting library, part of util-linux.
 
 %package -n libmount-devel
 Summary: Device mounting library
-Group: Development/Libraries
 License: LGPLv2+
 Requires: libmount = %{version}-%{release}
 Requires: pkgconfig
@@ -170,7 +163,6 @@ part of util-linux.
 
 %package -n libblkid
 Summary: Block device ID library
-Group: Development/Libraries
 License: LGPLv2+
 Requires: libuuid = %{version}-%{release}
 Conflicts: filesystem < 3
@@ -182,7 +174,6 @@ This is block device identification library, part of util-linux.
 
 %package -n libblkid-devel
 Summary: Block device ID library
-Group: Development/Libraries
 License: LGPLv2+
 Requires: libblkid = %{version}-%{release}
 Requires: pkgconfig
@@ -194,7 +185,6 @@ part of util-linux.
 
 %package -n libuuid
 Summary: Universally unique ID library
-Group: Development/Libraries
 License: BSD
 Conflicts: filesystem < 3
 
@@ -212,7 +202,6 @@ See also the "uuid" package, which is a separate implementation.
 
 %package -n libuuid-devel
 Summary: Universally unique ID library
-Group: Development/Libraries
 License: BSD
 Requires: libuuid = %{version}-%{release}
 Requires: pkgconfig
@@ -233,7 +222,6 @@ See also the "uuid-devel" package, which is a separate implementation.
 
 %package -n uuidd
 Summary: Helper daemon to guarantee uniqueness of time-based UUIDs
-Group: System Environment/Daemons
 Requires: libuuid = %{version}-%{release}
 License: GPLv2
 Requires: systemd
@@ -249,7 +237,6 @@ SMP systems.
 
 %package -n %{pypkg}-libmount
 Summary: Python bindings for the libmount library
-Group: Development/Libraries
 Requires: libmount = %{version}-%{release}
 License: LGPLv2+
 
@@ -262,7 +249,6 @@ mountinfo, etc) and mount filesystems.
 
 %package -n util-linux-user
 Summary: libuser based util-linux utilities
-Group: System Environment/Base
 Requires: util-linux = %{version}-%{release}
 License: GPLv2
 
