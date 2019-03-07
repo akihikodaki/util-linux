@@ -2,7 +2,7 @@
 Summary: A collection of basic system utilities
 Name: util-linux
 Version: 2.33.1
-Release: 3%{?dist}
+Release: 4%{?dist}
 License: GPLv2 and GPLv2+ and LGPLv2+ and BSD with advertising and Public Domain
 URL: http://en.wikipedia.org/wiki/Util-linux
 
@@ -433,8 +433,6 @@ if [ ! -L /etc/mtab ]; then
 fi
 
 %post -n libblkid
-/sbin/ldconfig
-
 ### Move blkid cache to /run
 [ -d /run/blkid ] || mkdir -p /run/blkid
 for I in /etc/blkid.tab /etc/blkid.tab.old \
@@ -910,6 +908,9 @@ fi
 %{_libdir}/python*/site-packages/libmount/
 
 %changelog
+* Thu Mar 07 2019 Igor Gnatenko <ignatenkobrain@fedoraproject.org> - 2.33.1-4
+- Remove obsolete scriptlets
+
 * Sun Feb 03 2019 Fedora Release Engineering <releng@fedoraproject.org> - 2.33.1-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_30_Mass_Rebuild
 
