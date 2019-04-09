@@ -1,8 +1,8 @@
 ### Header
 Summary: A collection of basic system utilities
 Name: util-linux
-Version: 2.33.1
-Release: 4%{?dist}
+Version: 2.33.2
+Release: 1%{?dist}
 License: GPLv2 and GPLv2+ and LGPLv2+ and BSD with advertising and Public Domain
 URL: http://en.wikipedia.org/wiki/Util-linux
 
@@ -908,6 +908,10 @@ fi
 %{_libdir}/python*/site-packages/libmount/
 
 %changelog
+* Tue Apr  9 2019 Karel Zak <kzak@redhat.com> - 2.33.2-1
+- upgrade to v2.33.2
+  https://mirrors.edge.kernel.org/pub/linux/utils/util-linux/v2.33/v2.33.2-ReleaseNotes
+
 * Thu Mar 07 2019 Igor Gnatenko <ignatenkobrain@fedoraproject.org> - 2.33.1-4
 - Remove obsolete scriptlets
 
