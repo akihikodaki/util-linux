@@ -1,13 +1,13 @@
 ### Header
 Summary: A collection of basic system utilities
 Name: util-linux
-Version: 2.33.2
-Release: 1%{?dist}
+Version: 2.34
+Release: 0.1%{?dist}
 License: GPLv2 and GPLv2+ and LGPLv2+ and BSD with advertising and Public Domain
 URL: http://en.wikipedia.org/wiki/Util-linux
 
 ### Macros
-%define upstream_version %{version}
+%define upstream_version %{version}-rc1
 %define upstream_major %(eval echo %{version} | %{__sed} -e 's/\([[:digit:]]*\)\.\([[:digit:]]*\)\.[[:digit:]]*$/\1.\2/')
 
 %define compldir %{_datadir}/bash-completion/completions/
@@ -35,6 +35,7 @@ BuildRequires: systemd
 Buildrequires: libuser-devel
 BuildRequires: libcap-ng-devel
 BuildRequires: %{pypkg}-devel
+BuildRequires: pcre2-devel
 BuildRequires: gcc
 
 ### Sources
@@ -60,6 +61,9 @@ Provides: eject = 2.1.6
 # rfkill has been merged into util-linux v2.31
 Obsoletes: rfkill <= 0.5
 Provides: rfkill = 0.5
+# hardlink has been merged into util-linux v2.34
+Obsoletes: hardlink <= 1:1.3-9
+Provides: hardlink = 1:1.3-9
 # sulogin, utmpdump merged into util-linux v2.22;
 # last, lastb merged into util-linux v2.24
 Conflicts: sysvinit-tools < 2.88-14
@@ -276,6 +280,7 @@ export DAEMON_LDFLAGS="$SUID_LDFLAGS"
 	--enable-usrdir-path \
 	--enable-write \
 	--enable-raw \
+	--enable-hardlink \
 	--with-python=%{pyver} \
 	--with-systemd \
 	--with-udev \
@@ -508,6 +513,7 @@ fi
 %{_bindir}/findmnt
 %{_bindir}/flock
 %{_bindir}/getopt
+%{_bindir}/hardlink
 %{_bindir}/hexdump
 %{_bindir}/ionice
 %{_bindir}/ipcmk
@@ -565,6 +571,7 @@ fi
 %{_mandir}/man1/fincore.1*
 %{_mandir}/man1/flock.1*
 %{_mandir}/man1/getopt.1*
+%{_mandir}/man1/hardlink.1*
 %{_mandir}/man1/hexdump.1*
 %{_mandir}/man1/ionice.1*
 %{_mandir}/man1/ipcmk.1*
@@ -908,6 +915,11 @@ fi
 %{_libdir}/python*/site-packages/libmount/
 
 %changelog
+* Tue Apr 30 2019 Karel Zak <kzak@redhat.com> - 2.34-0.1
+- add command hardlink(1) (merged into util-linux upstream)
+- upgrade to v2.34-rc1
+  http://www.kernel.org/pub/linux/utils/util-linux/v2.34/v2.34-ReleaseNotes
+
 * Tue Apr  9 2019 Karel Zak <kzak@redhat.com> - 2.33.2-1
 - upgrade to v2.33.2
   https://mirrors.edge.kernel.org/pub/linux/utils/util-linux/v2.33/v2.33.2-ReleaseNotes
