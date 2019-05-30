@@ -2,12 +2,12 @@
 Summary: A collection of basic system utilities
 Name: util-linux
 Version: 2.34
-Release: 0.1%{?dist}
+Release: 0.2%{?dist}
 License: GPLv2 and GPLv2+ and LGPLv2+ and BSD with advertising and Public Domain
 URL: http://en.wikipedia.org/wiki/Util-linux
 
 ### Macros
-%define upstream_version %{version}-rc1
+%define upstream_version %{version}-rc2
 %define upstream_major %(eval echo %{version} | %{__sed} -e 's/\([[:digit:]]*\)\.\([[:digit:]]*\)\.[[:digit:]]*$/\1.\2/')
 
 %define compldir %{_datadir}/bash-completion/completions/
@@ -915,6 +915,9 @@ fi
 %{_libdir}/python*/site-packages/libmount/
 
 %changelog
+* Thu May 30 2019 Karel Zak <kzak@redhat.com> - 2.34-0.2
+- upgrade to v2.34-rc2
+
 * Tue Apr 30 2019 Karel Zak <kzak@redhat.com> - 2.34-0.1
 - add command hardlink(1) (merged into util-linux upstream)
 - upgrade to v2.34-rc1
