@@ -2,7 +2,7 @@
 Summary: A collection of basic system utilities
 Name: util-linux
 Version: 2.34
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: GPLv2 and GPLv2+ and LGPLv2+ and BSD with advertising and Public Domain
 URL: http://en.wikipedia.org/wiki/Util-linux
 
@@ -37,6 +37,9 @@ BuildRequires: libcap-ng-devel
 BuildRequires: %{pypkg}-devel
 BuildRequires: pcre2-devel
 BuildRequires: gcc
+%ifarch ppc64le
+BuildRequires: librtas-devel
+%endif
 
 ### Sources
 Source0: ftp://ftp.kernel.org/pub/linux/utils/util-linux/v%{upstream_major}/util-linux-%{upstream_version}.tar.xz
@@ -915,6 +918,9 @@ fi
 %{_libdir}/python*/site-packages/libmount/
 
 %changelog
+* Wed Jul 24 2019 Karel Zak <kzak@redhat.com> - 2.34-2
+- fix lscpu compilation on ppc
+
 * Fri Jun 14 2019 Karel Zak <kzak@redhat.com> - 2.34-1
 - upgrade to v2.34
 
