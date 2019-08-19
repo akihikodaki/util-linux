@@ -2,7 +2,7 @@
 Summary: A collection of basic system utilities
 Name: util-linux
 Version: 2.34
-Release: 2%{?dist}
+Release: 3%{?dist}
 License: GPLv2 and GPLv2+ and LGPLv2+ and BSD with advertising and Public Domain
 URL: http://en.wikipedia.org/wiki/Util-linux
 
@@ -918,6 +918,9 @@ fi
 %{_libdir}/python*/site-packages/libmount/
 
 %changelog
+* Mon Aug 19 2019 Miro Hrončok <mhroncok@redhat.com> - 2.34-3
+- Rebuilt for Python 3.8
+
 * Wed Jul 24 2019 Karel Zak <kzak@redhat.com> - 2.34-2
 - fix lscpu compilation on ppc
 
