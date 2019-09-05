@@ -2,7 +2,7 @@
 Summary: A collection of basic system utilities
 Name: util-linux
 Version: 2.34
-Release: 3%{?dist}
+Release: 4%{?dist}
 License: GPLv2 and GPLv2+ and LGPLv2+ and BSD with advertising and Public Domain
 URL: http://en.wikipedia.org/wiki/Util-linux
 
@@ -26,6 +26,7 @@ BuildRequires: audit-libs-devel >= 1.0.6
 BuildRequires: gettext-devel
 BuildRequires: libselinux-devel
 BuildRequires: ncurses-devel
+BuildRequires: readline-devel
 BuildRequires: pam-devel
 BuildRequires: zlib-devel
 BuildRequires: popt-devel
@@ -918,6 +919,9 @@ fi
 %{_libdir}/python*/site-packages/libmount/
 
 %changelog
+* Thu Sep 05 2019 Karel Zak <kzak@redhat.com> - 2.34-4
+- add BuildRequires: readline for fdisks
+
 * Mon Aug 19 2019 Miro Hrončok <mhroncok@redhat.com> - 2.34-3
 - Rebuilt for Python 3.8
 
