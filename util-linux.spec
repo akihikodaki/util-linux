@@ -2,7 +2,7 @@
 Summary: A collection of basic system utilities
 Name: util-linux
 Version: 2.34
-Release: 4%{?dist}
+Release: 5%{?dist}
 License: GPLv2 and GPLv2+ and LGPLv2+ and BSD with advertising and Public Domain
 URL: http://en.wikipedia.org/wiki/Util-linux
 
@@ -101,6 +101,9 @@ Requires: libfdisk = %{version}-%{release}
 ###
 # 151635 - makeing /var/log/lastlog
 Patch0: 2.28-login-lastlog-create.patch
+
+# 1751290 - regression: lsblk not showing PKNAME in f31+
+Patch1: lsblk-force-to-print-PKNAME-for-partition.patch
 
 %description
 The util-linux package contains a large variety of low-level system
@@ -919,6 +922,9 @@ fi
 %{_libdir}/python*/site-packages/libmount/
 
 %changelog
+* Thu Sep 12 2019 Karel Zak <kzak@redhat.com> - 2.34-5
+- fix #1751290 - regression: lsblk not showing PKNAME in f31+
+
 * Thu Sep 05 2019 Karel Zak <kzak@redhat.com> - 2.34-4
 - add BuildRequires: readline for fdisks
 
