@@ -2,7 +2,7 @@
 Summary: A collection of basic system utilities
 Name: util-linux
 Version: 2.34
-Release: 5%{?dist}
+Release: 6%{?dist}
 License: GPLv2 and GPLv2+ and LGPLv2+ and BSD with advertising and Public Domain
 URL: http://en.wikipedia.org/wiki/Util-linux
 
@@ -41,6 +41,10 @@ BuildRequires: gcc
 %ifarch ppc64le
 BuildRequires: librtas-devel
 %endif
+BuildRequires: autoconf
+BuildRequires: automake
+BuildRequires: libtool
+BuildRequires: bison
 
 ### Sources
 Source0: ftp://ftp.kernel.org/pub/linux/utils/util-linux/v%{upstream_major}/util-linux-%{upstream_version}.tar.xz
@@ -104,6 +108,8 @@ Patch0: 2.28-login-lastlog-create.patch
 
 # 1751290 - regression: lsblk not showing PKNAME in f31+
 Patch1: lsblk-force-to-print-PKNAME-for-partition.patch
+# https://github.com/systemd/systemd/issues/10872
+Patch2: libmount-improve-mountinfo-reliability.patch
 
 %description
 The util-linux package contains a large variety of low-level system
@@ -272,6 +278,12 @@ chfn and chsh utilities with dependence on libuser
 
 %build
 unset LINGUAS || :
+
+# unfortunately, we did changes to build-system
+./autogen.sh
+
+# we modify .po files by RHEL patches
+rm -f po/stamp*
 
 export CFLAGS="-D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64 $RPM_OPT_FLAGS"
 export SUID_CFLAGS="-fpie"
@@ -922,6 +934,9 @@ fi
 %{_libdir}/python*/site-packages/libmount/
 
 %changelog
+* Fri Sep 13 2019 Karel Zak <kzak@redhat.com> - 2.34-6
+- fix https://github.com/systemd/systemd/issues/10872
+
 * Thu Sep 12 2019 Karel Zak <kzak@redhat.com> - 2.34-5
 - fix #1751290 - regression: lsblk not showing PKNAME in f31+
 
