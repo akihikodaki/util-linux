@@ -1,13 +1,13 @@
 ### Header
 Summary: A collection of basic system utilities
 Name: util-linux
-Version: 2.34
-Release: 6%{?dist}
+Version: 2.35
+Release: 0.1%{?dist}
 License: GPLv2 and GPLv2+ and LGPLv2+ and BSD with advertising and Public Domain
 URL: http://en.wikipedia.org/wiki/Util-linux
 
 ### Macros
-%define upstream_version %{version}
+%define upstream_version %{version}-rc1
 %define upstream_major %(eval echo %{version} | %{__sed} -e 's/\([[:digit:]]*\)\.\([[:digit:]]*\)\.[[:digit:]]*$/\1.\2/')
 
 %define compldir %{_datadir}/bash-completion/completions/
@@ -105,11 +105,6 @@ Requires: libfdisk = %{version}-%{release}
 ###
 # 151635 - makeing /var/log/lastlog
 Patch0: 2.28-login-lastlog-create.patch
-
-# 1751290 - regression: lsblk not showing PKNAME in f31+
-Patch1: lsblk-force-to-print-PKNAME-for-partition.patch
-# https://github.com/systemd/systemd/issues/10872
-Patch2: libmount-improve-mountinfo-reliability.patch
 
 %description
 The util-linux package contains a large variety of low-level system
@@ -564,6 +559,7 @@ fi
 %{_bindir}/rev
 %{_bindir}/script
 %{_bindir}/scriptreplay
+%{_bindir}/scriptlive
 %{_bindir}/setarch
 %{_bindir}/setpriv
 %{_bindir}/setsid
@@ -619,6 +615,7 @@ fi
 %{_mandir}/man1/runuser.1*
 %{_mandir}/man1/script.1*
 %{_mandir}/man1/scriptreplay.1*
+%{_mandir}/man1/scriptlive.1*
 %{_mandir}/man1/setpriv.1*
 %{_mandir}/man1/setsid.1*
 %{_mandir}/man1/setterm.1*
@@ -791,6 +788,7 @@ fi
 %{compldir}/runuser
 %{compldir}/script
 %{compldir}/scriptreplay
+%{compldir}/scriptlive
 %{compldir}/setarch
 %{compldir}/setpriv
 %{compldir}/setsid
@@ -934,6 +932,10 @@ fi
 %{_libdir}/python*/site-packages/libmount/
 
 %changelog
+* Wed Dec 11 2019 Karel Zak <kzak@redhat.com> - 2.35-0.1
+- upgrade to v2.35-rc1
+  https://www.kernel.org/pub/linux/utils/util-linux/v2.35/v2.35-ReleaseNotes
+
 * Fri Sep 13 2019 Karel Zak <kzak@redhat.com> - 2.34-6
 - fix https://github.com/systemd/systemd/issues/10872
 
