@@ -2,7 +2,7 @@
 Summary: A collection of basic system utilities
 Name: util-linux
 Version: 2.35
-Release: 0.1%{?dist}
+Release: 0.2%{?dist}
 License: GPLv2 and GPLv2+ and LGPLv2+ and BSD with advertising and Public Domain
 URL: http://en.wikipedia.org/wiki/Util-linux
 
@@ -105,6 +105,13 @@ Requires: libfdisk = %{version}-%{release}
 ###
 # 151635 - makeing /var/log/lastlog
 Patch0: 2.28-login-lastlog-create.patch
+
+# Revert https://github.com/karelzak/util-linux/commit/7ef86a0
+# to fix boot of installer and live images as optical media:
+# https://bugzilla.redhat.com/show_bug.cgi?id=1783066
+# Other reversion is needed for this revert to be clean
+Patch1: 0001-Revert-tests-add-missing-ts_check_prog-xz.patch
+Patch2: 0002-Revert-libblkid-improve-handling-of-ISO-files-with-p.patch
 
 %description
 The util-linux package contains a large variety of low-level system
@@ -932,6 +939,9 @@ fi
 %{_libdir}/python*/site-packages/libmount/
 
 %changelog
+* Thu Dec 12 2019 Adam Williamson <awilliam@redhat.com> - 2.35-0.2
+- Revert upstream commit 7ef86a0 to fix RHBZ #1783066
+
 * Wed Dec 11 2019 Karel Zak <kzak@redhat.com> - 2.35-0.1
 - upgrade to v2.35-rc1
   https://www.kernel.org/pub/linux/utils/util-linux/v2.35/v2.35-ReleaseNotes

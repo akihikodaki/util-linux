@@ -1,0 +1,39 @@
+From 908a490fa475c643f275ed1f4e3060ae17f51794 Mon Sep 17 00:00:00 2001
+From: Adam Williamson <awilliam@redhat.com>
+Date: Thu, 12 Dec 2019 17:19:56 -0800
+Subject: [PATCH 1/2] Revert "tests: add missing 'ts_check_prog xz'"
+
+This reverts commit a72a19865d72481c2dd40110919863121cc644bd.
+---
+ tests/ts/blkid/iso-partitions | 1 -
+ tests/ts/hardlink/options     | 2 --
+ 2 files changed, 3 deletions(-)
+
+diff --git a/tests/ts/blkid/iso-partitions b/tests/ts/blkid/iso-partitions
+index 4aaa164f7..02fdd4e50 100755
+--- a/tests/ts/blkid/iso-partitions
++++ b/tests/ts/blkid/iso-partitions
+@@ -25,7 +25,6 @@ ts_init "$*"
+ 
+ ts_check_test_command "$TS_CMD_BLKID"
+ ts_check_test_command "$TS_CMD_PARTX"
+-ts_check_prog xz
+ 
+ ts_skip_nonroot
+ 
+diff --git a/tests/ts/hardlink/options b/tests/ts/hardlink/options
+index bb445caf4..16d26c4ac 100755
+--- a/tests/ts/hardlink/options
++++ b/tests/ts/hardlink/options
+@@ -23,8 +23,6 @@ TS_DESC="options"
+ ts_init "$*"
+ 
+ ts_check_test_command "$TS_CMD_HARDLINK"
+-ts_check_prog xz
+-ts_check_prog tar
+ 
+ SRCDIR="$TS_OUTDIR/testdir1"
+ 
+-- 
+2.24.0
+
