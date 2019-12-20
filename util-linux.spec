@@ -2,12 +2,12 @@
 Summary: A collection of basic system utilities
 Name: util-linux
 Version: 2.35
-Release: 0.2%{?dist}
+Release: 0.3%{?dist}
 License: GPLv2 and GPLv2+ and LGPLv2+ and BSD with advertising and Public Domain
 URL: http://en.wikipedia.org/wiki/Util-linux
 
 ### Macros
-%define upstream_version %{version}-rc1
+%define upstream_version %{version}-rc1-20-63f8
 %define upstream_major %(eval echo %{version} | %{__sed} -e 's/\([[:digit:]]*\)\.\([[:digit:]]*\)\.[[:digit:]]*$/\1.\2/')
 
 %define compldir %{_datadir}/bash-completion/completions/
@@ -105,13 +105,6 @@ Requires: libfdisk = %{version}-%{release}
 ###
 # 151635 - makeing /var/log/lastlog
 Patch0: 2.28-login-lastlog-create.patch
-
-# Revert https://github.com/karelzak/util-linux/commit/7ef86a0
-# to fix boot of installer and live images as optical media:
-# https://bugzilla.redhat.com/show_bug.cgi?id=1783066
-# Other reversion is needed for this revert to be clean
-Patch1: 0001-Revert-tests-add-missing-ts_check_prog-xz.patch
-Patch2: 0002-Revert-libblkid-improve-handling-of-ISO-files-with-p.patch
 
 %description
 The util-linux package contains a large variety of low-level system
@@ -939,6 +932,10 @@ fi
 %{_libdir}/python*/site-packages/libmount/
 
 %changelog
+* Fri Dec 20 2019 Karel Zak <kzak@redhat.com> - 2.35-0.3
+- upgrade to the upstream git snapshot (v2.35-rc1-20-g63f8c66af)
+- fix #1783066 - Fedora-Rawhide images do not boot
+
 * Thu Dec 12 2019 Adam Williamson <awilliam@redhat.com> - 2.35-0.2
 - Revert upstream commit 7ef86a0 to fix RHBZ #1783066
 
