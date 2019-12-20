@@ -2,7 +2,7 @@
 Summary: A collection of basic system utilities
 Name: util-linux
 Version: 2.35
-Release: 0.3%{?dist}
+Release: 0.4%{?dist}
 License: GPLv2 and GPLv2+ and LGPLv2+ and BSD with advertising and Public Domain
 URL: http://en.wikipedia.org/wiki/Util-linux
 
@@ -105,6 +105,10 @@ Requires: libfdisk = %{version}-%{release}
 ###
 # 151635 - makeing /var/log/lastlog
 Patch0: 2.28-login-lastlog-create.patch
+
+# 1784536 - Segfaults in agetty during Cloud image testing
+Patch1: 0001-agetty-keep-freed-issue-file-pointer-zeroized.patch
+
 
 %description
 The util-linux package contains a large variety of low-level system
@@ -932,6 +936,9 @@ fi
 %{_libdir}/python*/site-packages/libmount/
 
 %changelog
+* Fri Dec 20 2019 Karel Zak <kzak@redhat.com> - 2.35-0.4
+- fix #1784536 - Segfaults in agetty during Cloud image testing
+
 * Fri Dec 20 2019 Karel Zak <kzak@redhat.com> - 2.35-0.3
 - upgrade to the upstream git snapshot (v2.35-rc1-20-g63f8c66af)
 - fix #1783066 - Fedora-Rawhide images do not boot
