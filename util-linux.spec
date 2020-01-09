@@ -2,12 +2,12 @@
 Summary: A collection of basic system utilities
 Name: util-linux
 Version: 2.35
-Release: 0.4%{?dist}
+Release: 0.5%{?dist}
 License: GPLv2 and GPLv2+ and LGPLv2+ and BSD with advertising and Public Domain
 URL: http://en.wikipedia.org/wiki/Util-linux
 
 ### Macros
-%define upstream_version %{version}-rc1-20-63f8
+%define upstream_version %{version}-rc2
 %define upstream_major %(eval echo %{version} | %{__sed} -e 's/\([[:digit:]]*\)\.\([[:digit:]]*\)\.[[:digit:]]*$/\1.\2/')
 
 %define compldir %{_datadir}/bash-completion/completions/
@@ -105,10 +105,6 @@ Requires: libfdisk = %{version}-%{release}
 ###
 # 151635 - makeing /var/log/lastlog
 Patch0: 2.28-login-lastlog-create.patch
-
-# 1784536 - Segfaults in agetty during Cloud image testing
-Patch1: 0001-agetty-keep-freed-issue-file-pointer-zeroized.patch
-
 
 %description
 The util-linux package contains a large variety of low-level system
@@ -936,6 +932,9 @@ fi
 %{_libdir}/python*/site-packages/libmount/
 
 %changelog
+* Thu Jan 9 2020 Karel Zak <kzak@redhat.com> - 2.35-0.5
+- upgrade to v2.35-rc2
+
 * Fri Dec 20 2019 Karel Zak <kzak@redhat.com> - 2.35-0.4
 - fix #1784536 - Segfaults in agetty during Cloud image testing
 
