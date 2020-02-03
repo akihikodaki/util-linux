@@ -1,8 +1,8 @@
 ### Header
 Summary: A collection of basic system utilities
 Name: util-linux
-Version: 2.35
-Release: 2%{?dist}
+Version: 2.35.1
+Release: 1%{?dist}
 License: GPLv2 and GPLv2+ and LGPLv2+ and BSD with advertising and Public Domain
 URL: http://en.wikipedia.org/wiki/Util-linux
 
@@ -41,10 +41,12 @@ BuildRequires: gcc
 %ifarch ppc64le
 BuildRequires: librtas-devel
 %endif
-BuildRequires: autoconf
-BuildRequires: automake
-BuildRequires: libtool
-BuildRequires: bison
+
+# enable if make changes to build-system
+#BuildRequires: autoconf
+#BuildRequires: automake
+#BuildRequires: libtool
+#BuildRequires: bison
 
 ### Sources
 Source0: ftp://ftp.kernel.org/pub/linux/utils/util-linux/v%{upstream_major}/util-linux-%{upstream_version}.tar.xz
@@ -273,12 +275,6 @@ chfn and chsh utilities with dependence on libuser
 
 %build
 unset LINGUAS || :
-
-# unfortunately, we did changes to build-system
-./autogen.sh
-
-# we modify .po files by RHEL patches
-rm -f po/stamp*
 
 export CFLAGS="-D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64 $RPM_OPT_FLAGS"
 export SUID_CFLAGS="-fpie"
@@ -932,6 +928,9 @@ fi
 %{_libdir}/python*/site-packages/libmount/
 
 %changelog
+* Mon Feb 03 2020 Karel Zak <kzak@redhat.com> - 2.35.1-1
+- upgrade to upstream bug fix release 2.35.1
+
 * Fri Jan 31 2020 Fedora Release Engineering <releng@fedoraproject.org> - 2.35-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
 
