@@ -2,7 +2,7 @@
 Summary: A collection of basic system utilities
 Name: util-linux
 Version: 2.35.1
-Release: 2%{?dist}
+Release: 3%{?dist}
 License: GPLv2 and GPLv2+ and LGPLv2+ and BSD with advertising and Public Domain
 URL: http://en.wikipedia.org/wiki/Util-linux
 
@@ -109,6 +109,8 @@ Requires: libfdisk = %{version}-%{release}
 Patch0: 2.28-login-lastlog-create.patch
 # https://github.com/karelzak/util-linux/issues/949
 Patch1: 0001-libfdisk-script-accept-sector-size-ignore-unknown-he.patch
+# https://github.com/karelzak/util-linux/issues/948
+Patch2: 0002-fstrim-do-not-use-Protect-setting-in-systemd-service.patch
 
 %description
 The util-linux package contains a large variety of low-level system
@@ -930,6 +932,9 @@ fi
 %{_libdir}/python*/site-packages/libmount/
 
 %changelog
+* Tue Feb 04 2020 Karel Zak <kzak@redhat.com> - 2.35.1-3
+- fix fstrim.service (util-linux github #948)
+
 * Tue Feb 04 2020 Karel Zak <kzak@redhat.com> - 2.35.1-2
 - fix sfdisk dump issue (util-linux github #949)
 
