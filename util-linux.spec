@@ -2,7 +2,7 @@
 Summary: A collection of basic system utilities
 Name: util-linux
 Version: 2.35.1
-Release: 3%{?dist}
+Release: 4%{?dist}
 License: GPLv2 and GPLv2+ and LGPLv2+ and BSD with advertising and Public Domain
 URL: http://en.wikipedia.org/wiki/Util-linux
 
@@ -483,6 +483,8 @@ fi
 %postun -n uuidd
 %systemd_postun_with_restart uuidd.service
 
+%triggerpostun -- fedora-release < 32
+%systemd_post fstrim.timer
 
 %files -f %{name}.files
 %doc README NEWS AUTHORS
@@ -932,6 +934,9 @@ fi
 %{_libdir}/python*/site-packages/libmount/
 
 %changelog
+* Thu Feb 06 2020 Karel Zak <kzak@redhat.com> - 2.35.1-4
+- add triggerpostun for fstrim.timer (#1785041, FESCo #2309)
+
 * Tue Feb 04 2020 Karel Zak <kzak@redhat.com> - 2.35.1-3
 - fix fstrim.service (util-linux github #948)
 
