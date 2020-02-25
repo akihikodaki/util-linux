@@ -2,7 +2,7 @@
 Summary: A collection of basic system utilities
 Name: util-linux
 Version: 2.35.1
-Release: 4%{?dist}
+Release: 5%{?dist}
 License: GPLv2 and GPLv2+ and LGPLv2+ and BSD with advertising and Public Domain
 URL: http://en.wikipedia.org/wiki/Util-linux
 
@@ -111,6 +111,8 @@ Patch0: 2.28-login-lastlog-create.patch
 Patch1: 0001-libfdisk-script-accept-sector-size-ignore-unknown-he.patch
 # https://github.com/karelzak/util-linux/issues/948
 Patch2: 0002-fstrim-do-not-use-Protect-setting-in-systemd-service.patch
+# https://github.com/ibm-s390-tools/s390-tools/issues/80
+Patch3: 0003-lsblk-fix-P-regression-from-v2.34.patch
 
 %description
 The util-linux package contains a large variety of low-level system
@@ -934,6 +936,9 @@ fi
 %{_libdir}/python*/site-packages/libmount/
 
 %changelog
+* Tue Feb 25 2020 Karel Zak <kzak@redhat.com> - 2.35.1-5
+- fix lsblk -P output for RAIDs, etc.
+
 * Thu Feb 06 2020 Karel Zak <kzak@redhat.com> - 2.35.1-4
 - add triggerpostun for fstrim.timer (#1785041, FESCo #2309)
 
