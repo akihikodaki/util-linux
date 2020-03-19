@@ -2,7 +2,7 @@
 Summary: A collection of basic system utilities
 Name: util-linux
 Version: 2.35.1
-Release: 5%{?dist}
+Release: 6%{?dist}
 License: GPLv2 and GPLv2+ and LGPLv2+ and BSD with advertising and Public Domain
 URL: http://en.wikipedia.org/wiki/Util-linux
 
@@ -485,7 +485,7 @@ fi
 %postun -n uuidd
 %systemd_postun_with_restart uuidd.service
 
-%triggerpostun -- fedora-release < 32
+%triggerpostun -- util-linux < 2.35
 %systemd_post fstrim.timer
 
 %files -f %{name}.files
@@ -936,6 +936,9 @@ fi
 %{_libdir}/python*/site-packages/libmount/
 
 %changelog
+* Thu Mar 19 2020 Karel Zak <kzak@redhat.com> - 2.35.1-6
+- fix #1811506 (triggerpostun)
+
 * Tue Feb 25 2020 Karel Zak <kzak@redhat.com> - 2.35.1-5
 - fix lsblk -P output for RAIDs, etc.
 
