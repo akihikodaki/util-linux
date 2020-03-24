@@ -2,7 +2,7 @@
 Summary: A collection of basic system utilities
 Name: util-linux
 Version: 2.35.1
-Release: 6%{?dist}
+Release: 7%{?dist}
 License: GPLv2 and GPLv2+ and LGPLv2+ and BSD with advertising and Public Domain
 URL: http://en.wikipedia.org/wiki/Util-linux
 
@@ -485,8 +485,11 @@ fi
 %postun -n uuidd
 %systemd_postun_with_restart uuidd.service
 
-%triggerpostun -- util-linux < 2.35
-%systemd_post fstrim.timer
+%triggerpostun -- util-linux < 2.35.1-7
+if [ $1 -gt 1 ] && [ -x /usr/bin/systemctl ] ; then
+        # Enable fstrim.timer for upgrades to F32
+        /usr/bin/systemctl --no-reload preset fstrim.timer || :
+fi
 
 %files -f %{name}.files
 %doc README NEWS AUTHORS
@@ -936,6 +939,9 @@ fi
 %{_libdir}/python*/site-packages/libmount/
 
 %changelog
+* Tue Mar 24 2020 Kalev Lember <klember@redhat.com> - 2.35.1-7
+- Another attempt at enabling fstrim.timer on F32 upgrades (#1811506)
+
 * Thu Mar 19 2020 Karel Zak <kzak@redhat.com> - 2.35.1-6
 - fix #1811506 (triggerpostun)
 
