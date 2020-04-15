@@ -2,7 +2,7 @@
 Summary: A collection of basic system utilities
 Name: util-linux
 Version: 2.35.1
-Release: 8%{?dist}
+Release: 9%{?dist}
 License: GPLv2 and GPLv2+ and LGPLv2+ and BSD with advertising and Public Domain
 URL: http://en.wikipedia.org/wiki/Util-linux
 
@@ -941,7 +941,10 @@ fi
 %{_libdir}/python*/site-packages/libmount/
 
 %changelog
-* Wed Apr 15 2020 Kalev Lember <klember@redhat.com> - 2.35.1-8
+* Wed Apr 15 2020 Karel Zak <kzak@redhat.com> - 2.35.1-9
+- fix copy & past bug in specfile changelog
+
+* Wed Apr 15 2020 Karel Zak <kzak@redhat.com> - 2.35.1-8
 - fix #1822226 - remove pam_console dependency
 - fix #1823463 - hwclock unable to set system time
 
