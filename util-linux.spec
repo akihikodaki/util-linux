@@ -2,7 +2,7 @@
 Summary: A collection of basic system utilities
 Name: util-linux
 Version: 2.35.1
-Release: 7%{?dist}
+Release: 8%{?dist}
 License: GPLv2 and GPLv2+ and LGPLv2+ and BSD with advertising and Public Domain
 URL: http://en.wikipedia.org/wiki/Util-linux
 
@@ -113,6 +113,8 @@ Patch1: 0001-libfdisk-script-accept-sector-size-ignore-unknown-he.patch
 Patch2: 0002-fstrim-do-not-use-Protect-setting-in-systemd-service.patch
 # https://github.com/ibm-s390-tools/s390-tools/issues/80
 Patch3: 0003-lsblk-fix-P-regression-from-v2.34.patch
+# 1823463 - hwclock unable to set system time
+Patch4: 0004-hwclock-make-glibc-2.31-compatible.patch
 
 %description
 The util-linux package contains a large variety of low-level system
@@ -939,6 +941,10 @@ fi
 %{_libdir}/python*/site-packages/libmount/
 
 %changelog
+* Wed Apr 15 2020 Kalev Lember <klember@redhat.com> - 2.35.1-8
+- fix #1822226 - remove pam_console dependency
+- fix #1823463 - hwclock unable to set system time
+
 * Tue Mar 24 2020 Kalev Lember <klember@redhat.com> - 2.35.1-7
 - Another attempt at enabling fstrim.timer on F32 upgrades (#1811506)
 
