@@ -1,8 +1,8 @@
 ### Header
 Summary: A collection of basic system utilities
 Name: util-linux
-Version: 2.35.1
-Release: 9%{?dist}
+Version: 2.35.2
+Release: 1%{?dist}
 License: GPLv2 and GPLv2+ and LGPLv2+ and BSD with advertising and Public Domain
 URL: http://en.wikipedia.org/wiki/Util-linux
 
@@ -107,14 +107,6 @@ Requires: libfdisk = %{version}-%{release}
 ###
 # 151635 - makeing /var/log/lastlog
 Patch0: 2.28-login-lastlog-create.patch
-# https://github.com/karelzak/util-linux/issues/949
-Patch1: 0001-libfdisk-script-accept-sector-size-ignore-unknown-he.patch
-# https://github.com/karelzak/util-linux/issues/948
-Patch2: 0002-fstrim-do-not-use-Protect-setting-in-systemd-service.patch
-# https://github.com/ibm-s390-tools/s390-tools/issues/80
-Patch3: 0003-lsblk-fix-P-regression-from-v2.34.patch
-# 1823463 - hwclock unable to set system time
-Patch4: 0004-hwclock-make-glibc-2.31-compatible.patch
 
 %description
 The util-linux package contains a large variety of low-level system
@@ -941,6 +933,10 @@ fi
 %{_libdir}/python*/site-packages/libmount/
 
 %changelog
+* Wed May 20 2020 Karel Zak <kzak@redhat.com> - 2.35.2-1
+- upgrade to upstream bug fix release 2.35.2
+  https://www.kernel.org/pub/linux/utils/util-linux/v2.35/v2.35.2-ReleaseNotes
+
 * Wed Apr 15 2020 Karel Zak <kzak@redhat.com> - 2.35.1-9
 - fix copy & past bug in specfile changelog
 
