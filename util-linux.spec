@@ -2,7 +2,7 @@
 Summary: A collection of basic system utilities
 Name: util-linux
 Version: 2.35.2
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: GPLv2 and GPLv2+ and LGPLv2+ and BSD with advertising and Public Domain
 URL: http://en.wikipedia.org/wiki/Util-linux
 
@@ -933,6 +933,9 @@ fi
 %{_libdir}/python*/site-packages/libmount/
 
 %changelog
+* Tue May 26 2020 Miro Hrončok <mhroncok@redhat.com> - 2.35.2-2
+- Rebuilt for Python 3.9
+
 * Wed May 20 2020 Karel Zak <kzak@redhat.com> - 2.35.2-1
 - upgrade to upstream bug fix release 2.35.2
   https://www.kernel.org/pub/linux/utils/util-linux/v2.35/v2.35.2-ReleaseNotes
