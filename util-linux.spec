@@ -12,14 +12,8 @@ URL: http://en.wikipedia.org/wiki/Util-linux
 
 %define compldir %{_datadir}/bash-completion/completions/
 
-%if 0%{?fedora} >= 23
 %define pypkg python3
 %define pyver 3
-%else
-%define pypkg python
-%define pyver 2
-%endif
-
 
 ### Dependencies
 BuildRequires: audit-libs-devel >= 1.0.6
