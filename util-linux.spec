@@ -1,8 +1,8 @@
 ### Header
 Summary: A collection of basic system utilities
 Name: util-linux
-Version: 2.35.2
-Release: 2%{?dist}
+Version: 2.36
+Release: 1%{?dist}
 License: GPLv2 and GPLv2+ and LGPLv2+ and BSD with advertising and Public Domain
 URL: http://en.wikipedia.org/wiki/Util-linux
 
@@ -100,7 +100,7 @@ Requires: libfdisk = %{version}-%{release}
 ### Ready for upstream?
 ###
 # 151635 - makeing /var/log/lastlog
-Patch0: 2.28-login-lastlog-create.patch
+Patch0: 2.36-login-lastlog-create.patch
 
 %description
 The util-linux package contains a large variety of low-level system
@@ -508,13 +508,13 @@ fi
 %{_unitdir}/fstrim.*
 
 %{_bindir}/cal
+%{_bindir}/chmem
+%{_bindir}/choom
 %{_bindir}/chrt
 %{_bindir}/col
 %{_bindir}/colcrt
 %{_bindir}/colrm
 %{_bindir}/column
-%{_bindir}/choom
-%{_bindir}/chmem
 %{_bindir}/dmesg
 %{_bindir}/eject
 %{_bindir}/fallocate
@@ -528,6 +528,7 @@ fi
 %{_bindir}/ipcmk
 %{_bindir}/ipcrm
 %{_bindir}/ipcs
+%{_bindir}/irqtop
 %{_bindir}/isosize
 %{_bindir}/kill
 %{_bindir}/last
@@ -537,6 +538,7 @@ fi
 %{_bindir}/lsblk
 %{_bindir}/lscpu
 %{_bindir}/lsipc
+%{_bindir}/lsirq
 %{_bindir}/lslocks
 %{_bindir}/lslogins
 %{_bindir}/lsmem
@@ -553,8 +555,8 @@ fi
 %{_bindir}/renice
 %{_bindir}/rev
 %{_bindir}/script
-%{_bindir}/scriptreplay
 %{_bindir}/scriptlive
+%{_bindir}/scriptreplay
 %{_bindir}/setarch
 %{_bindir}/setpriv
 %{_bindir}/setsid
@@ -587,6 +589,7 @@ fi
 %{_mandir}/man1/ipcmk.1*
 %{_mandir}/man1/ipcrm.1*
 %{_mandir}/man1/ipcs.1*
+%{_mandir}/man1/irqtop.1*
 %{_mandir}/man1/kill.1*
 %{_mandir}/man1/last.1*
 %{_mandir}/man1/lastb.1*
@@ -595,6 +598,7 @@ fi
 %{_mandir}/man1/look.1*
 %{_mandir}/man1/lscpu.1*
 %{_mandir}/man1/lsipc.1*
+%{_mandir}/man1/lsirq.1*
 %{_mandir}/man1/lslogins.1*
 %{_mandir}/man1/lsmem.1*
 %{_mandir}/man1/mcookie.1*
@@ -609,8 +613,8 @@ fi
 %{_mandir}/man1/rev.1*
 %{_mandir}/man1/runuser.1*
 %{_mandir}/man1/script.1*
-%{_mandir}/man1/scriptreplay.1*
 %{_mandir}/man1/scriptlive.1*
+%{_mandir}/man1/scriptreplay.1*
 %{_mandir}/man1/setpriv.1*
 %{_mandir}/man1/setsid.1*
 %{_mandir}/man1/setterm.1*
@@ -746,6 +750,7 @@ fi
 %{compldir}/ipcmk
 %{compldir}/ipcrm
 %{compldir}/ipcs
+%{compldir}/irqtop
 %{compldir}/isosize
 %{compldir}/last
 %{compldir}/ldattach
@@ -755,6 +760,7 @@ fi
 %{compldir}/lsblk
 %{compldir}/lscpu
 %{compldir}/lsipc
+%{compldir}/lsirq
 %{compldir}/lslocks
 %{compldir}/lslogins
 %{compldir}/lsmem
@@ -782,8 +788,8 @@ fi
 %{compldir}/rtcwake
 %{compldir}/runuser
 %{compldir}/script
-%{compldir}/scriptreplay
 %{compldir}/scriptlive
+%{compldir}/scriptreplay
 %{compldir}/setarch
 %{compldir}/setpriv
 %{compldir}/setsid
@@ -927,6 +933,11 @@ fi
 %{_libdir}/python*/site-packages/libmount/
 
 %changelog
+* Thu Jul 23 2020 Karel Zak <kzak@redhat.com> - 2.36-1
+- upgrade to upstream release v2.36
+  https://www.kernel.org/pub/linux/utils/util-linux/v2.36/v2.36-ReleaseNotes
+- add irqtop and lsirq commands
+
 * Tue May 26 2020 Miro Hrončok <mhroncok@redhat.com> - 2.35.2-2
 - Rebuilt for Python 3.9
 
