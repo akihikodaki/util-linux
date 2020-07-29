@@ -2,7 +2,7 @@
 Summary: A collection of basic system utilities
 Name: util-linux
 Version: 2.36
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: GPLv2 and GPLv2+ and LGPLv2+ and BSD with advertising and Public Domain
 URL: http://en.wikipedia.org/wiki/Util-linux
 
@@ -933,6 +933,9 @@ fi
 %{_libdir}/python*/site-packages/libmount/
 
 %changelog
+* Wed Jul 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 2.36-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
+
 * Thu Jul 23 2020 Karel Zak <kzak@redhat.com> - 2.36-1
 - upgrade to upstream release v2.36
   https://www.kernel.org/pub/linux/utils/util-linux/v2.36/v2.36-ReleaseNotes
