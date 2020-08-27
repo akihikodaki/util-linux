@@ -32,6 +32,9 @@ BuildRequires: libcap-ng-devel
 BuildRequires: %{pypkg}-devel
 BuildRequires: pcre2-devel
 BuildRequires: gcc
+BuildRequires: autoconf
+BuildRequires: automake
+BuildRequires: libtool
 %ifarch ppc64le
 BuildRequires: librtas-devel
 %endif
@@ -101,9 +104,11 @@ Requires: libfdisk = %{version}-%{release}
 ###
 # 151635 - makeing /var/log/lastlog
 Patch0: 2.36-login-lastlog-create.patch
+# 1860461 - sfdisk regression creating simple 3 partition MBR disk
+Patch1: 0001-libfdisk-fix-last-free-sector-detection-if-partition.patch
 # https://github.com/karelzak/util-linux/commit/57898c3a7ee8fc5933cddd4526bb3980bef85a02
 # The workaround is unnecessary on Fedora with kernel >= 5.8.
-Patch1: libmount-remove-read-mountinfo-workaround.patch
+Patch2: 0002-libmount-remove-read-mountinfo-workaround.patch
 
 %description
 The util-linux package contains a large variety of low-level system
@@ -938,6 +943,7 @@ fi
 %changelog
 * Tue Sep 01 2020 Karel Zak <kzak@redhat.com> - 2.36-3
 - remove mountinfo workaround (unnecessary for kernel 5.8)
+- fix #1860461 - sfdisk regression creating simple 3 partition MBR disk
 
 * Wed Jul 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 2.36-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
