@@ -2,7 +2,7 @@
 Summary: A collection of basic system utilities
 Name: util-linux
 Version: 2.36
-Release: 2%{?dist}
+Release: 3%{?dist}
 License: GPLv2 and GPLv2+ and LGPLv2+ and BSD with advertising and Public Domain
 URL: http://en.wikipedia.org/wiki/Util-linux
 
@@ -101,6 +101,9 @@ Requires: libfdisk = %{version}-%{release}
 ###
 # 151635 - makeing /var/log/lastlog
 Patch0: 2.36-login-lastlog-create.patch
+# https://github.com/karelzak/util-linux/commit/57898c3a7ee8fc5933cddd4526bb3980bef85a02
+# The workaround is unnecessary on Fedora with kernel >= 5.8.
+Patch1: libmount-remove-read-mountinfo-workaround.patch
 
 %description
 The util-linux package contains a large variety of low-level system
@@ -933,6 +936,9 @@ fi
 %{_libdir}/python*/site-packages/libmount/
 
 %changelog
+* Tue Sep 01 2020 Karel Zak <kzak@redhat.com> - 2.36-3
+- remove mountinfo workaround (unnecessary for kernel 5.8)
+
 * Wed Jul 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 2.36-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
 
