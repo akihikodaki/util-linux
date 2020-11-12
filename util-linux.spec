@@ -2,7 +2,7 @@
 Summary: A collection of basic system utilities
 Name: util-linux
 Version: 2.36
-Release: 3%{?dist}
+Release: 4%{?dist}
 License: GPLv2 and GPLv2+ and LGPLv2+ and BSD with advertising and Public Domain
 URL: http://en.wikipedia.org/wiki/Util-linux
 
@@ -306,7 +306,7 @@ export DAEMON_LDFLAGS="$SUID_LDFLAGS"
 %endif
 
 # build util-linux
-make %{?_smp_mflags}
+%make_build
 
 %check
 #to run tests use "--with check"
@@ -326,7 +326,7 @@ touch ${RPM_BUILD_ROOT}/var/log/lastlog
 chmod 0644 ${RPM_BUILD_ROOT}/var/log/lastlog
 
 # install util-linux
-make install DESTDIR=${RPM_BUILD_ROOT}
+%make_install
 
 # raw
 echo '.so man8/raw.8' > $RPM_BUILD_ROOT%{_mandir}/man8/rawdevices.8
@@ -941,6 +941,10 @@ fi
 %{_libdir}/python*/site-packages/libmount/
 
 %changelog
+* Tue Jul 14 2020 Tom Stellard <tstellar@redhat.com> - 2.36-4
+- Use make macros
+- https://fedoraproject.org/wiki/Changes/UseMakeBuildInstallMacro
+
 * Tue Sep 01 2020 Karel Zak <kzak@redhat.com> - 2.36-3
 - remove mountinfo workaround (unnecessary for kernel 5.8)
 - fix #1860461 - sfdisk regression creating simple 3 partition MBR disk
