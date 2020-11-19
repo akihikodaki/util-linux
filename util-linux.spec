@@ -2,7 +2,7 @@
 Summary: A collection of basic system utilities
 Name: util-linux
 Version: 2.36.1
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: GPLv2 and GPLv2+ and LGPLv2+ and BSD with advertising and Public Domain
 URL: http://en.wikipedia.org/wiki/Util-linux
 
@@ -103,10 +103,12 @@ Requires: libfdisk = %{version}-%{release}
 ### Ready for upstream?
 ###
 # 151635 - makeing /var/log/lastlog
-Patch0: 2.36-login-lastlog-create.patch
+Patch0: login-lastlog-create.patch
 # https://github.com/karelzak/util-linux/commit/57898c3a7ee8fc5933cddd4526bb3980bef85a02
 # The workaround is unnecessary on Fedora with kernel >= 5.8.
-Patch1: 0002-libmount-remove-read-mountinfo-workaround.patch
+Patch1: libmount-remove-read-mountinfo-workaround.patch
+# usptream patch, https://github.com/karelzak/util-linux/issues/1193
+Patch2: libmount-don-t-use-symfollow-for-helpers-on-user-mou.patch
 
 %description
 The util-linux package contains a large variety of low-level system
@@ -939,6 +941,11 @@ fi
 %{_libdir}/python*/site-packages/libmount/
 
 %changelog
+* Thu Nov 19 2020 Karel Zak <kzak@redhat.com> - 2.36.1-2
+- remove unused patches
+- remove versions and seq.numbers from patch names
+- fix mount "symfollow" issue (upstream patch)
+
 * Mon Nov 16 2020 Karel Zak <kzak@redhat.com> - 2.36.1-1
 - upgrade to stable upstream 2.36.1
   https://www.kernel.org/pub/linux/utils/util-linux/v2.36/v2.36.1-ReleaseNotes
