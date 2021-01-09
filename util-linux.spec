@@ -16,6 +16,7 @@ URL: http://en.wikipedia.org/wiki/Util-linux
 %define pyver 3
 
 ### Dependencies
+BuildRequires: make
 BuildRequires: audit-libs-devel >= 1.0.6
 BuildRequires: gettext-devel
 BuildRequires: libselinux-devel
