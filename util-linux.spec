@@ -1,10 +1,10 @@
 ### Header
-Summary: A collection of basic system utilities
+Summary: Collection of basic system utilities
 Name: util-linux
 Version: 2.36.2
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: GPLv2 and GPLv2+ and LGPLv2+ and BSD with advertising and Public Domain
-URL: http://en.wikipedia.org/wiki/Util-linux
+URL: https://en.wikipedia.org/wiki/Util-linux
 
 ### Macros
 %define upstream_version %{version}
@@ -47,7 +47,7 @@ BuildRequires: librtas-devel
 #BuildRequires: bison
 
 ### Sources
-Source0: ftp://ftp.kernel.org/pub/linux/utils/util-linux/v%{upstream_major}/util-linux-%{upstream_version}.tar.xz
+Source0: https://www.kernel.org/pub/linux/utils/util-linux/v%{upstream_major}/util-linux-%{upstream_version}.tar.xz
 Source1: util-linux-login.pamd
 Source2: util-linux-remote.pamd
 Source3: util-linux-chsh-chfn.pamd
@@ -130,7 +130,7 @@ This is library for fdisk-like programs, part of util-linux.
 %package -n libfdisk-devel
 Summary:  Partitioning library for fdisk-like programs.
 License: LGPLv2+
-Requires: libfdisk = %{version}-%{release}
+Requires: libfdisk%{?_isa} = %{version}-%{release}
 Requires: pkgconfig
 
 %description -n libfdisk-devel
@@ -149,7 +149,7 @@ This is library for ls-like terminal programs, part of util-linux.
 %package -n libsmartcols-devel
 Summary: Formatting library for ls-like programs.
 License: LGPLv2+
-Requires: libsmartcols = %{version}-%{release}
+Requires: libsmartcols%{?_isa} = %{version}-%{release}
 Requires: pkgconfig
 
 %description -n libsmartcols-devel
@@ -160,8 +160,8 @@ part of util-linux.
 %package -n libmount
 Summary: Device mounting library
 License: LGPLv2+
-Requires: libblkid = %{version}-%{release}
-Requires: libuuid = %{version}-%{release}
+Requires: libblkid%{?_isa} = %{version}-%{release}
+Requires: libuuid%{?_isa} = %{version}-%{release}
 Conflicts: filesystem < 3
 
 %description -n libmount
@@ -171,7 +171,7 @@ This is the device mounting library, part of util-linux.
 %package -n libmount-devel
 Summary: Device mounting library
 License: LGPLv2+
-Requires: libmount = %{version}-%{release}
+Requires: libmount%{?_isa} = %{version}-%{release}
 Requires: pkgconfig
 
 %description -n libmount-devel
@@ -182,7 +182,7 @@ part of util-linux.
 %package -n libblkid
 Summary: Block device ID library
 License: LGPLv2+
-Requires: libuuid = %{version}-%{release}
+Requires: libuuid%{?_isa} = %{version}-%{release}
 Conflicts: filesystem < 3
 Requires(post): coreutils
 
@@ -193,7 +193,7 @@ This is block device identification library, part of util-linux.
 %package -n libblkid-devel
 Summary: Block device ID library
 License: LGPLv2+
-Requires: libblkid = %{version}-%{release}
+Requires: libblkid%{?_isa} = %{version}-%{release}
 Requires: pkgconfig
 
 %description -n libblkid-devel
@@ -221,7 +221,7 @@ See also the "uuid" package, which is a separate implementation.
 %package -n libuuid-devel
 Summary: Universally unique ID library
 License: BSD
-Requires: libuuid = %{version}-%{release}
+Requires: libuuid%{?_isa} = %{version}-%{release}
 Requires: pkgconfig
 
 %description -n libuuid-devel
@@ -255,7 +255,7 @@ SMP systems.
 
 %package -n %{pypkg}-libmount
 Summary: Python bindings for the libmount library
-Requires: libmount = %{version}-%{release}
+Requires: libmount%{?_isa} = %{version}-%{release}
 License: LGPLv2+
 
 %description -n %{pypkg}-libmount
@@ -318,7 +318,6 @@ make check
 
 
 %install
-rm -rf ${RPM_BUILD_ROOT}
 mkdir -p ${RPM_BUILD_ROOT}%{_bindir}
 mkdir -p ${RPM_BUILD_ROOT}%{_mandir}/man{1,6,8,5}
 mkdir -p ${RPM_BUILD_ROOT}%{_sbindir}
@@ -495,7 +494,6 @@ fi
 %files -f %{name}.files
 %doc README NEWS AUTHORS
 %doc Documentation/deprecated.txt 
-%{!?_licensedir:%global license %%doc}
 %license Documentation/licenses/*
 %doc misc-utils/getopt-*.{bash,tcsh}
 
@@ -863,7 +861,6 @@ fi
 
 
 %files -n uuidd
-%{!?_licensedir:%global license %%doc}
 %license Documentation/licenses/COPYING.GPL-2.0-or-later
 %{_mandir}/man8/uuidd.8*
 %{_sbindir}/uuidd
@@ -874,7 +871,6 @@ fi
 
 
 %files -n libfdisk
-%{!?_licensedir:%global license %%doc}
 %license Documentation/licenses/COPYING.LGPL-2.1-or-later libfdisk/COPYING
 %{_libdir}/libfdisk.so.*
 
@@ -885,7 +881,6 @@ fi
 
 
 %files -n libsmartcols
-%{!?_licensedir:%global license %%doc}
 %license Documentation/licenses/COPYING.LGPL-2.1-or-later libsmartcols/COPYING
 %{_libdir}/libsmartcols.so.*
 
@@ -896,7 +891,6 @@ fi
 
 
 %files -n libmount
-%{!?_licensedir:%global license %%doc}
 %license Documentation/licenses/COPYING.LGPL-2.1-or-later libmount/COPYING
 %{_libdir}/libmount.so.*
 
@@ -919,7 +913,6 @@ fi
 
 
 %files -n libuuid
-%{!?_licensedir:%global license %%doc}
 %license Documentation/licenses/COPYING.BSD-3-Clause libuuid/COPYING
 %{_libdir}/libuuid.so.*
 
@@ -941,11 +934,13 @@ fi
 %{_libdir}/pkgconfig/uuid.pc
 
 %files -n %{pypkg}-libmount
-%{!?_licensedir:%global license %%doc}
 %license Documentation/licenses/COPYING.LGPL-2.1-or-later libmount/COPYING
 %{_libdir}/python*/site-packages/libmount/
 
 %changelog
+* Tue Mar  2 2021 Karel Zak <kzak@redhat.com> - 2.36.2-2
+- spec file cleanup https://src.fedoraproject.org/rpms/util-linux/pull-request/9
+
 * Fri Feb 12 2021 Karel Zak <kzak@redhat.com> - 2.36.2-1
 - upgrade to stable upstream 2.36.2
   https://mirrors.edge.kernel.org/pub/linux/utils/util-linux/v2.36/v2.36.2-ReleaseNotes
