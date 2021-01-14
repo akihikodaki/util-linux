@@ -2,7 +2,7 @@
 Summary: A collection of basic system utilities
 Name: util-linux
 Version: 2.36.1
-Release: 2%{?dist}
+Release: 3%{?dist}
 License: GPLv2 and GPLv2+ and LGPLv2+ and BSD with advertising and Public Domain
 URL: http://en.wikipedia.org/wiki/Util-linux
 
@@ -472,14 +472,17 @@ exit 0
 # "systemctl preset" and it enable/disable service only.
 %post -n uuidd
 %systemd_post uuidd.service
-if [ $1 -eq 1 ]; then
+if [ $1 -eq 1 ] && [ -x /usr/bin/systemctl ]; then
+	# install
 	/bin/systemctl start uuidd.service > /dev/null 2>&1 || :
 fi
 
 %preun -n uuidd
+%systemd_preun uuidd.socket
 %systemd_preun uuidd.service
 
 %postun -n uuidd
+%systemd_postun_with_restart uuidd.socket
 %systemd_postun_with_restart uuidd.service
 
 %triggerpostun -- util-linux < 2.35.1-7
@@ -942,6 +945,9 @@ fi
 %{_libdir}/python*/site-packages/libmount/
 
 %changelog
+* Thu Jan 14 2021 Karel Zak <kzak@redhat.com> - 2.36.1-3
+- improve uuidd scriptlets (fix #1767553)
+
 * Thu Nov 19 2020 Karel Zak <kzak@redhat.com> - 2.36.1-2
 - remove unused patches
 - remove versions and seq.numbers from patch names
@@ -949,7 +955,6 @@ fi
 
 * Mon Nov 16 2020 Karel Zak <kzak@redhat.com> - 2.36.1-1
 - upgrade to stable upstream 2.36.1
-  https://www.kernel.org/pub/linux/utils/util-linux/v2.36/v2.36.1-ReleaseNotes
 
 * Tue Jul 14 2020 Tom Stellard <tstellar@redhat.com> - 2.36-4
 - Use make macros
