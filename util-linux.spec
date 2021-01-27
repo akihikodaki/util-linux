@@ -2,7 +2,7 @@
 Summary: A collection of basic system utilities
 Name: util-linux
 Version: 2.36.1
-Release: 3%{?dist}
+Release: 4%{?dist}
 License: GPLv2 and GPLv2+ and LGPLv2+ and BSD with advertising and Public Domain
 URL: http://en.wikipedia.org/wiki/Util-linux
 
@@ -110,6 +110,9 @@ Patch0: login-lastlog-create.patch
 Patch1: libmount-remove-read-mountinfo-workaround.patch
 # usptream patch, https://github.com/karelzak/util-linux/issues/1193
 Patch2: libmount-don-t-use-symfollow-for-helpers-on-user-mou.patch
+# Add `/run/motd.d` to the hardcoded MOTD_FILE
+# https://github.com/coreos/console-login-helper-messages/issues/60
+Patch3: login-default-motd-file.patch
 
 %description
 The util-linux package contains a large variety of low-level system
@@ -945,6 +948,9 @@ fi
 %{_libdir}/python*/site-packages/libmount/
 
 %changelog
+* Wed Jan 27 2021 Kelvin Fan <kfan@redhat.com> - 2.36.1-4
+- Add patch to add /run/motd.d to default MOTD_FILE in login(1)
+
 * Thu Jan 14 2021 Karel Zak <kzak@redhat.com> - 2.36.1-3
 - improve uuidd scriptlets (fix #1767553)
 
