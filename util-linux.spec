@@ -1,8 +1,8 @@
 ### Header
 Summary: A collection of basic system utilities
 Name: util-linux
-Version: 2.36.1
-Release: 4%{?dist}
+Version: 2.36.2
+Release: 1%{?dist}
 License: GPLv2 and GPLv2+ and LGPLv2+ and BSD with advertising and Public Domain
 URL: http://en.wikipedia.org/wiki/Util-linux
 
@@ -108,11 +108,9 @@ Patch0: login-lastlog-create.patch
 # https://github.com/karelzak/util-linux/commit/57898c3a7ee8fc5933cddd4526bb3980bef85a02
 # The workaround is unnecessary on Fedora with kernel >= 5.8.
 Patch1: libmount-remove-read-mountinfo-workaround.patch
-# usptream patch, https://github.com/karelzak/util-linux/issues/1193
-Patch2: libmount-don-t-use-symfollow-for-helpers-on-user-mou.patch
 # Add `/run/motd.d` to the hardcoded MOTD_FILE
 # https://github.com/coreos/console-login-helper-messages/issues/60
-Patch3: login-default-motd-file.patch
+Patch2: login-default-motd-file.patch
 
 %description
 The util-linux package contains a large variety of low-level system
@@ -948,6 +946,10 @@ fi
 %{_libdir}/python*/site-packages/libmount/
 
 %changelog
+* Fri Feb 12 2021 Karel Zak <kzak@redhat.com> - 2.36.2-1
+- upgrade to stable upstream 2.36.2
+  https://mirrors.edge.kernel.org/pub/linux/utils/util-linux/v2.36/v2.36.2-ReleaseNotes
+
 * Wed Jan 27 2021 Kelvin Fan <kfan@redhat.com> - 2.36.1-4
 - Add patch to add /run/motd.d to default MOTD_FILE in login(1)
 
