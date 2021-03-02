@@ -2,7 +2,7 @@
 Summary: Collection of basic system utilities
 Name: util-linux
 Version: 2.36.2
-Release: 2%{?dist}
+Release: 3%{?dist}
 License: GPLv2 and GPLv2+ and LGPLv2+ and BSD with advertising and Public Domain
 URL: https://en.wikipedia.org/wiki/Util-linux
 
@@ -938,6 +938,10 @@ fi
 %{_libdir}/python*/site-packages/libmount/
 
 %changelog
+* Tue Mar 02 2021 Zbigniew Jędrzejewski-Szmek <zbyszek@in.waw.pl> - 2.36.2-3
+- Rebuilt for updated systemd-rpm-macros
+  See https://pagure.io/fesco/issue/2583.
+
 * Tue Mar  2 2021 Karel Zak <kzak@redhat.com> - 2.36.2-2
 - spec file cleanup https://src.fedoraproject.org/rpms/util-linux/pull-request/9
 
