@@ -963,7 +963,7 @@ fi
 * Mon Nov 16 2020 Karel Zak <kzak@redhat.com> - 2.36.1-1
 - upgrade to stable upstream 2.36.1
 
-* Tue Jul 14 2020 Tom Stellard <tstellar@redhat.com> - 2.36-4
+* Thu Nov 12 2020 Tom Stellard <tstellar@redhat.com> - 2.36-4
 - Use make macros
 - https://fedoraproject.org/wiki/Changes/UseMakeBuildInstallMacro
 
