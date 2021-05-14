@@ -1,13 +1,13 @@
 ### Header
 Summary: Collection of basic system utilities
 Name: util-linux
-Version: 2.36.2
-Release: 3%{?dist}
+Version: 2.37
+Release: 0.1%{?dist}
 License: GPLv2 and GPLv2+ and LGPLv2+ and BSD with advertising and Public Domain
 URL: https://en.wikipedia.org/wiki/Util-linux
 
 ### Macros
-%define upstream_version %{version}
+%define upstream_version %{version}-rc2
 %define upstream_major %(eval echo %{version} | %{__sed} -e 's/\([[:digit:]]*\)\.\([[:digit:]]*\)\.[[:digit:]]*$/\1.\2/')
 
 %define compldir %{_datadir}/bash-completion/completions/
@@ -36,6 +36,7 @@ BuildRequires: gcc
 BuildRequires: autoconf
 BuildRequires: automake
 BuildRequires: libtool
+BuildRequires: rubygem-asciidoctor
 %ifarch ppc64le
 BuildRequires: librtas-devel
 %endif
@@ -105,12 +106,9 @@ Requires: libfdisk = %{version}-%{release}
 ###
 # 151635 - makeing /var/log/lastlog
 Patch0: login-lastlog-create.patch
-# https://github.com/karelzak/util-linux/commit/57898c3a7ee8fc5933cddd4526bb3980bef85a02
-# The workaround is unnecessary on Fedora with kernel >= 5.8.
-Patch1: libmount-remove-read-mountinfo-workaround.patch
 # Add `/run/motd.d` to the hardcoded MOTD_FILE
 # https://github.com/coreos/console-login-helper-messages/issues/60
-Patch2: login-default-motd-file.patch
+Patch1: login-default-motd-file.patch
 
 %description
 The util-linux package contains a large variety of low-level system
@@ -295,6 +293,8 @@ export DAEMON_LDFLAGS="$SUID_LDFLAGS"
 	--enable-write \
 	--enable-raw \
 	--enable-hardlink \
+	--enable-fdformat \
+	--enable-asciidoc \
 	--with-python=%{pyver} \
 	--with-systemd \
 	--with-udev \
@@ -402,9 +402,9 @@ done
 %endif
 
 # we install getopt-*.{bash,tcsh} by doc directive
-chmod 644 misc-utils/getopt-*.{bash,tcsh}
-rm -f ${RPM_BUILD_ROOT}%{_datadir}/doc/util-linux/getopt/*
-rmdir ${RPM_BUILD_ROOT}%{_datadir}/doc/util-linux/getopt
+#chmod 644 misc-utils/getopt-*.{bash,tcsh}
+#rm -f ${RPM_BUILD_ROOT}%{_datadir}/doc/util-linux/getopt/*
+#rmdir ${RPM_BUILD_ROOT}%{_datadir}/doc/util-linux/getopt
 
 ln -sf ../proc/self/mounts %{buildroot}/etc/mtab
 
@@ -573,6 +573,7 @@ fi
 %{_bindir}/setsid
 %{_bindir}/setterm
 %{_bindir}/taskset
+%{_bindir}/uclampset
 %{_bindir}/ul
 %{_bindir}/unshare
 %{_bindir}/utmpdump
@@ -631,6 +632,7 @@ fi
 %{_mandir}/man1/setterm.1*
 %{_mandir}/man1/su.1*
 %{_mandir}/man1/taskset.1*
+%{_mandir}/man1/uclampset.1.*
 %{_mandir}/man1/ul.1*
 %{_mandir}/man1/unshare.1*
 %{_mandir}/man1/utmpdump.1.gz
@@ -810,6 +812,7 @@ fi
 %{compldir}/swapoff
 %{compldir}/swapon
 %{compldir}/taskset
+%{compldir}/uclampset
 %{compldir}/ul
 %{compldir}/unshare
 %{compldir}/utmpdump
@@ -938,6 +941,10 @@ fi
 %{_libdir}/python*/site-packages/libmount/
 
 %changelog
+* Fri May 14 2021 Karel Zak <kzak@redhat.com> - 2.37-0.1
+- upgrade to v2.37-rc2
+  https://kernel.org/pub/linux/utils/util-linux/v2.37/v2.37-ReleaseNotes
+
 * Tue Mar 02 2021 Zbigniew Jędrzejewski-Szmek <zbyszek@in.waw.pl> - 2.36.2-3
 - Rebuilt for updated systemd-rpm-macros
   See https://pagure.io/fesco/issue/2583.
