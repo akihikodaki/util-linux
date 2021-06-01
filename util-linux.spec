@@ -2,12 +2,12 @@
 Summary: Collection of basic system utilities
 Name: util-linux
 Version: 2.37
-Release: 0.1%{?dist}
+Release: 1%{?dist}
 License: GPLv2 and GPLv2+ and LGPLv2+ and BSD with advertising and Public Domain
 URL: https://en.wikipedia.org/wiki/Util-linux
 
 ### Macros
-%define upstream_version %{version}-rc2
+%define upstream_version %{version}
 %define upstream_major %(eval echo %{version} | %{__sed} -e 's/\([[:digit:]]*\)\.\([[:digit:]]*\)\.[[:digit:]]*$/\1.\2/')
 
 %define compldir %{_datadir}/bash-completion/completions/
@@ -70,28 +70,15 @@ Provides: eject = 2.1.6
 # rfkill has been merged into util-linux v2.31
 Obsoletes: rfkill <= 0.5
 Provides: rfkill = 0.5
-# hardlink has been merged into util-linux v2.34
-Obsoletes: hardlink <= 1:1.3-9
-Provides: hardlink = 1:1.3-9
 # sulogin, utmpdump merged into util-linux v2.22;
 # last, lastb merged into util-linux v2.24
 Conflicts: sysvinit-tools < 2.88-14
-# old versions of e2fsprogs contain fsck, uuidgen
-Conflicts: e2fsprogs < 1.41.8-5
 # rename from util-linux-ng back to util-linux
 Obsoletes: util-linux-ng < 2.19
 Provides: util-linux-ng = %{version}-%{release}
 Conflicts: filesystem < 3
-Provides: /bin/dmesg
-Provides: /bin/kill
-Provides: /bin/more
-Provides: /bin/mount
-Provides: /bin/umount
-Provides: /sbin/blkid
-Provides: /sbin/blockdev
-Provides: /sbin/findfs
-Provides: /sbin/fsck
 Provides: /sbin/nologin
+Provides: /sbin/findfs
 
 Requires(post): coreutils
 Requires: pam >= 1.1.3-7, /etc/pam.d/system-auth
@@ -101,6 +88,7 @@ Requires: libblkid = %{version}-%{release}
 Requires: libmount = %{version}-%{release}
 Requires: libsmartcols = %{version}-%{release}
 Requires: libfdisk = %{version}-%{release}
+Requires: util-linux-core = %{version}-%{release}
 
 ### Ready for upstream?
 ###
@@ -115,6 +103,32 @@ The util-linux package contains a large variety of low-level system
 utilities that are necessary for a Linux system to function. Among
 others, Util-linux contains the fdisk configuration tool and the login
 program.
+
+
+%package -n util-linux-core
+Summary: The most essential utilities from the util-linux suite.
+License: GPLv2 and GPLv2+ and LGPLv2+ and BSD with advertising and Public Domain
+Provides: /bin/dmesg
+Provides: /bin/kill
+Provides: /bin/more
+Provides: /bin/mount
+Provides: /bin/umount
+Provides: /sbin/blkid
+Provides: /sbin/blockdev
+Provides: /sbin/fsck
+# hardlink has been merged into util-linux v2.34
+Obsoletes: hardlink <= 1:1.3-9
+Provides: hardlink = 1:1.3-9
+Requires: libuuid = %{version}-%{release}
+Requires: libblkid = %{version}-%{release}
+Requires: libmount = %{version}-%{release}
+Requires: libsmartcols = %{version}-%{release}
+# old versions of e2fsprogs contain fsck, uuidgen
+Conflicts: e2fsprogs < 1.41.8-5
+
+%description -n util-linux-core
+This is a very basic set of Linux utilities that is necessary on
+minimal installations.
 
 
 %package -n libfdisk
@@ -429,6 +443,7 @@ find  $RPM_BUILD_ROOT%{_mandir}/man8 -regextype posix-egrep  \
 	-regex ".*(linux32|linux64|s390|s390x|i386|ppc|ppc64|ppc32|sparc|sparc64|sparc32|sparc32bash|mips|mips64|mips32|ia64|x86_64|uname26)\.8.*" \
 	-printf "%{_mandir}/man8/%f*\n" >> %{name}.files
 
+
 %post
 # only for minimal buildroots without /var/log
 [ -d /var/log ] || mkdir -p /var/log
@@ -446,6 +461,8 @@ if [ -x /usr/sbin/selinuxenabled ] && /usr/sbin/selinuxenabled; then
 		/usr/bin/chcon "$SECXT"  /var/log/lastlog >/dev/null 2>&1 || :
 	fi
 fi
+
+%post -n util-linux-core
 if [ ! -L /etc/mtab ]; then
 	ln -sf ../proc/self/mounts /etc/mtab || :
 fi
@@ -507,44 +524,30 @@ fi
 
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/adjtime
 
-%attr(4755,root,root)	%{_bindir}/mount
-%attr(4755,root,root)	%{_bindir}/umount
 %attr(4755,root,root)	%{_bindir}/su
 %attr(755,root,root)	%{_bindir}/login
 %attr(2755,root,tty)	%{_bindir}/write
 
 %ghost %attr(0644,root,root) %verify(not md5 size mtime) /var/log/lastlog
-%ghost %verify(not md5 size mtime) %config(noreplace,missingok) /etc/mtab
 
 %{_unitdir}/fstrim.*
 
 %{_bindir}/cal
 %{_bindir}/chmem
 %{_bindir}/choom
-%{_bindir}/chrt
 %{_bindir}/col
 %{_bindir}/colcrt
 %{_bindir}/colrm
 %{_bindir}/column
-%{_bindir}/dmesg
 %{_bindir}/eject
 %{_bindir}/fallocate
 %{_bindir}/fincore
-%{_bindir}/findmnt
-%{_bindir}/flock
 %{_bindir}/getopt
-%{_bindir}/hardlink
 %{_bindir}/hexdump
-%{_bindir}/ionice
-%{_bindir}/ipcmk
-%{_bindir}/ipcrm
-%{_bindir}/ipcs
 %{_bindir}/irqtop
 %{_bindir}/isosize
-%{_bindir}/kill
 %{_bindir}/last
 %{_bindir}/lastb
-%{_bindir}/logger
 %{_bindir}/look
 %{_bindir}/lsblk
 %{_bindir}/lscpu
@@ -556,26 +559,19 @@ fi
 %{_bindir}/lsns
 %{_bindir}/mcookie
 %{_bindir}/mesg
-%{_bindir}/more
-%{_bindir}/mountpoint
 %{_bindir}/namei
-%{_bindir}/nsenter
 %{_bindir}/prlimit
 %{_bindir}/raw
 %{_bindir}/rename
-%{_bindir}/renice
 %{_bindir}/rev
 %{_bindir}/script
 %{_bindir}/scriptlive
 %{_bindir}/scriptreplay
 %{_bindir}/setarch
 %{_bindir}/setpriv
-%{_bindir}/setsid
 %{_bindir}/setterm
-%{_bindir}/taskset
 %{_bindir}/uclampset
 %{_bindir}/ul
-%{_bindir}/unshare
 %{_bindir}/utmpdump
 %{_bindir}/uuidgen
 %{_bindir}/uuidparse
@@ -584,28 +580,18 @@ fi
 %{_bindir}/whereis
 %{_mandir}/man1/cal.1*
 %{_mandir}/man1/choom.1*
-%{_mandir}/man1/chrt.1*
 %{_mandir}/man1/col.1*
 %{_mandir}/man1/colcrt.1*
 %{_mandir}/man1/colrm.1*
 %{_mandir}/man1/column.1*
-%{_mandir}/man1/dmesg.1*
 %{_mandir}/man1/eject.1*
 %{_mandir}/man1/fallocate.1*
 %{_mandir}/man1/fincore.1*
-%{_mandir}/man1/flock.1*
 %{_mandir}/man1/getopt.1*
-%{_mandir}/man1/hardlink.1*
 %{_mandir}/man1/hexdump.1*
-%{_mandir}/man1/ionice.1*
-%{_mandir}/man1/ipcmk.1*
-%{_mandir}/man1/ipcrm.1*
-%{_mandir}/man1/ipcs.1*
 %{_mandir}/man1/irqtop.1*
-%{_mandir}/man1/kill.1*
 %{_mandir}/man1/last.1*
 %{_mandir}/man1/lastb.1*
-%{_mandir}/man1/logger.1*
 %{_mandir}/man1/login.1*
 %{_mandir}/man1/look.1*
 %{_mandir}/man1/lscpu.1*
@@ -615,26 +601,19 @@ fi
 %{_mandir}/man1/lsmem.1*
 %{_mandir}/man1/mcookie.1*
 %{_mandir}/man1/mesg.1*
-%{_mandir}/man1/more.1*
-%{_mandir}/man1/mountpoint.1*
 %{_mandir}/man1/namei.1*
-%{_mandir}/man1/nsenter.1*
 %{_mandir}/man1/prlimit.1*
 %{_mandir}/man1/rename.1*
-%{_mandir}/man1/renice.1*
 %{_mandir}/man1/rev.1*
 %{_mandir}/man1/runuser.1*
 %{_mandir}/man1/script.1*
 %{_mandir}/man1/scriptlive.1*
 %{_mandir}/man1/scriptreplay.1*
 %{_mandir}/man1/setpriv.1*
-%{_mandir}/man1/setsid.1*
 %{_mandir}/man1/setterm.1*
 %{_mandir}/man1/su.1*
-%{_mandir}/man1/taskset.1*
 %{_mandir}/man1/uclampset.1.*
 %{_mandir}/man1/ul.1*
-%{_mandir}/man1/unshare.1*
 %{_mandir}/man1/utmpdump.1.gz
 %{_mandir}/man1/uuidgen.1*
 %{_mandir}/man1/uuidparse.1*
@@ -644,36 +623,27 @@ fi
 %{_mandir}/man5/fstab.5*
 %{_mandir}/man5/terminal-colors.d.5*
 %{_mandir}/man8/addpart.8*
-%{_mandir}/man8/agetty.8*
 %{_mandir}/man8/blkdiscard.8*
-%{_mandir}/man8/blkid.8*
 %{_mandir}/man8/blkzone.8*
-%{_mandir}/man8/blockdev.8*
 %{_mandir}/man8/chcpu.8*
 %{_mandir}/man8/chmem.8*
 %{_mandir}/man8/ctrlaltdel.8*
 %{_mandir}/man8/delpart.8*
 %{_mandir}/man8/fdisk.8*
 %{_mandir}/man8/findfs.8*
-%{_mandir}/man8/findmnt.8*
-%{_mandir}/man8/fsck.8*
 %{_mandir}/man8/fsck.cramfs.8*
 %{_mandir}/man8/fsck.minix.8*
 %{_mandir}/man8/fsfreeze.8*
 %{_mandir}/man8/fstrim.8*
 %{_mandir}/man8/isosize.8*
 %{_mandir}/man8/ldattach.8*
-%{_mandir}/man8/losetup.8*
 %{_mandir}/man8/lsblk.8*
 %{_mandir}/man8/lslocks.8*
 %{_mandir}/man8/lsns.8*
 %{_mandir}/man8/mkfs.8*
 %{_mandir}/man8/mkfs.cramfs.8*
 %{_mandir}/man8/mkfs.minix.8*
-%{_mandir}/man8/mkswap.8*
-%{_mandir}/man8/mount.8*
 %{_mandir}/man8/nologin.8*
-%{_mandir}/man8/partx.8*
 %{_mandir}/man8/pivot_root.8*
 %{_mandir}/man8/raw.8*
 %{_mandir}/man8/rawdevices.8*
@@ -684,37 +654,26 @@ fi
 %{_mandir}/man8/setarch.8*
 %{_mandir}/man8/sulogin.8.gz
 %{_mandir}/man8/swaplabel.8*
-%{_mandir}/man8/swapoff.8*
-%{_mandir}/man8/swapon.8*
-%{_mandir}/man8/switch_root.8*
-%{_mandir}/man8/umount.8*
 %{_mandir}/man8/wdctl.8.gz
 %{_mandir}/man8/wipefs.8*
 %{_mandir}/man8/zramctl.8*
 %{_sbindir}/addpart
-%{_sbindir}/agetty
 %{_sbindir}/blkdiscard
-%{_sbindir}/blkid
 %{_sbindir}/blkzone
-%{_sbindir}/blockdev
 %{_sbindir}/chcpu
 %{_sbindir}/ctrlaltdel
 %{_sbindir}/delpart
 %{_sbindir}/fdisk
 %{_sbindir}/findfs
-%{_sbindir}/fsck
 %{_sbindir}/fsck.cramfs
 %{_sbindir}/fsck.minix
 %{_sbindir}/fsfreeze
 %{_sbindir}/fstrim
 %{_sbindir}/ldattach
-%{_sbindir}/losetup
 %{_sbindir}/mkfs
 %{_sbindir}/mkfs.cramfs
 %{_sbindir}/mkfs.minix
-%{_sbindir}/mkswap
 %{_sbindir}/nologin
-%{_sbindir}/partx
 %{_sbindir}/pivot_root
 %{_sbindir}/readprofile
 %{_sbindir}/resizepart
@@ -723,53 +682,37 @@ fi
 %{_sbindir}/runuser
 %{_sbindir}/sulogin
 %{_sbindir}/swaplabel
-%{_sbindir}/swapoff
-%{_sbindir}/swapon
-%{_sbindir}/switch_root
 %{_sbindir}/wipefs
 %{_sbindir}/zramctl
 
 %{compldir}/addpart
 %{compldir}/blkdiscard
-%{compldir}/blkid
 %{compldir}/blkzone
-%{compldir}/blockdev
 %{compldir}/cal
 %{compldir}/chcpu
 %{compldir}/chmem
-%{compldir}/chrt
 %{compldir}/col
 %{compldir}/colcrt
 %{compldir}/colrm
 %{compldir}/column
 %{compldir}/ctrlaltdel
 %{compldir}/delpart
-%{compldir}/dmesg
 %{compldir}/eject
 %{compldir}/fallocate
 %{compldir}/fdisk
 %{compldir}/fincore
 %{compldir}/findfs
-%{compldir}/findmnt
-%{compldir}/flock
-%{compldir}/fsck
 %{compldir}/fsck.cramfs
 %{compldir}/fsck.minix
 %{compldir}/fsfreeze
 %{compldir}/fstrim
 %{compldir}/getopt
 %{compldir}/hexdump
-%{compldir}/ionice
-%{compldir}/ipcmk
-%{compldir}/ipcrm
-%{compldir}/ipcs
 %{compldir}/irqtop
 %{compldir}/isosize
 %{compldir}/last
 %{compldir}/ldattach
-%{compldir}/logger
 %{compldir}/look
-%{compldir}/losetup
 %{compldir}/lsblk
 %{compldir}/lscpu
 %{compldir}/lsipc
@@ -783,18 +726,12 @@ fi
 %{compldir}/mkfs
 %{compldir}/mkfs.cramfs
 %{compldir}/mkfs.minix
-%{compldir}/mkswap
-%{compldir}/more
-%{compldir}/mountpoint
 %{compldir}/namei
-%{compldir}/nsenter
-%{compldir}/partx
 %{compldir}/pivot_root
 %{compldir}/prlimit
 %{compldir}/raw
 %{compldir}/readprofile
 %{compldir}/rename
-%{compldir}/renice
 %{compldir}/resizepart
 %{compldir}/rev
 %{compldir}/rfkill
@@ -805,16 +742,11 @@ fi
 %{compldir}/scriptreplay
 %{compldir}/setarch
 %{compldir}/setpriv
-%{compldir}/setsid
 %{compldir}/setterm
 %{compldir}/su
 %{compldir}/swaplabel
-%{compldir}/swapoff
-%{compldir}/swapon
-%{compldir}/taskset
 %{compldir}/uclampset
 %{compldir}/ul
-%{compldir}/unshare
 %{compldir}/utmpdump
 %{compldir}/uuidgen
 %{compldir}/uuidparse
@@ -824,7 +756,6 @@ fi
 %{compldir}/wipefs
 %{compldir}/write
 %{compldir}/zramctl
-
 
 %ifnarch s390 s390x
 %{_sbindir}/clock
@@ -850,6 +781,94 @@ fi
 %ifarch %{sparc}
 %{_bindir}/sunhostid
 %endif
+
+
+%files -n util-linux-core
+%ghost %verify(not md5 size mtime) %config(noreplace,missingok) /etc/mtab
+%attr(4755,root,root)	%{_bindir}/mount
+%attr(4755,root,root)	%{_bindir}/umount
+%{_bindir}/chrt
+%{_bindir}/dmesg
+%{_bindir}/findmnt
+%{_bindir}/flock
+%{_bindir}/hardlink
+%{_bindir}/ionice
+%{_bindir}/ipcmk
+%{_bindir}/ipcrm
+%{_bindir}/ipcs
+%{_bindir}/kill
+%{_bindir}/logger
+%{_bindir}/more
+%{_bindir}/mountpoint
+%{_bindir}/nsenter
+%{_bindir}/renice
+%{_bindir}/setsid
+%{_bindir}/taskset
+%{_bindir}/unshare
+%{compldir}/blkid
+%{compldir}/blockdev
+%{compldir}/chrt
+%{compldir}/dmesg
+%{compldir}/findmnt
+%{compldir}/flock
+%{compldir}/fsck
+%{compldir}/ionice
+%{compldir}/ipcmk
+%{compldir}/ipcrm
+%{compldir}/ipcs
+%{compldir}/logger
+%{compldir}/losetup
+%{compldir}/mkswap
+%{compldir}/more
+%{compldir}/mountpoint
+%{compldir}/nsenter
+%{compldir}/partx
+%{compldir}/renice
+%{compldir}/setsid
+%{compldir}/swapoff
+%{compldir}/swapon
+%{compldir}/taskset
+%{compldir}/unshare
+%{_mandir}/man1/chrt.1*
+%{_mandir}/man1/dmesg.1*
+%{_mandir}/man1/flock.1*
+%{_mandir}/man1/hardlink.1*
+%{_mandir}/man1/ionice.1*
+%{_mandir}/man1/ipcmk.1*
+%{_mandir}/man1/ipcrm.1*
+%{_mandir}/man1/ipcs.1*
+%{_mandir}/man1/kill.1*
+%{_mandir}/man1/logger.1*
+%{_mandir}/man1/more.1*
+%{_mandir}/man1/mountpoint.1*
+%{_mandir}/man1/nsenter.1*
+%{_mandir}/man1/renice.1*
+%{_mandir}/man1/setsid.1*
+%{_mandir}/man1/taskset.1*
+%{_mandir}/man1/unshare.1*
+%{_mandir}/man8/agetty.8*
+%{_mandir}/man8/blkid.8*
+%{_mandir}/man8/blockdev.8*
+%{_mandir}/man8/findmnt.8*
+%{_mandir}/man8/fsck.8*
+%{_mandir}/man8/losetup.8*
+%{_mandir}/man8/mkswap.8*
+%{_mandir}/man8/mount.8*
+%{_mandir}/man8/partx.8*
+%{_mandir}/man8/swapoff.8*
+%{_mandir}/man8/swapon.8*
+%{_mandir}/man8/switch_root.8*
+%{_mandir}/man8/umount.8*
+%{_sbindir}/agetty
+%{_sbindir}/blkid
+%{_sbindir}/blockdev
+%{_sbindir}/fsck
+%{_sbindir}/losetup
+%{_sbindir}/mkswap
+%{_sbindir}/partx
+%{_sbindir}/swapoff
+%{_sbindir}/swapon
+%{_sbindir}/switch_root
 
 
 %files -n util-linux-user
@@ -941,6 +960,10 @@ fi
 %{_libdir}/python*/site-packages/libmount/
 
 %changelog
+* Tue Jun  1 2021 Karel Zak <kzak@redhat.com> - 2.37-1
+- upgrade to v2.37
+- introduce util-linux-core subpackage
+
 * Fri May 14 2021 Karel Zak <kzak@redhat.com> - 2.37-0.1
 - upgrade to v2.37-rc2
   https://kernel.org/pub/linux/utils/util-linux/v2.37/v2.37-ReleaseNotes
