@@ -2,7 +2,7 @@
 Summary: Collection of basic system utilities
 Name: util-linux
 Version: 2.37
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: GPLv2 and GPLv2+ and LGPLv2+ and BSD with advertising and Public Domain
 URL: https://en.wikipedia.org/wiki/Util-linux
 
@@ -960,6 +960,9 @@ fi
 %{_libdir}/python*/site-packages/libmount/
 
 %changelog
+* Fri Jun 04 2021 Python Maint <python-maint@redhat.com> - 2.37-2
+- Rebuilt for Python 3.10
+
 * Tue Jun  1 2021 Karel Zak <kzak@redhat.com> - 2.37-1
 - upgrade to v2.37
 - introduce util-linux-core subpackage
