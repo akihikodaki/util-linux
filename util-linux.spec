@@ -2,7 +2,7 @@
 Summary: Collection of basic system utilities
 Name: util-linux
 Version: 2.37
-Release: 3%{?dist}
+Release: 4%{?dist}
 License: GPLv2 and GPLv2+ and LGPLv2+ and BSD with advertising and Public Domain
 URL: https://en.wikipedia.org/wiki/Util-linux
 
@@ -31,11 +31,11 @@ BuildRequires: systemd
 Buildrequires: libuser-devel
 BuildRequires: libcap-ng-devel
 BuildRequires: %{pypkg}-devel
-BuildRequires: pcre2-devel
 BuildRequires: gcc
 BuildRequires: autoconf
 BuildRequires: automake
 BuildRequires: libtool
+BuildRequires: bison
 BuildRequires: rubygem-asciidoctor
 %ifarch ppc64le
 BuildRequires: librtas-devel
@@ -97,6 +97,14 @@ Patch0: login-lastlog-create.patch
 # Add `/run/motd.d` to the hardcoded MOTD_FILE
 # https://github.com/coreos/console-login-helper-messages/issues/60
 Patch1: login-default-motd-file.patch
+
+### Upstream patches (remove ./autogen.sh call from build section  when remove
+###                   these patches)
+###
+# 1981729 - close_range()
+Patch2: login-fix-close_range-use.patch
+# Remove dependence on POSIX PCRE2
+Patch3: hardlink-remove-pcre2posix.h-support.patch
 
 %description
 The util-linux package contains a large variety of low-level system
@@ -292,6 +300,10 @@ chfn and chsh utilities with dependence on libuser
 %build
 unset LINGUAS || :
 
+# unfortunately, we did changes to build-system
+./autogen.sh
+
+
 export CFLAGS="-D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64 $RPM_OPT_FLAGS"
 export SUID_CFLAGS="-fpie"
 export SUID_LDFLAGS="-pie -Wl,-z,relro -Wl,-z,now"
@@ -305,7 +317,7 @@ export DAEMON_LDFLAGS="$SUID_LDFLAGS"
 	--enable-chfn-chsh \
 	--enable-usrdir-path \
 	--enable-write \
-	--enable-raw \
+	--disable-raw \
 	--enable-hardlink \
 	--enable-fdformat \
 	--enable-asciidoc \
@@ -342,19 +354,6 @@ chmod 0644 ${RPM_BUILD_ROOT}/var/log/lastlog
 
 # install util-linux
 %make_install
-
-# raw
-echo '.so man8/raw.8' > $RPM_BUILD_ROOT%{_mandir}/man8/rawdevices.8
-{
-	# see RH bugzilla #216664
-	mkdir -p ${RPM_BUILD_ROOT}%{_prefix}/lib/udev/rules.d
-	pushd ${RPM_BUILD_ROOT}%{_prefix}/lib/udev/rules.d
-	install -m 644 %{SOURCE4} ./60-raw.rules
-	popd
-}
-
-# sbin -> bin
-mv ${RPM_BUILD_ROOT}%{_sbindir}/raw ${RPM_BUILD_ROOT}%{_bindir}/raw
 
 # And a dirs uuidd needs that the makefiles don't create
 install -d ${RPM_BUILD_ROOT}/run/uuidd
@@ -520,7 +519,6 @@ fi
 %config(noreplace)	%{_sysconfdir}/pam.d/su-l
 %config(noreplace)	%{_sysconfdir}/pam.d/runuser
 %config(noreplace)	%{_sysconfdir}/pam.d/runuser-l
-%config(noreplace)	%{_prefix}/lib/udev/rules.d/60-raw.rules
 
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/adjtime
 
@@ -561,7 +559,6 @@ fi
 %{_bindir}/mesg
 %{_bindir}/namei
 %{_bindir}/prlimit
-%{_bindir}/raw
 %{_bindir}/rename
 %{_bindir}/rev
 %{_bindir}/script
@@ -645,8 +642,6 @@ fi
 %{_mandir}/man8/mkfs.minix.8*
 %{_mandir}/man8/nologin.8*
 %{_mandir}/man8/pivot_root.8*
-%{_mandir}/man8/raw.8*
-%{_mandir}/man8/rawdevices.8*
 %{_mandir}/man8/readprofile.8*
 %{_mandir}/man8/resizepart.8*
 %{_mandir}/man8/rfkill.8*
@@ -729,7 +724,6 @@ fi
 %{compldir}/namei
 %{compldir}/pivot_root
 %{compldir}/prlimit
-%{compldir}/raw
 %{compldir}/readprofile
 %{compldir}/rename
 %{compldir}/resizepart
@@ -960,6 +954,11 @@ fi
 %{_libdir}/python*/site-packages/libmount/
 
 %changelog
+* Wed Jul 14 2021 Karel Zak <kzak@redhat.com> - 2.37-4
+- disable raw(8) - no more supported since Linux v5.14 (commit 03e4922f1c81fc2ed3a87b4f91a8d3aafc7e093)
+- remove dependence on deprecated pcre2posix.h
+- fix #1981729 - close_range() 3rd argument
+
 * Wed Jun 16 2021 Richard W.M. Jones <rjones@redhat.com> - 2.37-3
 - Rebuild for updated pcre2
 
