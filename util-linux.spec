@@ -2,7 +2,7 @@
 Summary: Collection of basic system utilities
 Name: util-linux
 Version: 2.37
-Release: 4%{?dist}
+Release: 5%{?dist}
 License: GPLv2 and GPLv2+ and LGPLv2+ and BSD with advertising and Public Domain
 URL: https://en.wikipedia.org/wiki/Util-linux
 
@@ -52,7 +52,6 @@ Source0: https://www.kernel.org/pub/linux/utils/util-linux/v%{upstream_major}/ut
 Source1: util-linux-login.pamd
 Source2: util-linux-remote.pamd
 Source3: util-linux-chsh-chfn.pamd
-Source4: util-linux-60-raw.rules
 Source5: adjtime
 Source12: util-linux-su.pamd
 Source13: util-linux-su-l.pamd
@@ -954,6 +953,9 @@ fi
 %{_libdir}/python*/site-packages/libmount/
 
 %changelog
+* Wed Jul 14 2021 Karel Zak <kzak@redhat.com> - 2.37-5
+- remove unused util-linux-60-raw.rules
+
 * Wed Jul 14 2021 Karel Zak <kzak@redhat.com> - 2.37-4
 - disable raw(8) - no more supported since Linux v5.14 (commit 03e4922f1c81fc2ed3a87b4f91a8d3aafc7e093)
 - remove dependence on deprecated pcre2posix.h
