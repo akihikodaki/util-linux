@@ -1,8 +1,8 @@
 ### Header
 Summary: Collection of basic system utilities
 Name: util-linux
-Version: 2.37
-Release: 6%{?dist}
+Version: 2.37.2
+Release: 1%{?dist}
 License: GPLv2 and GPLv2+ and LGPLv2+ and BSD with advertising and Public Domain
 URL: https://en.wikipedia.org/wiki/Util-linux
 
@@ -96,14 +96,6 @@ Patch0: login-lastlog-create.patch
 # Add `/run/motd.d` to the hardcoded MOTD_FILE
 # https://github.com/coreos/console-login-helper-messages/issues/60
 Patch1: login-default-motd-file.patch
-
-### Upstream patches (remove ./autogen.sh call from build section  when remove
-###                   these patches)
-###
-# 1981729 - close_range()
-Patch2: login-fix-close_range-use.patch
-# Remove dependence on POSIX PCRE2
-Patch3: hardlink-remove-pcre2posix.h-support.patch
 
 %description
 The util-linux package contains a large variety of low-level system
@@ -804,6 +796,7 @@ fi
 %{compldir}/dmesg
 %{compldir}/findmnt
 %{compldir}/flock
+%{compldir}/hardlink
 %{compldir}/fsck
 %{compldir}/ionice
 %{compldir}/ipcmk
@@ -953,6 +946,9 @@ fi
 %{_libdir}/python*/site-packages/libmount/
 
 %changelog
+* Tue Aug 17 2021 Karel Zak <kzak@redhat.com> - 2.37.2-1
+* upgrade to v2.37.2
+
 * Fri Jul 23 2021 Fedora Release Engineering <releng@fedoraproject.org> - 2.37-6
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
 
