@@ -2,7 +2,7 @@
 Summary: Collection of basic system utilities
 Name: util-linux
 Version: 2.37.2
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: GPLv2 and GPLv2+ and LGPLv2+ and BSD with advertising and Public Domain
 URL: https://en.wikipedia.org/wiki/Util-linux
 
@@ -946,6 +946,9 @@ fi
 %{_libdir}/python*/site-packages/libmount/
 
 %changelog
+* Sat Jan 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 2.37.2-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
 * Tue Aug 17 2021 Karel Zak <kzak@redhat.com> - 2.37.2-1
 * upgrade to v2.37.2
 
