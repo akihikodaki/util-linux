@@ -1,13 +1,13 @@
 ### Header
 Summary: Collection of basic system utilities
 Name: util-linux
-Version: 2.37.2
-Release: 2%{?dist}
+Version: 2.38
+Release: 0.1%{?dist}
 License: GPLv2 and GPLv2+ and LGPLv2+ and BSD with advertising and Public Domain
 URL: https://en.wikipedia.org/wiki/Util-linux
 
 ### Macros
-%define upstream_version %{version}
+%define upstream_version %{version}-rc1
 %define upstream_major %(eval echo %{version} | %{__sed} -e 's/\([[:digit:]]*\)\.\([[:digit:]]*\)\.[[:digit:]]*$/\1.\2/')
 
 %define compldir %{_datadir}/bash-completion/completions/
@@ -540,6 +540,7 @@ fi
 %{_bindir}/look
 %{_bindir}/lsblk
 %{_bindir}/lscpu
+%{_bindir}/lsfd
 %{_bindir}/lsipc
 %{_bindir}/lsirq
 %{_bindir}/lslocks
@@ -583,6 +584,7 @@ fi
 %{_mandir}/man1/login.1*
 %{_mandir}/man1/look.1*
 %{_mandir}/man1/lscpu.1*
+%{_mandir}/man1/lsfd.1*
 %{_mandir}/man1/lsipc.1*
 %{_mandir}/man1/lsirq.1*
 %{_mandir}/man1/lslogins.1*
@@ -697,6 +699,7 @@ fi
 %{compldir}/irqtop
 %{compldir}/isosize
 %{compldir}/last
+%{compldir}/lastb
 %{compldir}/ldattach
 %{compldir}/look
 %{compldir}/lsblk
@@ -946,6 +949,9 @@ fi
 %{_libdir}/python*/site-packages/libmount/
 
 %changelog
+* Mon Jan 31 2022 Karel Zak <kzak@redhat.com> - 2.38-0.1
+- upgrade to v2.38-rc1
+
 * Sat Jan 22 2022 Fedora Release Engineering <releng@fedoraproject.org> - 2.37.2-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
 
