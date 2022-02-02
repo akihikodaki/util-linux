@@ -2,7 +2,7 @@
 Summary: Collection of basic system utilities
 Name: util-linux
 Version: 2.38
-Release: 0.1%{?dist}
+Release: 0.2%{?dist}
 License: GPLv2 and GPLv2+ and LGPLv2+ and BSD with advertising and Public Domain
 URL: https://en.wikipedia.org/wiki/Util-linux
 
@@ -339,9 +339,6 @@ mkdir -p ${RPM_BUILD_ROOT}%{_bindir}
 mkdir -p ${RPM_BUILD_ROOT}%{_mandir}/man{1,6,8,5}
 mkdir -p ${RPM_BUILD_ROOT}%{_sbindir}
 mkdir -p ${RPM_BUILD_ROOT}%{_sysconfdir}/{pam.d,security/console.apps}
-mkdir -p ${RPM_BUILD_ROOT}/var/log
-touch ${RPM_BUILD_ROOT}/var/log/lastlog
-chmod 0644 ${RPM_BUILD_ROOT}/var/log/lastlog
 
 # install util-linux
 %make_install
@@ -434,24 +431,6 @@ find  $RPM_BUILD_ROOT%{_mandir}/man8 -regextype posix-egrep  \
 	-printf "%{_mandir}/man8/%f*\n" >> %{name}.files
 
 
-%post
-# only for minimal buildroots without /var/log
-[ -d /var/log ] || mkdir -p /var/log
-touch /var/log/lastlog
-chown root:root /var/log/lastlog
-chmod 0644 /var/log/lastlog
-# Fix the file context, do not use restorecon
-if [ -x /usr/sbin/selinuxenabled ] && /usr/sbin/selinuxenabled; then
-	SECXT=$( /usr/sbin/matchpathcon -n /var/log/lastlog 2> /dev/null )
-	if [ -n "$SECXT" ]; then
-		# Selinux enabled, but without policy? It's true for buildroots
-		# without selinux stuff on host machine with enabled selinux.
-		# We don't want to use any RPM dependence on selinux policy for
-		# matchpathcon(2). SELinux policy should be optional.
-		/usr/bin/chcon "$SECXT"  /var/log/lastlog >/dev/null 2>&1 || :
-	fi
-fi
-
 %post -n util-linux-core
 if [ ! -L /etc/mtab ]; then
 	ln -sf ../proc/self/mounts /etc/mtab || :
@@ -516,8 +495,6 @@ fi
 %attr(4755,root,root)	%{_bindir}/su
 %attr(755,root,root)	%{_bindir}/login
 %attr(2755,root,tty)	%{_bindir}/write
-
-%ghost %attr(0644,root,root) %verify(not md5 size mtime) /var/log/lastlog
 
 %{_unitdir}/fstrim.*
 
@@ -949,6 +926,9 @@ fi
 %{_libdir}/python*/site-packages/libmount/
 
 %changelog
+* Wed Feb  2 2022 Karel Zak <kzak@redhat.com> - 2.38-0.2
+- release ownership of /var/log/lastlog
+
 * Mon Jan 31 2022 Karel Zak <kzak@redhat.com> - 2.38-0.1
 - upgrade to v2.38-rc1
 
