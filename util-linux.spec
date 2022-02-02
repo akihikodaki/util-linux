@@ -2,7 +2,7 @@
 Summary: Collection of basic system utilities
 Name: util-linux
 Version: 2.38
-Release: 0.2%{?dist}
+Release: 0.3%{?dist}
 License: GPLv2 and GPLv2+ and LGPLv2+ and BSD with advertising and Public Domain
 URL: https://en.wikipedia.org/wiki/Util-linux
 
@@ -52,6 +52,7 @@ Source0: https://www.kernel.org/pub/linux/utils/util-linux/v%{upstream_major}/ut
 Source1: util-linux-login.pamd
 Source2: util-linux-remote.pamd
 Source3: util-linux-chsh-chfn.pamd
+Source4: uuidd-tmpfiles.conf
 Source5: adjtime
 Source12: util-linux-su.pamd
 Source13: util-linux-su-l.pamd
@@ -339,11 +340,13 @@ mkdir -p ${RPM_BUILD_ROOT}%{_bindir}
 mkdir -p ${RPM_BUILD_ROOT}%{_mandir}/man{1,6,8,5}
 mkdir -p ${RPM_BUILD_ROOT}%{_sbindir}
 mkdir -p ${RPM_BUILD_ROOT}%{_sysconfdir}/{pam.d,security/console.apps}
+mkdir -p ${RPM_BUILD_ROOT}/usr/lib/tmpfiles.d
 
 # install util-linux
 %make_install
 
 # And a dirs uuidd needs that the makefiles don't create
+install -m 644 %{SOURCE4} ${RPM_BUILD_ROOT}/usr/lib/tmpfiles.d/uuidd.conf
 install -d ${RPM_BUILD_ROOT}/run/uuidd
 install -d ${RPM_BUILD_ROOT}/var/lib/libuuid
 
@@ -856,6 +859,7 @@ fi
 %dir %attr(2775, uuidd, uuidd) /var/lib/libuuid
 %dir %attr(2775, uuidd, uuidd) /run/uuidd
 %{compldir}/uuidd
+/usr/lib/tmpfiles.d/uuidd.conf
 
 
 %files -n libfdisk
@@ -926,6 +930,9 @@ fi
 %{_libdir}/python*/site-packages/libmount/
 
 %changelog
+* Wed Feb  2 2022 Karel Zak <kzak@redhat.com> - 2.38-0.3
+- add /usr/lib/tmpfiles.d/uuidd.conf (based on #2047952)
+
 * Wed Feb  2 2022 Karel Zak <kzak@redhat.com> - 2.38-0.2
 - release ownership of /var/log/lastlog
 
