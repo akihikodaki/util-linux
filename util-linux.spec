@@ -2,7 +2,7 @@
 Summary: Collection of basic system utilities
 Name: util-linux
 Version: 2.38
-Release: 0.4%{?dist}
+Release: 0.5%{?dist}
 License: GPLv2 and GPLv2+ and LGPLv2+ and BSD with advertising and Public Domain
 URL: https://en.wikipedia.org/wiki/Util-linux
 
@@ -196,7 +196,6 @@ Summary: Block device ID library
 License: LGPLv2+
 Requires: libuuid%{?_isa} = %{version}-%{release}
 Conflicts: filesystem < 3
-Requires(post): coreutils
 
 %description -n libblkid
 This is block device identification library, part of util-linux.
@@ -438,17 +437,6 @@ find  $RPM_BUILD_ROOT%{_mandir}/man8 -regextype posix-egrep  \
 if [ ! -L /etc/mtab ]; then
 	ln -sf ../proc/self/mounts /etc/mtab || :
 fi
-
-%post -n libblkid
-### Move blkid cache to /run
-[ -d /run/blkid ] || mkdir -p /run/blkid
-for I in /etc/blkid.tab /etc/blkid.tab.old \
-         /etc/blkid/blkid.tab /etc/blkid/blkid.tab.old; do
-
-	if [ -f "$I" ]; then
-		mv "$I" /run/blkid/ || :
-	fi
-done
 
 %pre -n uuidd
 getent group uuidd >/dev/null || groupadd -r uuidd
@@ -930,6 +918,9 @@ fi
 %{_libdir}/python*/site-packages/libmount/
 
 %changelog
+* Thu Feb 17 2022 Zbigniew Jędrzejewski-Szmek <zbyszek@in.waw.pl> - 2.38-0.5
+- Drop very old upgrade scriptlet for libblkid
+
 * Wed Mar 16 2022 Karel Zak <kzak@redhat.com> - 2.38-0.4
 - upgrade to v2.38-rc3
   https://mirrors.edge.kernel.org/pub/linux/utils/util-linux/v2.38/v2.38-ReleaseNotes
