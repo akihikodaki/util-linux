@@ -2,7 +2,7 @@
 Summary: Collection of basic system utilities
 Name: util-linux
 Version: 2.38
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: GPLv2 and GPLv2+ and LGPLv2+ and BSD with advertising and Public Domain
 URL: https://en.wikipedia.org/wiki/Util-linux
 
@@ -429,11 +429,6 @@ find  $RPM_BUILD_ROOT%{_mandir}/man8 -regextype posix-egrep  \
 	-printf "%{_mandir}/man8/%f*\n" >> %{name}.files
 
 
-%post -n util-linux-core
-if [ ! -L /etc/mtab ]; then
-	ln -sf ../proc/self/mounts /etc/mtab || :
-fi
-
 %pre -n uuidd
 getent group uuidd >/dev/null || groupadd -r uuidd
 getent passwd uuidd >/dev/null || \
@@ -736,7 +731,6 @@ fi
 
 
 %files -n util-linux-core
-%ghost %verify(not md5 size mtime) %config(noreplace,missingok) /etc/mtab
 %attr(4755,root,root)	%{_bindir}/mount
 %attr(4755,root,root)	%{_bindir}/umount
 %{_bindir}/chrt
@@ -822,6 +816,7 @@ fi
 %{_sbindir}/swapoff
 %{_sbindir}/swapon
 %{_sbindir}/switch_root
+/etc/mtab
 
 
 %files -n util-linux-user
@@ -914,6 +909,9 @@ fi
 %{_libdir}/python*/site-packages/libmount/
 
 %changelog
+* Wed Mar 30 2022 Zbigniew Jędrzejewski-Szmek <zbyszek@in.waw.pl> - 2.38-2
+- simplify creation of /etc/mtab symlink
+
 * Wed Mar 30 2022 Karel Zak <kzak@redhat.com> - 2.38-1
 - upgrade to v2.38
 - don't (re)generate build-system
