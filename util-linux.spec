@@ -7,13 +7,13 @@ License: GPLv2 and GPLv2+ and LGPLv2+ and BSD with advertising and Public Domain
 URL: https://en.wikipedia.org/wiki/Util-linux
 
 ### Macros
-%define upstream_version %{version}-rc3
-%define upstream_major %(eval echo %{version} | %{__sed} -e 's/\([[:digit:]]*\)\.\([[:digit:]]*\)\.[[:digit:]]*$/\1.\2/')
+%global upstream_version %{version}-rc3
+%global upstream_major %(eval echo %{version} | sed -e 's/\([[:digit:]]*\)\.\([[:digit:]]*\)\.[[:digit:]]*$/\1.\2/')
 
-%define compldir %{_datadir}/bash-completion/completions/
+%global compldir %{_datadir}/bash-completion/completions/
 
-%define pypkg python3
-%define pyver 3
+%global pypkg python3
+%global pyver 3
 
 ### Dependencies
 BuildRequires: make
@@ -26,9 +26,9 @@ BuildRequires: pam-devel
 BuildRequires: zlib-devel
 BuildRequires: popt-devel
 BuildRequires: libutempter-devel
-Buildrequires: systemd-devel
+BuildRequires: systemd-devel
 BuildRequires: systemd
-Buildrequires: libuser-devel
+BuildRequires: libuser-devel
 BuildRequires: libcap-ng-devel
 BuildRequires: %{pypkg}-devel
 BuildRequires: gcc
@@ -101,12 +101,12 @@ Patch1: login-default-motd-file.patch
 %description
 The util-linux package contains a large variety of low-level system
 utilities that are necessary for a Linux system to function. Among
-others, Util-linux contains the fdisk configuration tool and the login
+others, util-linux contains the fdisk configuration tool and the login
 program.
 
 
 %package -n util-linux-core
-Summary: The most essential utilities from the util-linux suite.
+Summary: The most essential utilities from the util-linux suite
 License: GPLv2 and GPLv2+ and LGPLv2+ and BSD with advertising and Public Domain
 Provides: /bin/dmesg
 Provides: /bin/kill
@@ -132,7 +132,7 @@ minimal installations.
 
 
 %package -n libfdisk
-Summary: Partitioning library for fdisk-like programs.
+Summary: Partitioning library for fdisk-like programs
 License: LGPLv2+
 
 %description -n libfdisk
@@ -140,7 +140,7 @@ This is library for fdisk-like programs, part of util-linux.
 
 
 %package -n libfdisk-devel
-Summary:  Partitioning library for fdisk-like programs.
+Summary:  Partitioning library for fdisk-like programs
 License: LGPLv2+
 Requires: libfdisk%{?_isa} = %{version}-%{release}
 Requires: pkgconfig
@@ -151,7 +151,7 @@ part of util-linux.
 
 
 %package -n libsmartcols
-Summary: Formatting library for ls-like programs.
+Summary: Formatting library for ls-like programs
 License: LGPLv2+
 
 %description -n libsmartcols
@@ -159,7 +159,7 @@ This is library for ls-like terminal programs, part of util-linux.
 
 
 %package -n libsmartcols-devel
-Summary: Formatting library for ls-like programs.
+Summary: Formatting library for ls-like programs
 License: LGPLv2+
 Requires: libsmartcols%{?_isa} = %{version}-%{release}
 Requires: pkgconfig
@@ -277,12 +277,12 @@ mountinfo, etc) and mount filesystems.
 
 
 %package -n util-linux-user
-Summary: libuser based util-linux utilities
+Summary: util-linux utilities based on libuser
 Requires: util-linux = %{version}-%{release}
 License: GPLv2
 
 %description -n util-linux-user
-chfn and chsh utilities with dependence on libuser
+chfn and chsh utilities with dependence on libuser.
 
 
 %prep
