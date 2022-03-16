@@ -2,12 +2,12 @@
 Summary: Collection of basic system utilities
 Name: util-linux
 Version: 2.38
-Release: 0.3%{?dist}
+Release: 0.4%{?dist}
 License: GPLv2 and GPLv2+ and LGPLv2+ and BSD with advertising and Public Domain
 URL: https://en.wikipedia.org/wiki/Util-linux
 
 ### Macros
-%define upstream_version %{version}-rc1
+%define upstream_version %{version}-rc3
 %define upstream_major %(eval echo %{version} | %{__sed} -e 's/\([[:digit:]]*\)\.\([[:digit:]]*\)\.[[:digit:]]*$/\1.\2/')
 
 %define compldir %{_datadir}/bash-completion/completions/
@@ -930,6 +930,10 @@ fi
 %{_libdir}/python*/site-packages/libmount/
 
 %changelog
+* Wed Mar 16 2022 Karel Zak <kzak@redhat.com> - 2.38-0.4
+- upgrade to v2.38-rc3
+  https://mirrors.edge.kernel.org/pub/linux/utils/util-linux/v2.38/v2.38-ReleaseNotes
+
 * Wed Feb  2 2022 Karel Zak <kzak@redhat.com> - 2.38-0.3
 - add /usr/lib/tmpfiles.d/uuidd.conf (based on #2047952)
 
