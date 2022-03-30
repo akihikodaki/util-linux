@@ -2,12 +2,12 @@
 Summary: Collection of basic system utilities
 Name: util-linux
 Version: 2.38
-Release: 0.5%{?dist}
+Release: 1%{?dist}
 License: GPLv2 and GPLv2+ and LGPLv2+ and BSD with advertising and Public Domain
 URL: https://en.wikipedia.org/wiki/Util-linux
 
 ### Macros
-%global upstream_version %{version}-rc3
+%global upstream_version %{version}
 %global upstream_major %(eval echo %{version} | sed -e 's/\([[:digit:]]*\)\.\([[:digit:]]*\)\.[[:digit:]]*$/\1.\2/')
 
 %global compldir %{_datadir}/bash-completion/completions/
@@ -32,10 +32,6 @@ BuildRequires: libuser-devel
 BuildRequires: libcap-ng-devel
 BuildRequires: %{pypkg}-devel
 BuildRequires: gcc
-BuildRequires: autoconf
-BuildRequires: automake
-BuildRequires: libtool
-BuildRequires: bison
 BuildRequires: rubygem-asciidoctor
 %ifarch ppc64le
 BuildRequires: librtas-devel
@@ -291,8 +287,8 @@ chfn and chsh utilities with dependence on libuser.
 %build
 unset LINGUAS || :
 
-# unfortunately, we did changes to build-system
-./autogen.sh
+# enable only when make a change to the build-system
+#./autogen.sh
 
 
 export CFLAGS="-D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64 $RPM_OPT_FLAGS"
@@ -918,6 +914,11 @@ fi
 %{_libdir}/python*/site-packages/libmount/
 
 %changelog
+* Wed Mar 30 2022 Karel Zak <kzak@redhat.com> - 2.38-1
+- upgrade to v2.38
+- don't (re)generate build-system
+- modernize spec file style (thanks to Zbigniew)
+
 * Thu Feb 17 2022 Zbigniew Jędrzejewski-Szmek <zbyszek@in.waw.pl> - 2.38-0.5
 - Drop very old upgrade scriptlet for libblkid
 
