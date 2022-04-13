@@ -2,7 +2,7 @@
 Summary: Collection of basic system utilities
 Name: util-linux
 Version: 2.38
-Release: 2%{?dist}
+Release: 3%{?dist}
 License: GPLv2 and GPLv2+ and LGPLv2+ and BSD with advertising and Public Domain
 URL: https://en.wikipedia.org/wiki/Util-linux
 
@@ -909,6 +909,9 @@ fi
 %{_libdir}/python*/site-packages/libmount/
 
 %changelog
+* Wed Apr 13 2022 Karel Zak <kzak@redhat.com> - 2.38-3
+- fix spec file changelog order
+
 * Wed Mar 30 2022 Zbigniew Jędrzejewski-Szmek <zbyszek@in.waw.pl> - 2.38-2
 - simplify creation of /etc/mtab symlink
 
@@ -917,7 +920,7 @@ fi
 - don't (re)generate build-system
 - modernize spec file style (thanks to Zbigniew)
 
-* Thu Feb 17 2022 Zbigniew Jędrzejewski-Szmek <zbyszek@in.waw.pl> - 2.38-0.5
+* Thu Mar 17 2022 Zbigniew Jędrzejewski-Szmek <zbyszek@in.waw.pl> - 2.38-0.5
 - Drop very old upgrade scriptlet for libblkid
 
 * Wed Mar 16 2022 Karel Zak <kzak@redhat.com> - 2.38-0.4
