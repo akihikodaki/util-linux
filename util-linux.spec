@@ -2,7 +2,7 @@
 Summary: Collection of basic system utilities
 Name: util-linux
 Version: 2.38
-Release: 3%{?dist}
+Release: 4%{?dist}
 License: GPLv2 and GPLv2+ and LGPLv2+ and BSD with advertising and Public Domain
 URL: https://en.wikipedia.org/wiki/Util-linux
 
@@ -909,6 +909,9 @@ fi
 %{_libdir}/python*/site-packages/libmount/
 
 %changelog
+* Mon Jun 13 2022 Python Maint <python-maint@redhat.com> - 2.38-4
+- Rebuilt for Python 3.11
+
 * Wed Apr 13 2022 Karel Zak <kzak@redhat.com> - 2.38-3
 - fix spec file changelog order
 
