@@ -1,8 +1,8 @@
 ### Header
 Summary: Collection of basic system utilities
 Name: util-linux
-Version: 2.38
-Release: 5%{?dist}
+Version: 2.38.1
+Release: 1%{?dist}
 License: GPLv2 and GPLv2+ and LGPLv2+ and BSD with advertising and Public Domain
 URL: https://en.wikipedia.org/wiki/Util-linux
 
@@ -909,6 +909,10 @@ fi
 %{_libdir}/python*/site-packages/libmount/
 
 %changelog
+* Thu Aug 4 2022 Karel Zak <kzak@redhat.com> - 2.38.1-1
+- upgrade to v2.38.1
+  https://kernel.org/pub/linux/utils/util-linux/v2.38/v2.38.1-ReleaseNotes
+
 * Sat Jul 23 2022 Fedora Release Engineering <releng@fedoraproject.org> - 2.38-5
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
 
