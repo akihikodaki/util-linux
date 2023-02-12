@@ -93,6 +93,7 @@ Patch0: login-lastlog-create.patch
 # Add `/run/motd.d` to the hardcoded MOTD_FILE
 # https://github.com/coreos/console-login-helper-messages/issues/60
 Patch1: login-default-motd-file.patch
+Patch2: 0001-lscpu-Decouple-cputype-and-topology.patch
 
 %description
 The util-linux package contains a large variety of low-level system
